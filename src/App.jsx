@@ -2,6 +2,9 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import Login from "./pages/Login";
+import Auth from "./features/Auth/components/Auth";
+import Signup from "./pages/Signup";
 
 
 import HomePage from "./pages/HomePage";
@@ -79,9 +82,21 @@ const router = createBrowserRouter([
 				element: <div>About us</div>
 			},
 		]
-
-
-	}
+	},
+	{
+		path: '/auth',
+		element: <Auth />,
+		children: [
+			{
+				path: "/login",
+				element: <Login />,
+			},
+			{
+				path: "/signup",
+				element: <Signup />,
+			},
+		],
+	},
  
 ]);
 

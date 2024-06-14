@@ -75,3 +75,28 @@
 .active span {
 	background-color: white;
 }
+.PhoneInputInput {
+  border: none;
+  padding: 4px;
+}
+.PhoneInputInput:focus {
+  outline: none;
+  box-shadow: none;
+}
+.PhoneInputCountryIcon--border {
+  outline: none;
+  box-shadow: none;
+}
+.PhoneInputCountrySelect {
+  outline: none;
+  box-shadow: none;
+}
+.PhoneInputCountry {
+  align-items: center;
+  gap: 8px;
+}
+.PhoneInputCountrySelectArrow {
+  height: 8px;
+  width: 8px;
+  margin-top: -8px;
+}
