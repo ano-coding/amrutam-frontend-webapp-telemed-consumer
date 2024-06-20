@@ -19,6 +19,7 @@ import ReminderChannel from "./features/Routine/components/ReminderChannel";
 import AssignCaregiver from "./features/Routine/components/AssignCaregiver";
 import RoutineDashboard from "./features/Routine/components/RoutineDashboard";
 import CreateRoutine from "./features/Routine/components/CreateRoutine";
+import ConsumerDashboard from "./pages/ConsumerDashboard";
 
 const router = createBrowserRouter([
   {
@@ -33,7 +34,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: "/dashboard",
-            element: <div className="">Home</div>,
+            element: <ConsumerDashboard />,
           },
           {
             path: "/appointments",

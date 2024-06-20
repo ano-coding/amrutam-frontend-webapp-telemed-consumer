@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { SideBarToggleContext } from "../context/SidebarToggleContext";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { NavLink } from "react-router-dom";
@@ -10,8 +10,6 @@ import PrescriptionSvg from "../assets/prescription.svg?react";
 import ArrowLeftSvg from "../assets/arrow-left.svg?react";
 import DashboardSvg from "../assets/dashboard.svg?react";
 import CallRecordingsSvg from "../assets/call-recordings.svg?react";
-import ChevronLeftSvg from "../assets/chevron-left.svg?react";
-import ChevronRightSvg from "../assets/chevron-right.svg?react";
 
 const sidebarItems = [
   {
@@ -59,13 +57,11 @@ const sidebarItems = [
 
 const DashboardSidebar = () => {
   const { toggled, setToggled } = useContext(SideBarToggleContext);
-  const [collapsed, setCollapsed] = useState(false);
   return (
-    <div className="relative bg-white">
+    <div className="relative ml-0 bg-white lg:ml-10">
       <Sidebar
         customBreakPoint="1024px"
         onBackdropClick={() => setToggled(false)}
-        collapsed={collapsed}
         toggled={toggled}
         width="300px"
         backgroundColor="#fff"
@@ -78,59 +74,35 @@ const DashboardSidebar = () => {
           <img
             src="/avatar-person.svg"
             alt="Profile Picture"
-            className={`${
-              collapsed ? "h-auto w-14" : "h-24 w-24"
-            } rounded-full`}
+            className={`h-24 w-24 rounded-full`}
           />
-          {!collapsed && (
-            <div className="flex flex-col items-center gap-[9px]">
-              <h2 className="text-[18px] font-semibold text-[#3a643b]">
-                Priya Singhal
-              </h2>
-              <p className="text-[15px] text-[#666]">
-                24th July, 1999, 25 years
-              </p>
-              <p className="text-[15px] text-[#666]">New Delhi, India</p>
-            </div>
-          )}
+
+          <div className="flex flex-col items-center gap-[9px]">
+            <h2 className="text-[18px] font-semibold text-[#3a643b]">
+              Priya Singhal
+            </h2>
+            <p className="text-[15px] text-[#666]">24th July, 1999, 25 years</p>
+            <p className="text-[15px] text-[#666]">New Delhi, India</p>
+          </div>
         </div>
 
-        <Menu
-          closeOnClick={true}
-          className={`${collapsed ? "" : "px-6"} w-full bg-white py-8`}
-        >
+        <Menu closeOnClick={true} className={`w-full bg-white px-6 py-8`}>
           {sidebarItems.map((item) => (
             <MenuItem
               key={item.text}
-              component={
-                <MenuComponent
-                  collapsed={collapsed}
-                  setToggled={setToggled}
-                  item={item}
-                />
-              }
+              component={<MenuComponent setToggled={setToggled} item={item} />}
               icon={
-                <div
-                  className={`${collapsed ? `-mr-2 group-hover:bg-neutral-200` : ""} rounded-lg bg-[#f4f5fa] px-2 py-2`}
-                >
+                <div className={`rounded-lg bg-[#f4f5fa] px-2 py-2`}>
                   <item.icon className="size-6" />
                 </div>
               }
-              className={`${collapsed ? `flex` : ""} w-full items-center justify-center border-b border-gray-200 py-2`}
+              className={`w-full items-center justify-center border-b border-gray-200 py-2`}
             >
-              {!collapsed && (
-                <span className="ml-3 text-[18px]">{item.text}</span>
-              )}
+              <span className="ml-3 text-[18px]">{item.text}</span>
             </MenuItem>
           ))}
         </Menu>
       </Sidebar>
-      <button
-        onClick={() => setCollapsed((p) => !p)}
-        className="absolute right-1 top-0 hidden translate-x-full border-2 border-solid border-[#ECECEC] py-2 lg:block"
-      >
-        {collapsed ? <ChevronRightSvg /> : <ChevronLeftSvg />}
-      </button>
     </div>
   );
 };
