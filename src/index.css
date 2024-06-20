@@ -1,3 +1,4 @@
+@import "@fontsource-variable/nunito";
 @import "@fontsource/poppins/300.css";
 @import "@fontsource/poppins/400.css";
 @import "@fontsource/poppins/500.css";
@@ -37,4 +38,9 @@
   height: 8px;
   width: 8px;
   margin-top: -8px;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #cccccc #ffffff;
 }
