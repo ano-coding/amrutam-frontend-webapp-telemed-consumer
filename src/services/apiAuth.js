@@ -48,7 +48,6 @@ export const verifyOTP = async (countryCallingCode, nationalNumber, otp) => {
 
   try {
     const response = await axios.request(config);
-    console.log(response);
 
     return response.data;
   } catch (error) {

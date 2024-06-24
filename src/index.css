@@ -9,6 +9,7 @@
 @import "@fontsource/poppins/400-italic.css";
 @import "@fontsource/poppins/500-italic.css";
 @import "@fontsource/poppins/600-italic.css";
+@import "@fontsource-variable/mulish";
 
 @tailwind base;
 @tailwind components;

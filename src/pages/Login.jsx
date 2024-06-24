@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import { PhoneNumberInput } from "../features/Auth/components/PhoneNumberInput";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   isPossiblePhoneNumber,
   parsePhoneNumber,
 } from "react-phone-number-input";
 import useSendOTP from "../hooks/useSendOTP";
 import useVerifyOTP from "../hooks/useVerifyOTP";
+import { UserContext } from "../context/UserContext";
 
 const Login = () => {
   const [value, setValue] = useState();
@@ -15,6 +16,8 @@ const Login = () => {
   const [otp, setOtp] = useState("");
   const [showOTPBox, setShowOTPBox] = useState(false);
   console.log(showOTPBox);
+
+  const { setToken } = useContext(UserContext);
 
   const isProcessing = sendOTPStatus === "pending";
   const isVerifying = verifyOTPStatus === "pending";
@@ -98,13 +101,18 @@ const Login = () => {
                     if (!isPossiblePhoneNumber(value)) return;
                     const { countryCallingCode, nationalNumber } =
                       parsePhoneNumber(value);
-                    verifyOTPMutate([countryCallingCode, nationalNumber, otp]);
+                    verifyOTPMutate([countryCallingCode, nationalNumber, otp], {
+                      onSuccess: (res) => {
+                        setToken(res.data.token);
+                        localStorage.setItem("token", res.data.token);
+                      },
+                    });
                   }}
                   type="submit"
                   disabled={isProcessing}
                   className={`text-md w-full rounded-lg bg-[#3a643b] ${isProcessing ? "bg-opacity-55" : ``} py-3 leading-[24px] text-white sm:text-[20px]`}
                 >
-                  {isProcessing ? "Processing..." : "Send OTP"}
+                  {isProcessing ? "Processing..." : "Verify OTP"}
                 </button>
               </>
             )}

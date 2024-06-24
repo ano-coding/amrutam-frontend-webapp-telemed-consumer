@@ -224,16 +224,21 @@ const RoutineDashboard = () => {
             </button>
           </div>
 
-          <div className="mb-6 flex flex-wrap gap-2 md:gap-4">
-            {filters.map((filter) => (
-              <button
-                onClick={() => setSelectedFilter(filter.name)}
-                key={filter.name}
-                className={`rounded-xl border-[1.5px] border-solid px-4 py-2 text-[14px] font-medium ${selectedFilter === filter.name ? `border-[#3a643b] bg-[#E7F5E7] text-[#3a643b]` : `border-[#D1D1D1] text-[#8e8e8e]`}`}
-              >
-                {filter.name}
-              </button>
-            ))}
+          <div className="overflow-hidden">
+            <div
+              className="mb-4 flex gap-2 overflow-x-auto pb-2 md:gap-4"
+              style={{ scrollbarWidth: "none" }}
+            >
+              {filters.map((filter) => (
+                <button
+                  onClick={() => setSelectedFilter(filter.name)}
+                  key={filter.name}
+                  className={`whitespace-nowrap rounded-xl border-[1.5px] border-solid px-4 py-2 text-[14px] font-medium ${selectedFilter === filter.name ? `border-[#3a643b] bg-[#E7F5E7] text-[#3a643b]` : `border-[#D1D1D1] text-[#8e8e8e]`}`}
+                >
+                  {filter.name}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">

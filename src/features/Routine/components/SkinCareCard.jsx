@@ -3,7 +3,7 @@ import WorkItemAlertSvg from "../../../assets/work-item-alert.svg?react";
 import HeartSvg from "../../../assets/heart.svg?react";
 const SkinCareCard = ({ title, image, duration, whatdo, reminders }) => {
   return (
-    <div className="mt-4 rounded-xl border p-3 shadow-sm sm:p-4">
+    <div className="mt-4 overflow-x-hidden rounded-xl border p-3 shadow-sm sm:p-4">
       <div className="relative w-full">
         <img
           src={image}
@@ -26,10 +26,12 @@ const SkinCareCard = ({ title, image, duration, whatdo, reminders }) => {
       </p>
       <div className="my-2 flex justify-start text-sm text-gray-500">
         <span className="mr-3">
-          <WorkItemAlertSvg />
+          <WorkItemAlertSvg className="mt-1" />
         </span>
-        <div className="line-clamp-1 overflow-ellipsis whitespace-nowrap">
-          {reminders} reminder itemsfgdfgdg
+        <div className="max-w-full overflow-hidden whitespace-nowrap">
+          <h1 className="line-clamp-1 block overflow-ellipsis">
+            {reminders} reminder items
+          </h1>
         </div>
       </div>
     </div>

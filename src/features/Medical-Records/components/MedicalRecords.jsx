@@ -4,7 +4,7 @@ import SearchBar from "../../../components/SearchBar";
 
 const data = [
   {
-    ID: "#MR-0010",
+    ID: "# MR- 0010",
     Doctor: {
       Name: "Dr. Darren Elder",
       Specialty: "Dental",
@@ -18,7 +18,7 @@ const data = [
     },
   },
   {
-    ID: "#MR-0010",
+    ID: "# MR- 0010",
     Doctor: {
       Name: "Dr. Darren Elder",
       Specialty: "Dental",
@@ -32,7 +32,7 @@ const data = [
     },
   },
   {
-    ID: "#MR-0010",
+    ID: "# MR- 0010",
     Doctor: {
       Name: "Dr. Darren Elder",
       Specialty: "Dental",
@@ -46,7 +46,7 @@ const data = [
     },
   },
   {
-    ID: "#MR-0010",
+    ID: "# MR- 0010",
     Doctor: {
       Name: "Dr. Darren Elder",
       Specialty: "Dental",
@@ -63,7 +63,7 @@ const data = [
 
 const MedicalRecords = () => {
   return (
-    <div className="flex flex-col gap-[37px] pt-4">
+    <div className="flex max-w-full flex-col gap-[37px] overflow-hidden pt-4">
       <SearchBar />
       <ContentBoxLayout title="Medical Records">
         <TabularData data={data} />

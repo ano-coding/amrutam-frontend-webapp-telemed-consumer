@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { SideBarToggleContext } from "../context/SidebarToggleContext";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import AppointmentSvg from "../assets/appointment.svg?react";
 import ChatSvg from "../assets/chat.svg?react";
 import MedicalRecordSvg from "../assets/medical-record.svg?react";
@@ -71,16 +71,20 @@ const DashboardSidebar = () => {
         }}
       >
         <div className="flex flex-col items-center justify-center gap-[12px] border-b-[3px] border-[#ECECEC] bg-white py-11">
-          <img
-            src="/avatar-person.svg"
-            alt="Profile Picture"
-            className={`h-24 w-24 rounded-full`}
-          />
+          <Link to="profile">
+            <img
+              src="/avatar-person.svg"
+              alt="Profile Picture"
+              className={`h-24 w-24 cursor-pointer rounded-full`}
+            />
+          </Link>
 
           <div className="flex flex-col items-center gap-[9px]">
-            <h2 className="text-[18px] font-semibold text-[#3a643b]">
-              Priya Singhal
-            </h2>
+            <Link to="profile">
+              <h2 className="cursor-pointer text-[18px] font-semibold text-[#3a643b]">
+                Priya Singhal
+              </h2>
+            </Link>
             <p className="text-[15px] text-[#666]">24th July, 1999, 25 years</p>
             <p className="text-[15px] text-[#666]">New Delhi, India</p>
           </div>

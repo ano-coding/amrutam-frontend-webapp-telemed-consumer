@@ -7,6 +7,7 @@ export default {
       fontFamily: {
         sans: ["Poppins", "ui-sans-serif", "system-ui", "sans-serif"],
         nunito: ["Nunito Variable", "ui-sans-serif", "system-ui", "sans-serif"],
+        mulish: ["Mulish Variable", "ui-sans-serif", "system-ui", "sans-serif"],
       },
     },
     screens: {

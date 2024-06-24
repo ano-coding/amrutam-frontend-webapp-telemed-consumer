@@ -6,11 +6,24 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import CloseCircleSvg from "../../../assets/close-circle.svg?react";
+import CopySvg from "../../../assets/copy.svg?react";
 import PhoneInput from "react-phone-number-input";
 import { useState } from "react";
 import SingleLineInput from "./SingleLineInput";
 
 const CareGiverInvitationModal = ({ open, setOpen }) => {
+  const invitationLink = "https://www.xyz.com/abc";
+
+  const copyText = (text) => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        alert("Copied the Link: " + text);
+      })
+      .catch((err) => {
+        console.error("Could not copy Link: ", err);
+      });
+  };
   return (
     <Transition show={open}>
       <Dialog className="relative z-10" onClose={setOpen}>
@@ -44,13 +57,18 @@ const CareGiverInvitationModal = ({ open, setOpen }) => {
                     Copy Invitation Link
                   </div>
                   <div
-                    className={`relative rounded-[16px] border-[1.5px] border-[#ced8e0] px-3 py-2 shadow-sm`}
+                    className={`relative flex items-center gap-2 rounded-[16px] border-[1.5px] border-[#ced8e0] px-3 py-2 shadow-sm`}
                   >
                     <input
                       type="text"
                       name="name"
                       id="name"
+                      value={invitationLink}
                       className="block w-full border-0 p-0 py-1.5 text-[16px] leading-[24px] text-black placeholder-neutral-400 placeholder:text-sm focus:ring-0"
+                    />
+                    <CopySvg
+                      onClick={() => copyText(invitationLink)}
+                      className="right-2 top-2"
                     />
                   </div>
 

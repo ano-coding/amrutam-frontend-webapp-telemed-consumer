@@ -20,6 +20,8 @@ import AssignCaregiver from "./features/Routine/components/AssignCaregiver";
 import RoutineDashboard from "./features/Routine/components/RoutineDashboard";
 import CreateRoutine from "./features/Routine/components/CreateRoutine";
 import ConsumerDashboard from "./pages/ConsumerDashboard";
+import PatientProfile from "./pages/PatientProfile";
+import { UserProvider } from "./context/UserContext";
 
 const router = createBrowserRouter([
   {
@@ -88,6 +90,10 @@ const router = createBrowserRouter([
             path: "/routines/create/assign-caregiver",
             element: <AssignCaregiver />,
           },
+          {
+            path: "/profile",
+            element: <PatientProfile />,
+          },
         ],
       },
     ],
@@ -112,10 +118,12 @@ const queryClient = new QueryClient();
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <UserProvider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </UserProvider>
   );
 }
 
