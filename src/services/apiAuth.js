@@ -55,3 +55,42 @@ export const verifyOTP = async (countryCallingCode, nationalNumber, otp) => {
     throw new Error(error.message);
   }
 };
+
+export const registerCustomer = async (
+  firstName,
+  lastName,
+  email,
+  countryCode,
+  phoneNumber,
+) => {
+  const data = JSON.stringify({
+    countryCode: `+${countryCode}`,
+    phoneNumber: phoneNumber,
+    email: email,
+    firstName: firstName,
+    lastName: lastName,
+  });
+
+  console.log(data);
+
+  const config = {
+    method: "post",
+    maxBodyLength: Infinity,
+    url: "https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/register-customer",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "",
+    },
+    data: data,
+  };
+
+  try {
+    const response = await axios.request(config);
+    console.log(response);
+
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};

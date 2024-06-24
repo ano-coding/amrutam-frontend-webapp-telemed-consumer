@@ -1,16 +1,47 @@
 import { Link } from "react-router-dom";
 import { PhoneNumberInput } from "../features/Auth/components/PhoneNumberInput";
 import { useForm } from "react-hook-form";
+import useRegisterCustomer from "../hooks/useRegisterCustomer";
+import { parsePhoneNumber } from "react-phone-number-input";
 
 const Signup = () => {
   const {
     register,
     handleSubmit,
-    watch,
     control,
     formState: { errors },
+    reset,
   } = useForm();
-  const onSubmit = (data) => console.log(data);
+
+  const { registerCustomerMutate, registerCustomerStatus } =
+    useRegisterCustomer();
+
+  const onSubmit = (data) => {
+    const { countryCallingCode, nationalNumber } = parsePhoneNumber(
+      data.phoneNumber,
+    );
+
+    registerCustomerMutate(
+      [
+        data.firstName,
+        data.lastName,
+        data.email,
+        countryCallingCode,
+        nationalNumber,
+      ],
+      {
+        onSuccess: (res) => {
+          console.log(res);
+        },
+        onError: (error) => {
+          console.log(error);
+        },
+        onSettled: () => {
+          reset();
+        },
+      },
+    );
+  };
 
   return (
     <div className="grid h-svh grid-cols-1 lg:grid-cols-2">
@@ -82,9 +113,17 @@ const Signup = () => {
                 <input
                   id="email"
                   className={`w-full rounded-lg border-[2px] border-solid px-4 py-2.5 focus:outline-none focus:ring-0 ${errors.email ? "border-red-500 focus:border-red-500" : `border-[#e5e7eb] focus:border-[#e5e7eb]`}`}
-                  {...register("email", { required: true })}
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                      message: "Invalid email address",
+                    },
+                  })}
                 />
-                {errors.email && <ErrorElement message="*Email is required" />}
+                {errors.email && (
+                  <ErrorElement message={errors.email.message} />
+                )}
               </div>
             </div>
             <PhoneNumberInput control={control} error={errors.phoneNumber} />

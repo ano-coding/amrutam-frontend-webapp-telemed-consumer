@@ -14,6 +14,7 @@ export const PhoneNumberInput = ({ control, isProcessing = false, error }) => {
           className={`relative w-full rounded-[8px] border-[2px] px-3 py-2 shadow-sm ${isProcessing ? "opacity-70" : ""} ${error ? "border-red-500" : "border-[#e5e7eb]"}`}
         >
           <PhoneInput
+            smartCaret={false}
             name="phoneNumber"
             control={control}
             disabled={isProcessing}
