@@ -6,7 +6,6 @@ import { UserContext } from "../context/UserContext";
 
 const DashboardLayout = () => {
   const { token } = useContext(UserContext);
-  console.log(token);
 
   if (token === null) {
     return <Navigate to="/login" />;

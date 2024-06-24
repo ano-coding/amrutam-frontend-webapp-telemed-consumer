@@ -1,26 +1,53 @@
 import { Link } from "react-router-dom";
 import { PhoneNumberInput } from "../features/Auth/components/PhoneNumberInput";
 import { useContext, useState } from "react";
-import {
-  isPossiblePhoneNumber,
-  parsePhoneNumber,
-} from "react-phone-number-input";
+import { parsePhoneNumber } from "react-phone-number-input";
 import useSendOTP from "../hooks/useSendOTP";
 import useVerifyOTP from "../hooks/useVerifyOTP";
 import { UserContext } from "../context/UserContext";
+import { useForm } from "react-hook-form";
 
 const Login = () => {
-  const [value, setValue] = useState();
-  const { sendOTPMutate, sendOTPStatus } = useSendOTP();
-  const { verifyOTPMutate, verifyOTPStatus } = useVerifyOTP();
-  const [otp, setOtp] = useState("");
-  const [showOTPBox, setShowOTPBox] = useState(false);
-  console.log(showOTPBox);
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm();
 
   const { setToken } = useContext(UserContext);
+  const { sendOTPMutate, sendOTPStatus } = useSendOTP();
+  const { verifyOTPMutate, verifyOTPStatus } = useVerifyOTP();
+
+  const [showOTPBox, setShowOTPBox] = useState(false);
 
   const isProcessing = sendOTPStatus === "pending";
   const isVerifying = verifyOTPStatus === "pending";
+
+  const onSubmit = (data) => {
+    const { countryCallingCode, nationalNumber } = parsePhoneNumber(
+      data.phoneNumber,
+    );
+    if (!showOTPBox) {
+      // Send OTP
+      sendOTPMutate([countryCallingCode, nationalNumber], {
+        onSuccess: (res) => {
+          if (res?.data?.otp) setShowOTPBox(true);
+        },
+        onError: (error) => {
+          console.error(error);
+        },
+      });
+    } else {
+      // Verify OTP
+      verifyOTPMutate([countryCallingCode, nationalNumber, data.otp], {
+        onSuccess: (res) => {
+          setToken(res.data.token);
+          localStorage.setItem("token", res.data.token);
+        },
+      });
+    }
+  };
 
   return (
     <div className="grid h-svh grid-cols-1 lg:grid-cols-2">
@@ -46,34 +73,18 @@ const Login = () => {
               : "Please provide your registered phone number for SMS OTP."}
           </p>
 
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             {!showOTPBox && (
               <>
                 <div disabled={isProcessing} className={`my-4`}>
                   <PhoneNumberInput
-                    value={value}
+                    control={control}
                     isProcessing={isProcessing}
-                    setValue={setValue}
+                    error={errors.phoneNumber}
                   />
                 </div>
 
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (!value) return;
-                    if (!isPossiblePhoneNumber(value)) return;
-                    const { countryCallingCode, nationalNumber } =
-                      parsePhoneNumber(value);
-                    console.log(countryCallingCode, nationalNumber);
-                    sendOTPMutate([countryCallingCode, nationalNumber], {
-                      onSuccess: (res) => {
-                        if (res?.data?.otp) setShowOTPBox(true);
-                      },
-                      onError: (error) => {
-                        console.error(error);
-                      },
-                    });
-                  }}
                   type="submit"
                   disabled={isProcessing}
                   className={`text-md w-full rounded-lg bg-[#3a643b] ${isProcessing ? "bg-opacity-55" : ``} py-3 leading-[24px] text-white sm:text-[20px]`}
@@ -87,27 +98,12 @@ const Login = () => {
                 <div className="my-4">
                   <input
                     type="text"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
                     placeholder="Enter OTP"
                     className="w-full rounded-lg border-[1px] border-[#e5e7eb] px-3 py-3 shadow-sm focus:border-[#e5e7eb] focus:ring-0"
+                    {...register("otp", { required: true })}
                   />
                 </div>
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (!otp) return;
-                    if (!value) return;
-                    if (!isPossiblePhoneNumber(value)) return;
-                    const { countryCallingCode, nationalNumber } =
-                      parsePhoneNumber(value);
-                    verifyOTPMutate([countryCallingCode, nationalNumber, otp], {
-                      onSuccess: (res) => {
-                        setToken(res.data.token);
-                        localStorage.setItem("token", res.data.token);
-                      },
-                    });
-                  }}
                   type="submit"
                   disabled={isProcessing}
                   className={`text-md w-full rounded-lg bg-[#3a643b] ${isProcessing ? "bg-opacity-55" : ``} py-3 leading-[24px] text-white sm:text-[20px]`}

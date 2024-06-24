@@ -80,7 +80,7 @@ const ConsumerDashboard = () => {
 
                         <span>{doctor.date}</span>
                       </p>
-                      <p className="flex items-start gap-2">
+                      <div className="flex items-start gap-2">
                         {doctor.consultationType === "Video consultation" ? (
                           <VideoSvg className="size-4" />
                         ) : (
@@ -94,7 +94,7 @@ const ConsumerDashboard = () => {
                             {` ${doctor.fee === "Free" ? "Free" : `₹${doctor.fee}`}`}
                           </span>
                         </div>
-                      </p>
+                      </div>
                     </div>
                   </div>
                 </div>
