@@ -174,7 +174,7 @@ const ProductDetail = () => {
               649
             </span>
           </div>
-          <div className="last:[&_div]:text-offWhite-300 mb-[52px] flex items-center justify-start gap-2 max-md:ml-5 max-sm:mb-5 [&_div]:rounded-xl [&_div]:px-3 [&_div]:py-2 first:[&_div]:border first:[&_div]:border-customlightgreen-100 first:[&_div]:bg-customgreen-100 last:[&_div]:bg-offWhite-100 even:[&_div]:bg-gray-300 [&_span]:font-nunito [&_span]:text-[18px] [&_span]:font-medium [&_span]:leading-5 [&_span]:tracking-tight">
+          <div className="mb-[52px] flex items-center justify-start gap-2 max-md:ml-5 max-sm:mb-5 [&_div]:rounded-xl [&_div]:px-3 [&_div]:py-2 first:[&_div]:border first:[&_div]:border-customlightgreen-100 first:[&_div]:bg-customgreen-100 last:[&_div]:bg-offWhite-100 last:[&_div]:text-offWhite-300 even:[&_div]:bg-gray-300 [&_span]:font-nunito [&_span]:text-[18px] [&_span]:font-medium [&_span]:leading-5 [&_span]:tracking-tight">
             <div>
               <span>200 ml</span>
             </div>
@@ -474,7 +474,7 @@ const ProductDetail = () => {
         <h4 className="m-0 mb-[114px] text-center text-2xl font-medium leading-6 tracking-tight max-md:mb-5 max-sm:ml-5 max-sm:text-left max-sm:text-base">
           Meet our Experts
         </h4>
-        <div className="noscroll mb-[31px] flex items-center justify-center gap-12 max-xl:mx-auto max-xl:my-0 max-xl:mb-[31px] max-xl:w-[90%] max-xl:justify-start max-xl:gap-4 max-xl:overflow-scroll">
+        <div className="no-scrollbar mb-[31px] flex items-center justify-center gap-12 max-xl:mx-auto max-xl:my-0 max-xl:mb-[31px] max-xl:w-[90%] max-xl:justify-start max-xl:gap-4 max-xl:overflow-scroll">
           <div className="flex h-[70px] w-[70px] cursor-pointer items-center justify-center rounded-[50%] border border-customgray-800 max-lg:hidden [&_img]:w-[23px]">
             <img src="/leftarrow.png" alt="left-arrow" />
           </div>
@@ -514,7 +514,7 @@ const ProductDetail = () => {
             <circle cx="6" cy="6" r="6" fill="#C3C3C3" />
           </svg>
         </div>
-        <button className="bg-customlightgreen-300 mx-auto my-0 mb-14 flex w-[276px] items-center justify-center gap-[10px] rounded-[7px] border border-customgreen-800 px-[25px] py-0 max-sm:mb-[100px] max-sm:w-[200px] max-sm:p-0">
+        <button className="mx-auto my-0 mb-14 flex w-[276px] items-center justify-center gap-[10px] rounded-[7px] border border-customgreen-800 bg-customlightgreen-300 px-[25px] py-0 max-sm:mb-[100px] max-sm:w-[200px] max-sm:p-0">
           <span className="text-lg font-medium leading-[58px] tracking-tight text-customgreen-800 max-sm:text-[15px]">
             Find more experts
           </span>
@@ -555,7 +555,7 @@ const ProductDetail = () => {
         </button>
       </div>
       {showSuccess ? (
-        <div className="bg-dimgray-400 animate-Morph1 fixed bottom-20 left-0 mx-[30px] hidden h-[62px] w-[calc(100%_-_60px)] items-center justify-start gap-3 rounded-xl max-sm:flex">
+        <div className="fixed bottom-20 left-0 mx-[30px] hidden h-[62px] w-[calc(100%_-_60px)] animate-Morph1 items-center justify-start gap-3 rounded-xl bg-dimgray-400 max-sm:flex">
           <img
             src="/cartSuccess.png"
             alt="success"
@@ -569,7 +569,7 @@ const ProductDetail = () => {
         ""
       )}
       {showCart ? (
-        <div className="bg-customblue animate-Morph2 fixed bottom-[78px] left-0 hidden w-full items-center justify-between px-5 py-3 max-sm:flex">
+        <div className="fixed bottom-[78px] left-0 hidden w-full animate-Morph2 items-center justify-between bg-customblue px-5 py-3 max-sm:flex">
           <div className="flex items-center justify-start gap-3">
             <img src="/recipe.png" alt="recipe" className="h-8 w-8" />
             <div>

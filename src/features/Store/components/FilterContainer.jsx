@@ -38,7 +38,7 @@ const FilterContainer = () => {
   return (
     <>
       <div
-        className="noscroll relative mt-9 flex items-center justify-center gap-9 max-md:gap-4 max-sm:mx-auto max-sm:mb-0 max-sm:mt-6 max-sm:w-11/12 max-sm:justify-start max-sm:overflow-scroll max-sm:overflow-y-hidden"
+        className="no-scrollbar relative mt-9 flex items-center justify-center gap-9 max-md:gap-4 max-sm:mx-auto max-sm:mb-0 max-sm:mt-6 max-sm:w-11/12 max-sm:justify-start max-sm:overflow-scroll max-sm:overflow-y-hidden"
         style={{ display: size ? "none" : "flex" }}
       >
         <Filter src="/all.png" name={"All"} width={"33px"} height={"28px"} />
