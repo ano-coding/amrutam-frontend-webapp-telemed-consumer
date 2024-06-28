@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from 'react-router-dom';
 
 const experts = [
 	{
@@ -97,7 +98,7 @@ function Experts() {
 		setScrollCard(margin / -990);
 	}
 
-	console.log('margin left ', marginLeft);
+	// console.log('margin left ', marginLeft);
 
 
 	useEffect(() => {
@@ -114,10 +115,9 @@ function Experts() {
 
 	return (
 		<div className="py-12">
-			<div className="text-center mb-12">
-				<h3 className="text-[#3A643B] inline-block px-4 text-[32px] lg:text-[48px] font-bold font-robo">
+			<div className="flex justify-center mb-12">
+				<h3 className="text-[#3A643B] px-10 sm:border-b-4 border-[#abdcac] text-[32px] lg:text-[48px] leading-none font-bold font-robo">
 					Meet Our Ayurveda Experts
-					<hr className='hidden lg:block -mt-[18px] -z-10 bg-[#abdcac] h-1.5' />
 				</h3>
 			</div>
 
@@ -127,7 +127,7 @@ function Experts() {
 				className="lg:hidden flex overflow-scroll max-w-[1000px] mx-auto scrollbar-hide gap-8 px-8 snap-x snap-mandatory"
 			>
 				{
-					experts.slice(0, 3).map((expert, index) => {
+					experts.slice(0, 6).map((expert, index) => {
 						return <ExpertCard key={index} expert={expert} />
 					})
 				}
@@ -166,17 +166,17 @@ function Experts() {
 
 			<div className="mx-auto flex items-center justify-center mt-12 gap-4">
 				{
-					Array.from({ length: 3 }).map((_, index) => {
+					Array(3).fill(undefined).map((_, index) => {
 						return <div key={index} className={`w-[12px] h-[12px] rounded-[50%] ${index === scrollCard ? 'bg-[#3A643B]' : 'bg-[#C3C3C3]'} `}></div>
 					})
 				}
 			</div>
 
 
-			<button className="hidden lg:flex mx-auto items-center gap-4 px-[25px] py-[15px] my-12 bg-[#DBE3DC63] text-[#3A643B] rounded-[7px] border border-[#3A643B]">
-				<p className="text-[24px] font-medium">Find more experts</p>
+			<Link to='/find-doctors' className="hidden sm:flex w-[275px] mx-auto items-center gap-4 px-[25px] py-5 my-12 bg-[#DBE3DC] text-[#3A643B] rounded-[7px] border border-gray-300 hover:border-[#3A643B]">
+				<p className="text-[24px] font-medium leading-none">Find more experts</p>
 				<img src='/images/arrow-right.png' alt='right arrow' />
-			</button>
+			</Link>
 			
 		</div>
 
@@ -196,10 +196,10 @@ function ExpertCard({ expert }) {
 				<img className="scale-75" src='/images/star.png' alt='star' />
 			</div>
 			<p className="text-[20px] text-center font-semibold">{expert.name}</p>
-			<p className="text-[#838383] mt-2 text-center text-[15px] font-medium">{expert.study}</p>
+			<p className="text-[#838383] mt-2 text-center text-[15px] font-bold">{expert.study}</p>
 			<div className="flex items-center justify-center gap-1 mt-2 mx-auto">
 				<img src='/images/hat.png' alt='hat' />
-				<p className="text-[#0C0C0C]">{expert.experience} years of experience</p>
+				<p className="text-[#0C0C0C] font-medium">{expert.experience} years of experience</p>
 			</div>
 
 			<div className="flex items-center justify-center gap-1 mt-4 bg-[#3A643B1F] w-[160px] h-[30px] mx-auto rounded-[18px]">

@@ -49,12 +49,17 @@ const SelfAssessmentQuestions = () => {
 
 	const nextQuestion = () => {
 		if (currentQuestionIndex < questions.length) {
-			setCurrentQuestionIndex(currentQuestionIndex + 1);
+			setCurrentQuestionIndex(cQI => cQI + 1);
 			setProgress(((currentQuestionIndex + 1) / questions.length) * 100);
 			setSelectedOption(null); // Clear the selected option for the next question
 		} else {
 			setProgress(100); // Set progress to 100% on the last question
 		}
+	};
+
+	const handleOptionSelect = (option) => {
+		setSelectedOption(option);
+		setTimeout(nextQuestion, 500);
 	};
 
 	useEffect(() => {
@@ -72,20 +77,19 @@ const SelfAssessmentQuestions = () => {
 
 	return (
 		<div className="max-w-6xl mx-auto">
-			<div className="flex items-center justify-between py-10 lg:px-0 px-5">
-				<div>
-					<img src={amrutam} alt="Logo" />
+			<div className="flex items-center justify-between gap-4 sm:gap-8 flex-wrap py-10 lg:px-0 px-5">
+				<div className="flex-1 flex items-center justify-between sm:justify-end gap-4 sm:gap-8 ">
+					<div className="font-semibold text-gray-400">
+						<h1>{`Question ${currentQuestionIndex + 1}/${questions.length}`}</h1>
+					</div>
+					<div className="font-semibold text-gray-400">
+						<h1 className="flex items-center gap-1">
+							Finish Later
+							<img src='/cross.png' alt='Cross Icon' />
+						</h1>
+					</div>
 				</div>
-				<div className="font-semibold text-gray-400">
-					<h1>{`Question ${currentQuestionIndex + 1}/${questions.length}`}</h1>
-				</div>
-				<div className="font-semibold text-gray-400">
-					<h1 className="flex items-center gap-1">
-						Finish Later
-						{/* <RxCross2 className="text-xl" /> */}
-						<img src='/cross.png' alt='Cross Icon' />
-					</h1>
-				</div>
+				
 			</div>
 			<div>
 				<h1 className="font-semibold text-xl tracking-wider md:text-left text-center lg:px-0 px-5">
@@ -94,11 +98,9 @@ const SelfAssessmentQuestions = () => {
 			</div>
 			<div className="py-10 lg:px-0 px-5">
 				<ProgressBar progress={progress} />
-				<p className="text-center mt-4">{Math.round(progress)}%</p>
 			</div>
 
-			<p className="flex items-center gap-2 text-lg font-semibold lg:ml-0 ml-10">
-				{/* <IoArrowBackOutline /> */}
+			<p className="flex items-center gap-2 px-5 lg:px-0 text-lg font-semibold">
 				<img src='/arrow-left.png' alt='Arrow Left' />
 				Go Back
 			</p>
@@ -111,8 +113,8 @@ const SelfAssessmentQuestions = () => {
 				{questions[currentQuestionIndex]?.options?.map((option, index) => (
 					<button
 						key={index}
-						className={`w-full py-2 border md:mt-0 mt-4  rounded-lg text-center hover:bg-gray-100 transition ${selectedOption === option ? "text-[#3a643b] font-bold border-[1.5px] border-[#3a643b] " : "border-gray-300"}`}
-						onClick={() => setSelectedOption(option)}>
+						className={`w-full py-2 border md:mt-0 mt-4  rounded-lg text-center hover:border-gray-100 transition ${selectedOption === option ? "text-[#3a643b] font-bold border-[1.5px] border-[#3a643b] " : "border-gray-300"}`}
+						onClick={() => handleOptionSelect(option)}>
 						{option}
 					</button>
 				))}

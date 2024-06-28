@@ -46,7 +46,7 @@ function Comment({ comment, lastComment }) {
 	}
 
 	return (
-		<div className={`relative flex items-start flex-col sm:flex-row gap-4 py-10 ${!lastComment && 'border-b'}`}>
+		<div className={`relative flex items-start flex-col sm:flex-row gap-4 py-10 ${!lastComment && 'border-b border-[#EDEDED]'}`}>
 			<div
 				onClick={toggleFavour}
 				className="absolute flex items-center gap-1 right-8 top-[50px] sm:right-12 sm:top-10 cursor-pointer"

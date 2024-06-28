@@ -13,13 +13,17 @@
     "@fontsource/poppins": "^5.0.14",
     "@headlessui/react": "^2.0.4",
     "@heroicons/react": "^2.1.3",
+    "@tanstack/react-query": "^5.45.1",
+    "axios": "^1.7.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-phone-number-input": "^3.4.3",
     "react-player": "^2.16.0",
     "react-router-dom": "^6.23.1",
+    "react-slick": "^0.30.2",
+    "slick-carousel": "^1.8.1",
     "sweetalert2": "^11.11.1",
-    "vite-plugin-svgr": "^4.2.0",
-    "react-phone-number-input": "^3.4.3"
+    "vite-plugin-svgr": "^4.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

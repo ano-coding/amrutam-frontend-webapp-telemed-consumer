@@ -2,6 +2,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import Login from "./pages/Login";
 import Auth from "./features/Auth/components/Auth";
 import Signup from "./pages/Signup";
@@ -21,6 +22,11 @@ import AppointmentBookingPage from "./pages/AppointmentBookingPage";
 import ForumPage from "./pages/ForumPage";
 import SinglePost from "./features/Forum/components/SinglePost"
 
+import Store from "./pages/Store";
+import ProductDetail from "./pages/ProductDetail";
+import Cart from "./pages/Cart";
+import Success from "./pages/Success";
+
 const router = createBrowserRouter([
 	{
 		path: "/",
@@ -36,7 +42,7 @@ const router = createBrowserRouter([
 				element: <FindDoctorsPage></FindDoctorsPage>
 			},
 			{
-				path: "/profile",
+				path: "/profile/:id",
 				element: <DoctorProfilePage></DoctorProfilePage>
 			}, 
 			{
@@ -81,10 +87,13 @@ const router = createBrowserRouter([
 				path: "/about",
 				element: <div>About us</div>
 			},
+			{ path: "/store", element: <Store /> },
+			{ path: "prodDetail", element: <ProductDetail /> },
+			{ path: "cart", element: <Cart /> },
+			{ path: "success", element: <Success /> },
 		]
 	},
 	{
-		path: '/auth',
 		element: <Auth />,
 		children: [
 			{
@@ -97,12 +106,15 @@ const router = createBrowserRouter([
 			},
 		],
 	},
- 
 ]);
+
+const queryClient = new QueryClient();
 
 function App() {
 	return (
-		<RouterProvider router={router} />
+		<QueryClientProvider client={queryClient}>
+			<RouterProvider router={router} />
+		</QueryClientProvider>
 	);
 }
 

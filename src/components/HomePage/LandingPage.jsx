@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 
 const listItems = [
 	{
@@ -28,30 +30,33 @@ function LandingPage() {
 				</div>
 
 				<div className="hidden md:flex absolute w-full h-full top-0 left-0 -z-10">
-					<div className='flex-1 bg-[#333333]'></div>
-					<img className='flex-1' src='/images/bg1-large.png' alt='Person' />
+					<div className='flex-1  bg-gradient-tor from-[#333333] to-[#411010de] bg-[#5a3535]'></div>
+					<div className="flex-1 h-full">
+						<img className='w-full h-full object-cover object-center' src='/images/bg1-large.png' alt='Person' />
+					</div>
 				</div>
 
 
-				<div className='-z-10 absolute inset-0 bg-gradient-to-b from-[#181818DE] to-[#2222227A] sm:bg-gradient-to-r sm:from-[#121212E0]   sm:via-[#121212EB]  sm:to-[#01010100]' ></div>
+				<div className='-z-10 absolute inset-0 bg-gradient-to-b from-[#000000] to-[#2222227A]  sm:bg-gradient-to-r md:from-[#000] md:via-[#000] md:to-[#01010100]' ></div>
+				{/* sm:from-[#121212E0]   sm:via-[#121212EB]  sm:to-[#01010100] from-[#181818DE] to-[#2222227A] */}
 
-				<div className='w-full sm:w-[80%]  mx-auto text-white  p-8 flex items-center '>
-					<div className='lg:w-[90%] max-w-[1000px] space-y-4 sm:space-y-8 '>
-						<p className='text-[#FFF7E2] sm:text-[28px]'>Namaste, Welcome to Amrutam </p>
-						<div className='font-robo'>
-							<p className='text-[24px] font-bold sm:text-[48px]'>
-								Step into Holistic Healing with <span className='underline cursor-pointer'>Ayurveda</span>.
+				<div className='w-full sm:w-[90%] mx-auto text-white px-8 sm:px-0 -mt-[100px]'>
+					<div className='lg:w-[90%] max-w-[1000px]'>
+						<p className='text-[#FFF7E2] sm:text-[28px] font-nexalight mb-2 sm:mb-4'>Namaste, Welcome to Amrutam </p>
+						<div className='mb-2 sm:mb-4'>
+							<p className='text-[20px] mb-2 font-bold sm:text-[30px] xl:text-[48px] leading-none'>
+								Step into Holistic Healing with <span className='underline cursor-pointer'>Ayurveda</span>
 							</p>
-							<p className='text-[24px] font-bold sm:text-[48px]'>
+							<p className='text-[20px] font-bold sm:text-[30px] xl:text-[48px] leading-normal'>
 								Book Consultation with certified Experts.
 							</p>
 						</div>
 
-						<p className='text-[14px] text-[#C9C9C9] font-medium sm:text-[20px]'>
+						<p className='w-[90%] md:w-[80%] xl:w-[75%] text-[14px] text-[#C9C9C9] font-medium sm:text-[20px] mb-10 sm:mb-16'>
 							Dive into the world of ayurveda and Experience Personalized Health Solutions and Holistic Guidance from Trusted Ayurvedic Doctors Anytime, anywhere.
 						</p>
 
-						<button className='bg-[#3A643B]  rounded-[10px] px-[30px] py-[15px] text-[14px] sm:text-[20px] font-medium'>BOOK AN APPOINTMENT</button>
+						<Link to='/find-doctors' className='inline-block bg-[#3A643B] hover:bg-[#1a301a] rounded-[10px] px-[30px] py-[15px] text-[14px] sm:text-[20px]  font-bold'>BOOK AN APPOINTMENT</Link>
 
 					</div>
 				</div>

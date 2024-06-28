@@ -10,7 +10,7 @@ import PopOverMenu from "./PopOverMenu";
 import { CloseButton } from "@headlessui/react";
 
 const AddReply = () => {
-	const { setIsShowAddReply } = useForumPost();
+	const setIsShowAddReply = true;
 	const fileInputRef = useRef(null);
 	const [files, setFiles] = useState([]);
 	console.log(files);
@@ -25,7 +25,7 @@ const AddReply = () => {
 	};
 
 	return (
-		<div className="mt-5 block w-11/12 space-y-5 md:flex md:gap-[41px] md:space-y-0">
+		<div className="mt-5 block space-y-5 md:flex md:gap-[41px] md:space-y-0">
 			<img src="/person2.png" className="size-[52px] rounded-full" />
 			<div className="flex flex-1 flex-col gap-3">
 				<textarea
@@ -177,7 +177,7 @@ const AddReply = () => {
 						</Fragment>
 					))}
 				</div>
-				<div className="mt-1.5 flex gap-5 self-end">
+				<div className="flex gap-5 -mt-8 self-end">
 					<button
 						onClick={() => setIsShowAddReply(false)}
 						className="rounded-lg border border-solid border-[#3a643b] px-4 py-2.5 text-center font-poppins text-[14px] font-medium tracking-[-0.01em] text-[#3a643b] sm:w-[116px]"

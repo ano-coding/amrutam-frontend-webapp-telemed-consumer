@@ -38,7 +38,7 @@ const AppointmentSelectTimeSlot = ({ onNext }) => {
 
             <h2 className="text-xl font-semibold text-center my-5">Pick a time slot</h2>
 
-            <div className="relative flex justify-center items-center border border-gray-200 p-4 rounded-lg my-4    ">
+            <div className="relative flex justify-center items-center border border-gray-200 p-4 rounded-lg my-4">
                 <button
                     onClick={scrollLeft}
                     className="absolute left-2 z-10 border border-gray-400 rounded-full p-1"
@@ -47,15 +47,15 @@ const AppointmentSelectTimeSlot = ({ onNext }) => {
                     <span><img src="/arrowLeft.svg" alt="" className='w-[20px] h-[20px] rotate-90' /></span>
                 </button>
 
-                <div className="flex space-x-2 overflow-x-hidden scrollbar-hide   w-[85%]" ref={sliderRef}>
+                <div className="flex space-x-2 overflow-x-hidden scrollbar-hide w-[85%]" ref={sliderRef}>
                     {dates.map((date, index) => (
                         <button
                             key={index}
-                            className={`px-4 py-2 rounded min-w-[150px] ${selectedDate === date.date ? 'border border-[--primary] text-[--primary]' : 'bg-gray-100 text-gray-600'} ${date.slots === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+							className={`p-2 rounded-xl min-w-[150px] ${selectedDate === date.date ? 'border border-[--primary] text-[--primary] font-semibold bg-[#EAF2EA]' : 'border border-[#F1F1F1]'} ${date.slots === 0 ? 'bg-[#F7F7F7] cursor-not-allowed' : ''}`}
                             onClick={() => date.slots > 0 && setSelectedDate(date.date)}
                         >
                             {date.date}
-                            <span className="block text-sm">{date.slots} slots available</span>
+							<span className={`block text-sm font-normal ${date.slots < 5 && date.slots > 0 && 'text-[#D5512E]'}`}>{date.slots} slots available</span>
                         </button>
                     ))}
                 </div>

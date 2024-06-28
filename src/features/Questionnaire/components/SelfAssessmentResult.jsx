@@ -1,4 +1,3 @@
-// import { RxCross2 } from "react-icons/rx";
 import amrutam from "/logoSmall.png";
 import SelfAssessmentProduct from "./SelfAssessmentProduct";
 import SelfAssessmentRoutineCard from "./SelfAssessmentRoutineCard";
@@ -24,20 +23,17 @@ const SelfAssessmentResult = () => {
 		},
 	];
 	return (
-		<div className="max-w-6xl mx-auto">
-			<div className="flex items-center justify-between py-10 lg:px-0 px-5">
-				<div>
-					<img src={amrutam} alt="Logo" />
-				</div>
-				<div className="font-semibold text-gray-400">
+		<div className="max-w-6xl mx-auto px-4 sm:px-5">
+			<div className="flex items-center justify-between sm:justify-end sm:gap-4 py-5 ">
+				
+				<div className="flex items-center gap-1 font-semibold text-gray-400">
+					<img src='/restart.png' alt='Cross Icon' />
 					<h1>Restart</h1>
 				</div>
 				<div className="font-semibold text-gray-400">
 					<h1 className="flex items-center gap-1">
 						Cancel
-						{/* <RxCross2 className="text-xl" /> */}
 						<img src='/cross.png' alt='Cross Icon' />
-
 					</h1>
 				</div>
 			</div>
@@ -45,7 +41,7 @@ const SelfAssessmentResult = () => {
 			{/* result */}
 			<div className="text-center">
 				<h1 className=" text-[#3a643b] font-semibold text-lg">{`"Your Results"`}</h1>
-				<p className="mt-7 font-medium tracking-wide px-5">
+				<p className="mt-7 font-medium tracking-wide">
 					This means that you are generally a creative, visionary type—always
 					full of new ideas—but your imaginative capacity is helpfully grounded
 					by your calm demeanor and steady mind, giving you an especially unique
@@ -69,7 +65,7 @@ const SelfAssessmentResult = () => {
 						Based on your preferences, we recommend the following products:
 					</p>
 				</div>
-				<div className="md:flex items-center justify-center px-10">
+				<div className="flex items-center justify-start gap-8 sm:justify-center px-0 sm:px-10 overflow-x-scroll sm:no-scrollbar">
 					{products?.map((product) => (
 						<SelfAssessmentProduct key={product?.id} product={product} />
 					))}
@@ -86,7 +82,8 @@ const SelfAssessmentResult = () => {
 						Based on your preferences, we recommend the following products:
 					</p>
 				</div>
-				<div className="md:flex items-center justify-center px-10">
+				<div className="flex items-center justify-start gap-8 sm:justify-center px-0 sm:px-10 overflow-x-scroll sm:no-scrollbar">
+
 					<SelfAssessmentRoutineCard />
 					<SelfAssessmentRoutineCard />
 				</div>

@@ -67,7 +67,7 @@ function ReportForm() {
 				<button
 					type='submit'
 					disabled={disabled}
-					className={`block w-[300px] mx-auto ${disabled ? 'bg-gray-200 cursor-not-allowed' : 'bg-customgreen-800 text-white'} font-semibold  rounded-2xl my-4 p-4`}
+					className={`block w-[300px] mx-auto ${disabled ? 'bg-slate-200 cursor-not-allowed' : 'bg-customgreen-800 text-white'} font-semibold  rounded-2xl my-4 p-4`}
 				>
 					Submit
 				</button>

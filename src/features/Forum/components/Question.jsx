@@ -24,9 +24,9 @@ function Question({ question, showAllReplies=false }) {
 
 
 	return (
-		<div className='border-b'>
+		<div className='border-b  border-[#F6F6F5]'>
 			<div className="px-2 sm:w-[90%] xl:w-[80%] mx-auto my-10">
-				<div className="space-y-4 p-4 border-b border-[#EDEDED]">
+				<div className="space-y-4 p-4 mb-8 pb-8 border-b border-[#EDEDED]">
 					<QuestionHeader
 						authorLogo={question.authorImg}
 						author={question.author}
@@ -72,13 +72,17 @@ function Question({ question, showAllReplies=false }) {
 						<Comments comments={question.comments}></Comments>
 					)
 				}
-
-				{
-					showAllReplies && (
-						<AddReply></AddReply>
-					)
-				}
 			</div>
+			{
+				showAllReplies && (
+					<div className='my-6 py-6 border-t border-[#EFEEEE]'>
+						<div className='px-2 sm:w-[90%] xl:w-[80%] mx-auto'>
+							<AddReply></AddReply>
+						</div>
+					</div>
+
+				)
+			}
 		</div>
 
 	)
@@ -107,7 +111,7 @@ function QuestionHeader({ authorLogo, author, time }) {
 
 			<div
 				onClick={togglePopUp}
-				className="ml-auto self-start w-[40px] h-[40px] rounded-[50%] flex items-center justify-center cursor-pointer hover:bg-slate-200 bg-slate-100"
+				className="ml-auto self-start w-[40px] h-[40px] rounded-[50%] flex items-center justify-center cursor-pointer hover:bg-slate-100"
 			>
 				<img src='/dots.png' alt='Dots' />
 			</div>
@@ -178,18 +182,19 @@ function QuestionBody({ title, description, tags, replies, showAllReplies }) {
 					})
 				}
 
-				{
-					totalReplies > 3 && !showAllReplies && (
-						<Link
-							to={`/commune/post/2`}
-							className='block text-customgreen-800 text-center font-semibold cursor-pointer hover:underline'
-						>
-							View All Replies
-						</Link>
-					)
-				}
-
+				{!showAllReplies && <AddReply></AddReply>}
 			</div>
+
+			{
+				totalReplies > 3 && !showAllReplies && (
+					<Link
+						to={`/commune/post/2`}
+						className='block text-customgreen-800 text-center font-semibold cursor-pointer hover:underline'
+					>
+						View All Replies
+					</Link>
+				)
+			}
 		</>
 	)
 }
@@ -209,13 +214,13 @@ function ReplyHeader({ authorLogo, author, time }) {
 				<img src={authorLogo} alt='Author logo' className='object-cover object-center' />
 			</div>
 			<div>
-				<p className="text-[#1E1E1E] text-[18px]">{author}</p>
+				<p className="text-[#3A643B] min-w-fit font-semibold text-nowrap sm:text-[18px]">{author}</p>
 				<p className="text-customgray-400 font-semibold">{time}</p>
 			</div>
 
 			<div
 				onClick={toggleShowPopUp}
-				className="ml-auto self-start w-[40px] h-[40px] rounded-[50%] flex items-center justify-center cursor-pointer hover:bg-slate-200 bg-slate-100"
+				className="ml-auto self-start w-[40px] h-[40px] rounded-[50%] flex items-center justify-center cursor-pointer hover:bg-slate-200"
 			>
 				<img src='/dots.png' alt='Dots' />
 			</div>
@@ -254,7 +259,7 @@ function Reply({ authorLogo, author, time, description, images }) {
 					author={author}
 					time={time}
 				></ReplyHeader>
-				<div className='font-medium text-justify sm:w-[90%] xl:w-[85%]'>
+				<div className='font-medium sm:w-[90%] xl:w-[85%]'>
 					<span className='font-semibold'>Ans. {'  '}</span>
 					<p className='inline'>{description}</p>
 					<div className='flex items-center justify-center sm:justify-start gap-4 flex-wrap mt-4'>

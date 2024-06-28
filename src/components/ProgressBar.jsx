@@ -20,7 +20,7 @@ const ProgressBar = ({ step }) => {
 
 
 					<span
-						className={`mt-2 text-sm md:text-md xl:text-md ${step >= item.id ? 'text-[--primary] ' : 'text-gray-600'}`}
+						className={`hidden sm:inline mt-2 text-sm md:text-md xl:text-md ${step >= item.id ? 'text-[--primary] ' : 'text-gray-600'}`}
 					>
 						{item.name}
 					</span>

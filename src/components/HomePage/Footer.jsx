@@ -56,7 +56,7 @@ function Footer() {
 				<div className="flex items-center">
 					<input
 						type='email'
-						className="w-[200px] sm:w-auto px-2 py-4 rounded-l-[40px] focus:outline-none border border-[#3A643B] placeholder:text-[14px] sm:placeholder:text-[18px]"
+						className="w-[200px] sm:w-auto px-6 py-4 rounded-l-[40px] focus:outline-none border border-[#3A643B] placeholder:text-[14px] sm:placeholder:text-[18px]"
 						placeholder='Your Email Address'
 					/>
 					<button className="text-white bg-black px-2 py-4 font-bold rounded-r-[40px]">Subscribe</button>

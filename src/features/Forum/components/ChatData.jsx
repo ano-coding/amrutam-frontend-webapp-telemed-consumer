@@ -19,27 +19,7 @@ export const chats = [
 		connection between emotional and physical well- being.
 		Its holistic approach has influenced many modern wellness practices and continues to garner
 		global interest for its natural and preventive methodologies.`,
-		images: ['/ayurveda.png', '/ayurveda.png', '/ayurveda.png'],
-		videos: ['/amrutam.mp4'],
 		files: [
-			{
-				path: '/acceptance-letter.pdf',
-				name: 'Healthy Lifestyle',
-				size: '1.2 MB',
-				type: 'pdf'
-			}, 
-			{
-				path: '/acceptance-letter.pdf',
-				name: 'Healthy Lifestyle',
-				size: '1.2 MB',
-				type: 'pdf'
-			}, 
-			{
-				path: '/acceptance-letter.pdf',
-				name: 'Healthy Lifestyle',
-				size: '1.2 MB',
-				type: 'pdf'
-			}, 
 			{
 				path: '/acceptance-letter.pdf',
 				name: 'Healthy Lifestyle',
@@ -48,7 +28,7 @@ export const chats = [
 			}
 		],
 		favours: 23,
-	    shares: 32,
+        shares: 32,
 		comments: [
 			{
 				type: 'comment',

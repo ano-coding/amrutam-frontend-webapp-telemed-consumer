@@ -5,6 +5,7 @@ const Banner = ({
 	followers,
 	following,
 	posts,
+	photo
 }) => {
 	return (
 		<>
@@ -13,16 +14,16 @@ const Banner = ({
 				src="/image-160@2x.png"
 				alt="background-image"
 			/>
-			<div className="box-border flex min-h-[151px] w-full   -translate-y-7 flex-col items-center border-[1.8px]  border-solid border-slate-200 bg-mintcream-200 md:flex-row">
-				<div className="  min-w-52">
+			<div className="box-border flex min-h-[151px] w-full -translate-y-7 flex-col items-center border-[1.8px]  border-solid border-slate-200 bg-mintcream-200 md:flex-row">
+				<div className="min-w-52">
 					<img
-						className=" z-30  h-[159px] w-[159px] -translate-y-8 translate-x-8 rounded-[50%]  border-4 border-white bg-no-repeat object-cover"
+						className="z-30 h-[159px] w-[159px] -translate-y-8 translate-x-4 sm:translate-x-8 rounded-[50%]  border-4 border-white bg-no-repeat object-cover"
 						alt=""
-						src="/ellipse-727@2x.png"
+						src={photo}
 					/>
 				</div>
 
-				<div className="m-5 ml-6 flex w-full flex-col items-start gap-5 pl-5 lg:mx-1 lg:mb-0 lg:ml-0 lg:mr-0  lg:mt-0 lg:flex-row lg:justify-around lg:gap-1 lg:pl-0">
+				<div className="m-5 flex w-full flex-col items-center gap-5  lg:mx-1 lg:mb-0 lg:ml-0 lg:mr-0  lg:mt-0 lg:flex-row lg:justify-around lg:gap-1 lg:pl-0">
 					<div className="flex  flex-col items-start gap-2">
 						<div className="flex  items-center gap-2">
 							<h3 className=" whitespace-nowrap  font-poppins text-[20px] font-medium leading-[21.6px] text-gray-800">
@@ -47,8 +48,8 @@ const Banner = ({
 							<span className=" font-poppins  text-darkolivegreen-200 ">
 								{ratings}
 							</span>
-							<div className="mt-0.5 flex items-center gap-0 ">
-								{Array(ratings >= 4.5 ? 5 : 4)
+							<div className="flex items-center gap-0 ">
+								{Array(ratings < 1? 1: Math.round(ratings))
 									.fill("star")
 									.map((_, index) => (
 										<img
@@ -93,7 +94,7 @@ const Banner = ({
 						</div>
 					</div>
 
-					<button className=" mb-1 mt-2.5 flex scale-90  cursor-pointer  justify-center  overflow-hidden whitespace-nowrap rounded-lg bg-darkolivegreen-200 px-5 py-[18px]  text-center font-inter text-lg font-medium text-white duration-100 [border:none] hover:bg-seagreen active:scale-95 lg:px-[33.5px] lg:text-xl xl:scale-100">
+					<button className="mb-1 mt-2.5 flex scale-90  cursor-pointer  justify-center  overflow-hidden whitespace-nowrap rounded-lg bg-darkolivegreen-200 px-5 py-[18px]  text-center font-inter text-lg font-medium text-white duration-100 [border:none] hover:bg-seagreen active:scale-95 lg:px-[33.5px] lg:text-xl xl:scale-100">
 						Book an Appointment
 					</button>
 				</div>

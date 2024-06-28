@@ -21,7 +21,7 @@ function QuestionForm(props) {
 	const [uploadedFiles, setUploadedFiles] = useState([]);
 	
 	const showCategoryRequest = formData.category === 'other';
-	const showSubCategoryRequest = formData.subcategory === 'other';
+	const showSubCategoryRequest = formData.category === 'other';
 
 	const subcategories = categories.find(category => category.category === formData.category)?.categoryList;
 
@@ -67,10 +67,10 @@ function QuestionForm(props) {
 	}, [])
 
 	return ( 
-		<ModalWindow {...props}>
+		// <ModalWindow {...props}>
 			<div className="flex flex-1 items-start flex-col sm:flex-row gap-4">
 				
-				<div className='flex items-center justify-center gap-4 mx-auto px-4'>
+				<div className='flex items-center justify-center gap-4 sm:px-4'>
 					<img src='/priya.png' alt='Person' />
 					<p className='text-[#3A643B] font-semibold min-w-fit'>Priya Singh</p>
 				</div>
@@ -242,7 +242,7 @@ function QuestionForm(props) {
 				</form>
 			</div>
 			
-		</ModalWindow>
+		// </ModalWindow>
 	
 	);
 }

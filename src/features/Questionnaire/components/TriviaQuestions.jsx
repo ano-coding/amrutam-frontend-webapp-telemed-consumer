@@ -1,8 +1,5 @@
 import { useState, useEffect } from "react";
 import amrutam from "/logoSmall.png";
-// import { RxCross2 } from "react-icons/rx";
-
-// import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import ProgressBar from "./ProgressBar";
@@ -55,7 +52,7 @@ const TriviaQuestions = () => {
 
 	const nextQuestion = () => {
 		if (currentQuestionIndex < questions.length) {
-			setCurrentQuestionIndex(currentQuestionIndex + 1);
+			setCurrentQuestionIndex(cQI => cQI + 1);
 			setProgress(((currentQuestionIndex + 1) / questions.length) * 100);
 			setSelectedOption(null);
 			setFeedback("");
@@ -71,6 +68,8 @@ const TriviaQuestions = () => {
 		} else {
 			setFeedback("Wrong Answer");
 		}
+		setTimeout(nextQuestion, 750);
+
 	};
 
 	useEffect(() => {
@@ -87,33 +86,35 @@ const TriviaQuestions = () => {
 	}, [progress, navigate]);
 
 	return (
-		<div className="max-w-6xl mx-auto">
-			<div className="flex items-center justify-between py-10 lg:px-0 px-5">
-				<div>
+		<div className="max-w-6xl mx-auto px-6">
+			{/* <div className="flex items-center "> */}
+				{/* <div>
 					<img src={amrutam} alt="Logo" />
+				</div> */}
+				<div className="flex items-center justify-between sm:justify-end gap-4 py-10">
+					<div className="font-semibold text-gray-400">
+						<h1>{`Question ${currentQuestionIndex + 1}/${questions.length}`}</h1>
+					</div>
+					<div className="font-semibold text-gray-400">
+						<h1 className="flex items-center gap-1">
+							Finish Later
+							<img src='/cross.png' alt='Cross Icon' />
+						</h1>
+					</div>
 				</div>
-				<div className="font-semibold text-gray-400">
-					<h1>{`Question ${currentQuestionIndex + 1}/${questions.length}`}</h1>
-				</div>
-				<div className="font-semibold text-gray-400">
-					<h1 className="flex items-center gap-1">
-						Finish Later
-						{/* <RxCross2 className="text-xl" /> */}
-						<img src='/cross.png' alt='Cross Icon' />
-					</h1>
-				</div>
-			</div>
+				
+			{/* </div> */}
 			<div>
-				<h1 className="font-semibold text-xl tracking-wider md:text-left text-center lg:px-0 px-5">
+				<h1 className="font-semibold text-xl tracking-wider md:text-left text-center">
 					Mental Health Quiz
 				</h1>
 			</div>
-			<div className="py-10 lg:px-0 px-5">
+			<div className="py-10 ">
 				<ProgressBar progress={progress} />
-				<p className="text-center mt-4">{Math.round(progress)}%</p>
+				{/* <p className="text-center mt-4">{Math.round(progress)}%</p> */}
 			</div>
 
-			<p className="flex items-center gap-2 text-lg font-semibold lg:ml-0 ml-10">
+			<p className="flex items-center gap-2 text-lg font-semibold">
 				{/* <IoArrowBackOutline /> */}
 				<img src='/arrow-left.png' alt="Arrow Left" />
 				Go Back
@@ -123,24 +124,25 @@ const TriviaQuestions = () => {
 				{questions[currentQuestionIndex]?.question}
 			</p>
 
-			<div className="my-10 md:flex items-center gap-12 lg:mx-0 mx-10 ">
+			<div className="px-2 md:px-6 my-10 md:flex items-center gap-12 lg:mx-0 mx-auto ">
 				{questions[currentQuestionIndex]?.options?.map((option, index) => (
 					<button
 						key={index}
-						className={`w-full py-2 border md:mt-0 mt-4  rounded-lg text-center hover:bg-gray-100 transition ${selectedOption === option ? (option === questions[currentQuestionIndex].correctAnswer ? "text-[#3a643b] font-bold border-[1.5px] border-[#3a643b] " : "text-[#b00000] font-bold border-[1.5px] border-[#b00000]") : "border-gray-300"}`}
+						className={`w-full py-2 border md:mt-0 mt-4  rounded-lg text-center  hover:border-gray-100 transition  border-gray-300
+							${selectedOption === option && option !== questions[currentQuestionIndex].correctAnswer &&  "text-[#b00000] font-bold border-[1.5px] border-[#b00000]"}
+							${selectedOption  && option === questions[currentQuestionIndex].correctAnswer && "text-[#3a643b] font-bold border-[1.5px] border-[#3a643b]"}`}
 						onClick={() => handleOptionSelect(option)}>
 						{option}
 					</button>
 				))}
 			</div>
-			<div className="text-center my-4 text-lg font-semibold">
+			<div className="text-center flex my-4 text-lg font-semibold">
 				{feedback && (
 					<p
-						className={
-							feedback === "Correct Answer"
-								? "text-[#3a643b]"
-								: "text-[#b00000]"
-						}>
+						className={`${feedback === "Correct Answer" ? "text-[#3a643b]" : "text-[#b00000]"} flex items-center gap-1 mx-auto`}>
+						{feedback === 'Correct Answer' ? (
+							<img src='/green-tick.png' className="w-5 h-5" alt='Green tick' />
+						) : (<img src='/red-cross.png' className="w-5 h-5" alt='Red cross' />)}
 						{feedback}
 					</p>
 				)}

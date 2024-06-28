@@ -35,16 +35,16 @@ const NAV_LINKS = [
 		path: "/find-doctors",
 	},
 	{
-		name: 'Questionnaire',
-		path: "/questionnaire"
-	},
-	{
 		name: "Commune",
 		path: "/commune",
 	},
 	{
-		name: "About Us",
-		path: "/about",
+		name: 'Questionnaire',
+		path: "/questionnaire"
+	},
+	{
+		name: "Store",
+		path: "/store",
 	},
 	
 ];

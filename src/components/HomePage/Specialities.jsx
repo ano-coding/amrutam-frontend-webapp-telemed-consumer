@@ -1,13 +1,13 @@
 
 function Specialities() {
 	return (
-		<div className="bg-[#FFFAEC] py-12 px-2">
-			<div className="text-center mb-8">
-				<h2 className="text-[#3A643B] inline-block text-[32px] sm:text-[48px]  font-robo text-center px-2 font-bold leading-tight ">
+		<div className="bg-[#FFFAEC] font-dinpro py-12 px-2">
+			<div className="flex justify-center mb-8">
+				<h2 className="text-[#3A643B] text-[32px] lg:text-[48px] sm:border-b-4 px-8 border-[#abdcac] text-center font-bold leading-tight ">
 					What sets Ayurvedic consultations apart?
-					<hr className='hidden lg:block -mt-[14px] text-center -z-10 bg-[#abdcac] h-2' />
 				</h2>
 			</div>
+
 
 			<div className='flex flex-col md:flex-row md:flex-wrap justify-center  items-center gap-4'>
 				<div className='md:flex-none md:w-[650px] xl:w-[600px] text-[#3A643B] w-[328px] px-16 py-[45px] shadow-lg rounded-[20px] border-t-[5px] border-[#3A643B] space-y-4'>
@@ -18,7 +18,7 @@ function Specialities() {
 					</p>
 				</div>
 				<div className='md:flex md:items-center md:flex-wrap md:gap-4'>
-					<div className='sm:flex-none w-[328px] rounded-[20px] overflow-hidden'>
+					<div className='sm:flex-none w-[328px] rounded-[20px] overflow-hidden pb-2 md:pb-0'>
 						<img className='w-[100%] h-[100%] scale-105' src='/images/hair-oil1.png' alt='hair medicine' />
 					</div>
 					<div className='sm:flex-none text-[#3A643B] w-[328px] md:w-[320px] h-[285px] px-[28px] py-[45px] shadow-lg rounded-[20px] border-t-[5px] border-[#3A643B] space-y-4'>

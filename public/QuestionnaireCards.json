@@ -6,7 +6,8 @@
     "likes": 22,
     "author": "By Amrutam",
     "imgSrc": "https://i.ibb.co/BzjQsYk/cardImg1.png",
-    "type": "Trivia"
+    "type": "Trivia",
+	"filter": "Doctor"
   },
   {
     "id": 2,
@@ -15,7 +16,9 @@
     "likes": 22,
     "author": "By: Aryan Khan",
     "imgSrc": "https://i.ibb.co/k0Frs9v/cardImg2.png",
-    "type": "Self Assessment"
+    "type": "Self Assessment",
+	"filter": "Amrutam"
+
   },
   {
     "id": 3,
@@ -24,7 +27,9 @@
     "likes": 22,
     "author": "By Amrutam",
     "imgSrc": "https://i.ibb.co/JjBdf3s/cardImg3.png",
-    "type": "Self Assessment"
+    "type": "Self Assessment",
+	"filter": "People"
+
   },
   {
     "id": 4,
@@ -33,7 +38,9 @@
     "likes": 22,
     "author": "By Amrutam",
     "imgSrc": "https://i.ibb.co/L1RRTWL/cardImg4.png",
-    "type": "Self Assessment"
+    "type": "Self Assessment",
+	"filter": "Amrutam"
+
   },
   {
     "id": 5,
@@ -42,7 +49,9 @@
     "likes": 22,
     "author": "By Amrutam",
     "imgSrc": "https://i.ibb.co/BzjQsYk/cardImg1.png",
-    "type": "Self Assessment"
+    "type": "Self Assessment",
+	"filter": "Amrutam"
+
   },
   {
     "id": 6,
@@ -51,7 +60,9 @@
     "likes": 30,
     "author": "By Amrutam",
     "imgSrc": "https://i.ibb.co/k0Frs9v/cardImg2.png",
-    "type": "Trivia"
+    "type": "Trivia",
+	"filter": "Doctor"
+
   },
   {
     "id": 7,
@@ -60,7 +71,9 @@
     "likes": 25,
     "author": "By Amrutam",
     "imgSrc": "https://i.ibb.co/L1RRTWL/cardImg4.png",
-    "type": "Trivia"
+    "type": "Trivia",
+	"filter": "Doctor"
+
   },
   {
     "id": 8,
@@ -69,7 +82,9 @@
     "likes": 27,
     "author": "By Amrutam",
     "imgSrc": "https://i.ibb.co/BzjQsYk/cardImg1.png",
-    "type": "Self Assessment"
+    "type": "Self Assessment",
+	"filter": "People"
+
   },
   {
     "id": 9,
@@ -78,7 +93,9 @@
     "likes": 21,
     "author": "By Amrutam",
     "imgSrc": "https://i.ibb.co/JjBdf3s/cardImg3.png",
-    "type": "Trivia"
+    "type": "Trivia",
+	"filter": "Doctor"
+
   },
   {
     "id": 10,
@@ -87,6 +104,8 @@
     "likes": 24,
     "author": "By Amrutam",
     "imgSrc": "https://i.ibb.co/L1RRTWL/cardImg4.png",
-    "type": "Trivia"
+    "type": "Trivia",
+	"filter": "Amrutam"
+
   }
 ]

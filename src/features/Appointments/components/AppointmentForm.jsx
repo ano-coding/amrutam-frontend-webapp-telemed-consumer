@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
+
 
 const AppointmentForm = ({ onNext }) => {
 	const [formData, setFormData] = useState({
@@ -43,11 +45,12 @@ const AppointmentForm = ({ onNext }) => {
 							type="button"
 							key={mode}
 							onClick={() => handleModeChange(mode)}
-							className={`flex-1 p-2 text-center  ${formData.mode === mode ? ' border-[--primary] text-[--primary]' : '  text-gray-600'} border rounded mx-1`}
+							className={`flex items-center justify-center flex-1 p-2 text-center  ${formData.mode === mode ? ' border-[--primary] text-[--primary]' : '  text-gray-600'} border rounded mx-1`}
 						>
 							{mode}
 							{formData.mode === mode && (
-								<span className="ml-2 text-[--primary]">&#10003;</span>
+								// <span className="ml-2 text-[--primary]">&#10003;</span>
+								<CheckCircleIcon className="w-6" />
 							)}
 						</button>
 					))}

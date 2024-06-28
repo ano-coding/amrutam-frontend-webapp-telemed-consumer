@@ -17,7 +17,7 @@ function Thought({ thought }) {
 
 
 	return (
-		<div className='border-b'>
+		<div className='border-b border-[#F6F6F5]'>
 			<div className="px-2 sm:w-[90%] xl:w-[80%] mx-auto my-10">
 				<div className="space-y-4 p-4 border-b border-[#EDEDED]">
 					<ThoughtHeader
@@ -92,7 +92,7 @@ function ThoughtHeader({ authorLogo, author, time }) {
 
 			<div
 				onClick={togglePopUp}
-				className="ml-auto self-start w-[40px] h-[40px] rounded-[50%] flex items-center justify-center cursor-pointer hover:bg-slate-200 bg-slate-100">
+				className="ml-auto self-start w-[40px] h-[40px] rounded-[50%] flex items-center justify-center cursor-pointer hover:bg-slate-100">
 				<img src='/dots.png' alt='Dots' />
 			</div>
 			{showPopUp && <QuestionPopUp togglePopUp={togglePopUp}></QuestionPopUp>}
