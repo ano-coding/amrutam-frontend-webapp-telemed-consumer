@@ -58,9 +58,9 @@ export const updatePatientProfile = async (
       value: weightValue,
     },
     gender: gender,
+    photo: photo,
     // bio: bio,
     // timezone: timezone,
-    // photo: photo,
     // sleepPattern: sleepPattern,
   });
 

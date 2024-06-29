@@ -5,15 +5,21 @@ import ContentBoxLayout from "../components/ContentBoxLayout";
 import useUpdatePatientProfile from "../hooks/useUpdatePatientProfile";
 import { PhoneInputPatient } from "../features/PatientProfile/PhoneInputPatient";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import uploadFileToS3 from "../services/apiUpload";
 
 const PatientProfileEdit = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
   const data = state?.data;
   const token = state.token;
   const { updatePatientProfileMutate, updatePatientProfileStatus } =
     useUpdatePatientProfile();
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+
   const defaultValues = data
     ? {
         dob: data.data?.dob,
@@ -41,7 +47,33 @@ const PatientProfileEdit = () => {
     defaultValues,
   });
 
-  const onSubmit = (data) => {
+  useEffect(() => {
+    if (!selectedFile) return;
+    setValue("photo", selectedFile);
+  }, [selectedFile, setValue]);
+
+  const handleDivClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const onSubmit = async (data) => {
+    console.log(data);
+    console.log(selectedFile);
+
+    const photoData = await uploadFileToS3(selectedFile, token);
+
     updatePatientProfileMutate(
       {
         token: token,
@@ -57,6 +89,7 @@ const PatientProfileEdit = () => {
         heightValue: data.height,
         weightUnit: "kg",
         weightValue: data.weight,
+        photo: photoData.data,
       },
       {
         onSuccess: (data) => {
@@ -81,13 +114,28 @@ const PatientProfileEdit = () => {
         <div className="my-2 flex w-full flex-col items-center gap-10 p-6 xl:w-11/12 xl:px-10">
           <div className="flex flex-col items-center gap-[15px]">
             <img
-              src={watch("photo") ? watch("photo") : "/user-avatar-2.png"}
+              src={
+                previewUrl
+                  ? previewUrl
+                  : watch("photo")
+                    ? watch("photo")
+                    : "/user-avatar-2.png"
+              }
               className="aspect-square h-[113px] rounded-full object-cover"
             />
-            <div className="flex cursor-pointer items-center justify-center gap-2 rounded-[29px] border-[1px] border-solid border-[#d0d0d0] bg-[#fcfcff] px-[22px] py-[10px]">
+            <div
+              onClick={handleDivClick}
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-[29px] border-[1px] border-solid border-[#d0d0d0] bg-[#fcfcff] px-[22px] py-[10px]"
+            >
               <UploadSvg className="size-5" />
               <span className="text-[15px] text-[#3a3a3a]">Upload a Photo</span>
             </div>
+            <input
+              type="file"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+            />
 
             <div className="text-[14px] text-[#5f5f5f]">
               Allowed JPG, GIF or PNG. Max size of 2MB
