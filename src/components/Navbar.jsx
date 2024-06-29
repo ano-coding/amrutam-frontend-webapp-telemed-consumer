@@ -22,8 +22,12 @@ const NAV_LINKS = [
     path: "/commune",
   },
   {
-    name: "About Us",
-    path: "/about",
+    name: "Questionnaire",
+    path: "/questionnaire",
+  },
+  {
+    name: "Store",
+    path: "/store",
   },
 ];
 
@@ -149,7 +153,7 @@ const Navbar = () => {
                 leaveTo="opacity-0 scale-95"
               >
                 <DisclosurePanel
-                  className="absolute w-full bg-[#fff7e2] lg:hidden"
+                  className="absolute z-50 w-full bg-[#fff7e2] lg:hidden"
                   id="mobile-menu"
                 >
                   <div ref={ref} className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
