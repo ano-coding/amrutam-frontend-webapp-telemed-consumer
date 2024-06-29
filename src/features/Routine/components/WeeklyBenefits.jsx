@@ -1,8 +1,9 @@
 import Breadcrumb from "../../../components/Breadcrumb";
-import SimpleDropDownComponent from "../components/DropDownComponent";
-import TextAreaWithAddMore from "../components/TextAreaWithAddMore";
 import BiQuestionSvg from "../../../assets/bi-question.svg?react";
 import ContentBoxLayout from "../../../components/ContentBoxLayout";
+import { FormProvider, useForm } from "react-hook-form";
+import HookFormDropDown from "./HookFormDropDown";
+import AddWeeklyBenefits from "./AddWeeklyBenefits";
 const breadCrumbList = [
   {
     name: "Routines",
@@ -23,6 +24,14 @@ const breadCrumbList = [
 ];
 
 const WeeklyBenefits = () => {
+  const methods = useForm();
+
+  const totalWeeks = 12; // Example totalWeeks value
+
+  const onSubmit = (data) => {
+    console.log(data);
+  };
+
   return (
     <div className="flex w-full flex-col gap-[37px]">
       <Breadcrumb list={breadCrumbList} />
@@ -36,34 +45,61 @@ const WeeklyBenefits = () => {
         </div>
       </div>
       <ContentBoxLayout title="Add Weekly Benefits">
-        <div className="mb-2 flex w-full flex-col gap-10 rounded-xl px-5 py-4 lg:pr-16">
-          <div className="text-[18px] font-medium text-black">
-            Enter Weekly Benefits
-          </div>
-          <SimpleDropDownComponent
-            label={`Select Weeks`}
-            mdWidth={`w-[400px]`}
-            list={[
-              "1 week",
-              "2 weeks",
-              "3 weeks",
-              "4 weeks",
-              "5 weeks",
-              "6 weeks",
-            ]}
-          />
-          <div className="flex flex-wrap gap-5 lg:gap-8">
-            <TextAreaWithAddMore label="0-2 Week Benefits" />
-            <TextAreaWithAddMore label="2-4 Week Benefits" />
-            <TextAreaWithAddMore label="4-6 Week Benefits" />
-          </div>
-          <button className="mx-auto my-10 box-border rounded-xl bg-[#3A643B] px-16 py-[17px] text-center text-base font-semibold text-white shadow-[0px_4px_14px_rgba(58,_100,_59,_0.25)] duration-100 hover:bg-[#618a61] active:scale-95 md:w-[23.4rem]">
-            Save Benefits
-          </button>
-        </div>
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="w-full">
+            <div className="mb-2 flex w-full flex-col gap-10 rounded-xl px-5 py-4 lg:pr-16">
+              <div className="text-[18px] font-medium text-black">
+                Enter Weekly Benefits
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <HookFormDropDown
+                  label="Select Week Intervals"
+                  mdWidth="w-[400px]"
+                  list={Array.from({ length: totalWeeks }, (_, i) => i + 1)
+                    .filter((i) => totalWeeks % i === 0)
+                    .map((i) => `${i} week${i > 1 ? "s" : ""}`)}
+                  name="weekInterval"
+                />
+                <div className="ml-5 text-[12px] text-[#A0A0A0]">
+                  Total Weeks for your “Skin Care Routine” is{" "}
+                  <span className="text-[#3a643b]">{`${totalWeeks} Weeks`}</span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-10">
+                {generateWeekObjects(
+                  totalWeeks,
+                  methods.watch("weekInterval"),
+                ).map((interval) => (
+                  <div className="flex flex-col gap-3" key={interval.interval}>
+                    <div className="text-[16px] font-medium text-black">
+                      {`${interval.weekName} week benefits`}
+                    </div>
+                    <AddWeeklyBenefits />
+                  </div>
+                ))}
+              </div>
+              {/* ------------- */}
+
+              <button className="mx-auto my-10 box-border rounded-xl bg-[#3A643B] px-16 py-[17px] text-center text-base text-white shadow-[0px_4px_14px_rgba(58,_100,_59,_0.25)] duration-100 hover:bg-[#618a61] active:scale-95 md:w-[23.4rem]">
+                Save Benefits
+              </button>
+            </div>
+          </form>
+        </FormProvider>
       </ContentBoxLayout>
     </div>
   );
 };
 
 export default WeeklyBenefits;
+
+function generateWeekObjects(totalWeeks, interval) {
+  return Array.from({ length: Math.ceil(totalWeeks / interval) }, (_, i) => {
+    const startWeek = i * interval + 1; // Adjust startWeek calculation
+    const endWeek = Math.min(startWeek + interval - 1, totalWeeks);
+    return {
+      interval: i + 1,
+      weekName: `${startWeek}-${endWeek}`,
+    };
+  });
+}

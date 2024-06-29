@@ -23,8 +23,7 @@ export const sendOTP = async (countryCallingCode, nationalNumber) => {
 
     return response.data;
   } catch (error) {
-    console.error(error);
-    throw new Error(error.message);
+    throw new Error(error);
   }
 };
 
@@ -51,8 +50,9 @@ export const verifyOTP = async (countryCallingCode, nationalNumber, otp) => {
 
     return response.data;
   } catch (error) {
-    console.error(error);
-    throw new Error(error.message);
+    console.log(error);
+
+    throw error;
   }
 };
 
@@ -71,8 +71,6 @@ export const registerCustomer = async (
     lastName: lastName,
   });
 
-  console.log(data);
-
   const config = {
     method: "post",
     maxBodyLength: Infinity,
@@ -90,7 +88,8 @@ export const registerCustomer = async (
 
     return response.data;
   } catch (error) {
-    console.error(error);
-    throw new Error(error.message);
+    console.log(error);
+
+    throw error;
   }
 };

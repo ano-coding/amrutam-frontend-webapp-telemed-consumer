@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { PhoneNumberInput } from "../features/Auth/components/PhoneNumberInput";
 import { useForm } from "react-hook-form";
 import useRegisterCustomer from "../hooks/useRegisterCustomer";
 import { parsePhoneNumber } from "react-phone-number-input";
+import { toast } from "react-toastify";
 
 const Signup = () => {
   const {
@@ -12,7 +13,7 @@ const Signup = () => {
     formState: { errors },
     reset,
   } = useForm();
-
+  const navigate = useNavigate();
   const { registerCustomerMutate, registerCustomerStatus } =
     useRegisterCustomer();
 
@@ -34,7 +35,15 @@ const Signup = () => {
           console.log(res);
         },
         onError: (error) => {
-          console.log(error);
+          const isRegistered =
+            error.response.data.data.action ===
+            "Cannot Register. User Already Exist. Login Directly from sendOTP.";
+          if (isRegistered) {
+            navigate("/login");
+            toast.error(
+              "User Already Exist. Please Login With your Phone Number!",
+            );
+          }
         },
         onSettled: () => {
           reset();

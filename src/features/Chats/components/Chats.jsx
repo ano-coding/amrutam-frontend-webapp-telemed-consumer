@@ -49,7 +49,51 @@ const contacts = [
     lastSeen: "2hrs",
     isActive: false,
   },
-  // Add more contacts here...
+  {
+    name: "Dr. Mehmud",
+    image: "/doctor-sample.png",
+    message: "Lorem ipsum dolor sit amet...",
+    time: "2hrs ago",
+    newMessages: 0,
+    lastSeen: "2hrs",
+    isActive: false,
+  },
+  {
+    name: "Dr. Mehmud",
+    image: "/doctor-sample.png",
+    message: "Lorem ipsum dolor sit amet...",
+    time: "2hrs ago",
+    newMessages: 0,
+    lastSeen: "2hrs",
+    isActive: false,
+  },
+  {
+    name: "Dr. Mehmud",
+    image: "/doctor-sample.png",
+    message: "Lorem ipsum dolor sit amet...",
+    time: "2hrs ago",
+    newMessages: 0,
+    lastSeen: "2hrs",
+    isActive: false,
+  },
+  {
+    name: "Dr. Mehmud",
+    image: "/doctor-sample.png",
+    message: "Lorem ipsum dolor sit amet...",
+    time: "2hrs ago",
+    newMessages: 0,
+    lastSeen: "2hrs",
+    isActive: false,
+  },
+  {
+    name: "Dr. Mehmud",
+    image: "/doctor-sample.png",
+    message: "Lorem ipsum dolor sit amet...",
+    time: "2hrs ago",
+    newMessages: 0,
+    lastSeen: "2hrs",
+    isActive: false,
+  },
 ];
 
 const messages = [
@@ -94,7 +138,7 @@ const Chats = () => {
   return (
     <div className="flex flex-col gap-[37px] pt-4">
       <ContentBoxLayout title="My Chats">
-        <div className="flex w-full">
+        <div className="grid w-full grid-cols-1 md:grid-cols-2">
           <ChatList
             contacts={contacts}
             onSelect={handleContactSelect}

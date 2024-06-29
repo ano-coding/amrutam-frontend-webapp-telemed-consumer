@@ -22,6 +22,9 @@ import CreateRoutine from "./features/Routine/components/CreateRoutine";
 import ConsumerDashboard from "./pages/ConsumerDashboard";
 import PatientProfile from "./pages/PatientProfile";
 import { UserProvider } from "./context/UserContext";
+import { Bounce, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import PatientProfileEdit from "./pages/PatientProfileEdit";
 
 const router = createBrowserRouter([
   {
@@ -94,6 +97,10 @@ const router = createBrowserRouter([
             path: "/profile",
             element: <PatientProfile />,
           },
+          {
+            path: "/profile/edit",
+            element: <PatientProfileEdit />,
+          },
         ],
       },
     ],
@@ -121,6 +128,19 @@ function App() {
     <UserProvider>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          transition={Bounce}
+        />
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </UserProvider>

@@ -10,6 +10,7 @@ import PrescriptionSvg from "../assets/prescription.svg?react";
 import ArrowLeftSvg from "../assets/arrow-left.svg?react";
 import DashboardSvg from "../assets/dashboard.svg?react";
 import CallRecordingsSvg from "../assets/call-recordings.svg?react";
+import { calculateAge, formatDate, isNotPhotoUrl } from "../helper/helper";
 
 const sidebarItems = [
   {
@@ -55,8 +56,12 @@ const sidebarItems = [
   },
 ];
 
-const DashboardSidebar = () => {
+const DashboardSidebar = ({ data }) => {
   const { toggled, setToggled } = useContext(SideBarToggleContext);
+
+  const { dob, state, country, first_name, last_name, photo } =
+    data?.data ?? {};
+
   return (
     <div className="relative ml-0 bg-white lg:ml-10">
       <Sidebar
@@ -73,7 +78,7 @@ const DashboardSidebar = () => {
         <div className="flex flex-col items-center justify-center gap-[12px] border-b-[3px] border-[#ECECEC] bg-white py-11">
           <Link to="profile">
             <img
-              src="/avatar-person.svg"
+              src={isNotPhotoUrl(photo) ? "/avatar-person.svg" : photo}
               alt="Profile Picture"
               className={`h-24 w-24 cursor-pointer rounded-full`}
             />
@@ -82,11 +87,13 @@ const DashboardSidebar = () => {
           <div className="flex flex-col items-center gap-[9px]">
             <Link to="profile">
               <h2 className="cursor-pointer text-[18px] font-semibold text-[#3a643b]">
-                Priya Singhal
+                {first_name && `${first_name} ${last_name}`}
               </h2>
             </Link>
-            <p className="text-[15px] text-[#666]">24th July, 1999, 25 years</p>
-            <p className="text-[15px] text-[#666]">New Delhi, India</p>
+            <p className="text-[15px] text-[#666]">
+              {dob && `${formatDate(dob)}, ${calculateAge(dob)} years`}
+            </p>
+            <p className="text-[15px] text-[#666]">{`${state || ""}, ${country || ""}`}</p>
           </div>
         </div>
 

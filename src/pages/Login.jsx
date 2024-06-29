@@ -6,6 +6,7 @@ import useSendOTP from "../hooks/useSendOTP";
 import useVerifyOTP from "../hooks/useVerifyOTP";
 import { UserContext } from "../context/UserContext";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const {
@@ -15,7 +16,7 @@ const Login = () => {
     formState: { errors },
   } = useForm();
 
-  const { setToken } = useContext(UserContext);
+  const { setToken, setUserId } = useContext(UserContext);
   const { sendOTPMutate, sendOTPStatus } = useSendOTP();
   const { verifyOTPMutate, verifyOTPStatus } = useVerifyOTP();
 
@@ -44,6 +45,16 @@ const Login = () => {
         onSuccess: (res) => {
           setToken(res.data.token);
           localStorage.setItem("token", res.data.token);
+          setUserId(res.data.info._id);
+          localStorage.setItem("userId", res.data.info._id);
+          toast.success("Logged in successfully!");
+        },
+        onError: (error) => {
+          if (error.response.data.message === "Invalid OTP")
+            toast.error("Invalid OTP. Please try again!");
+
+          if (error.response.data.message === "OTP has expired")
+            toast.error("OTP has expired. Please try again!");
         },
       });
     }

@@ -1,10 +1,13 @@
 import { isPossiblePhoneNumber } from "react-phone-number-input";
 import PhoneInput from "react-phone-number-input/react-hook-form";
 
-export const PhoneNumberInput = ({ control, isProcessing = false, error }) => {
+export const PhoneInputPatient = ({ control, isProcessing = false, error }) => {
   return (
-    <div className="flex flex-col gap-4">
-      <label htmlFor="phone" className="text-[18px] font-medium leading-[18px]">
+    <div className="flex flex-col gap-[10px]">
+      <label
+        htmlFor="phone"
+        className="font-nunito text-[18px] font-semibold leading-[18px]"
+      >
         <span>{`Phone `}</span>
         <span className="font-bold text-[#dd461e]">*</span>
       </label>

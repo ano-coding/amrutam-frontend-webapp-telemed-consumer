@@ -13,6 +13,7 @@ function classNames(...classes) {
 }
 
 export default function SimpleDropDownComponent({
+  setSelectedOption = () => {},
   label,
   list,
   mdWidth,
@@ -60,7 +61,10 @@ export default function SimpleDropDownComponent({
               <MenuItem key={item}>
                 {({ focus }) => (
                   <span
-                    onClick={() => setSelected(item)}
+                    onClick={() => {
+                      setSelected(item);
+                      setSelectedOption(item);
+                    }}
                     className={classNames(
                       focus ? "bg-gray-100 text-gray-900" : "text-gray-700",
                       "block px-4 py-2 text-sm",

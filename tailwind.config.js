@@ -1,13 +1,22 @@
 import formsPlugin from "@tailwindcss/forms";
+import flowbite from "flowbite-react/tailwind";
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}", flowbite.content()],
   theme: {
     extend: {
       fontFamily: {
         sans: ["Poppins", "ui-sans-serif", "system-ui", "sans-serif"],
         nunito: ["Nunito Variable", "ui-sans-serif", "system-ui", "sans-serif"],
         mulish: ["Mulish Variable", "ui-sans-serif", "system-ui", "sans-serif"],
+      },
+      colors: {
+        cyan: {
+          800: "#345a35",
+          700: "#3a643b",
+          600: "#4e744f",
+          300: "#89a289",
+        },
       },
     },
     screens: {
@@ -29,5 +38,5 @@ export default {
     },
   },
 
-  plugins: [formsPlugin()],
+  plugins: [formsPlugin(), flowbite.plugin()],
 };

@@ -1,15 +1,13 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useState } from "react";
 
 const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [userId, setUserId] = useState(localStorage.getItem("userId") || null);
 
-  useEffect(() => {
-    // Fetch user data
-  }, []);
   return (
-    <UserContext.Provider value={{ token, setToken }}>
+    <UserContext.Provider value={{ token, setToken, userId, setUserId }}>
       {children}
     </UserContext.Provider>
   );
