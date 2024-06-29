@@ -20,6 +20,7 @@ const PatientProfileEdit = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorPhoto, setErrorPhoto] = useState(null);
   const isProfileUpdating = updatePatientProfileStatus === "pending";
 
   const defaultValues = data
@@ -37,6 +38,8 @@ const PatientProfileEdit = () => {
         photo: data.data.photo,
       }
     : {};
+
+  let photoData = data?.data?.photo;
 
   const {
     register,
@@ -60,14 +63,35 @@ const PatientProfileEdit = () => {
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result);
-      };
-      reader.readAsDataURL(file);
+
+    // Check if the file exists
+    if (!file) {
+      setErrorPhoto("No file selected.");
+      return;
     }
+
+    // Check file type
+    const fileTypes = ["image/jpeg", "image/png"];
+    if (!fileTypes.includes(file.type)) {
+      setErrorPhoto("Only JPG and PNG files are allowed.");
+      return;
+    }
+
+    // Check file size (2MB = 2 * 1024 * 1024 bytes)
+    const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setErrorPhoto("File size should be less than 2MB.");
+      return;
+    }
+
+    setErrorPhoto(null); // Clear any previous errors
+    setSelectedFile(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   const onSubmit = async (data) => {
@@ -78,7 +102,10 @@ const PatientProfileEdit = () => {
       setIsLoading(true);
       if (isProfileUpdating) return;
 
-      const photoData = await uploadFileToS3(selectedFile, token);
+      if (selectedFile !== null) {
+        const response = await uploadFileToS3(selectedFile, token);
+        photoData = response.data;
+      }
 
       updatePatientProfileMutate(
         {
@@ -95,7 +122,7 @@ const PatientProfileEdit = () => {
           heightValue: data.height,
           weightUnit: "kg",
           weightValue: data.weight,
-          photo: photoData.data,
+          photo: photoData,
         },
         {
           onSuccess: (data) => {
@@ -153,7 +180,9 @@ const PatientProfileEdit = () => {
               onChange={handleFileChange}
             />
 
-            <div className="text-[14px] text-[#5f5f5f]">
+            <div
+              className={`text-[14px] ${errorPhoto ? `font-medium italic text-red-700` : `text-[#5f5f5f]`}`}
+            >
               Allowed JPG, GIF or PNG. Max size of 2MB
             </div>
           </div>
