@@ -7,7 +7,7 @@ import { PhoneInputPatient } from "../features/PatientProfile/PhoneInputPatient"
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import uploadFileToS3 from "../services/apiUpload";
-
+import SyncLoader from "react-spinners/SyncLoader";
 const PatientProfileEdit = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -19,6 +19,8 @@ const PatientProfileEdit = () => {
     useUpdatePatientProfile();
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const isProfileUpdating = updatePatientProfileStatus === "pending";
 
   const defaultValues = data
     ? {
@@ -72,45 +74,59 @@ const PatientProfileEdit = () => {
     console.log(data);
     console.log(selectedFile);
 
-    const photoData = await uploadFileToS3(selectedFile, token);
+    try {
+      setIsLoading(true);
+      if (isProfileUpdating) return;
 
-    updatePatientProfileMutate(
-      {
-        token: token,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        phone: data.phoneNumber,
-        email: data.email,
-        dob: data.dob,
-        gender: data.gender,
-        state: data.stateName,
-        country: data.countryName,
-        heightUnit: "cm",
-        heightValue: data.height,
-        weightUnit: "kg",
-        weightValue: data.weight,
-        photo: photoData.data,
-      },
-      {
-        onSuccess: (data) => {
-          console.log(data);
+      const photoData = await uploadFileToS3(selectedFile, token);
 
-          console.log("Success, Profile Updated");
-          navigate("/profile");
+      updatePatientProfileMutate(
+        {
+          token: token,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          phone: data.phoneNumber,
+          email: data.email,
+          dob: data.dob,
+          gender: data.gender,
+          state: data.stateName,
+          country: data.countryName,
+          heightUnit: "cm",
+          heightValue: data.height,
+          weightUnit: "kg",
+          weightValue: data.weight,
+          photo: photoData.data,
         },
-        onError: (error) => {
-          console.log("Error Profile Not Updated", error);
+        {
+          onSuccess: (data) => {
+            console.log(data);
+
+            console.log("Success, Profile Updated");
+            navigate("/profile");
+          },
+          onError: (error) => {
+            console.log("Error Profile Not Updated", error);
+          },
         },
-      },
-    );
+      );
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <ContentBoxLayout title={"Personal & Contact Details"}>
       <form
-        className="flex w-full items-center justify-center"
+        className="relative flex w-full items-center justify-center"
         onSubmit={handleSubmit(onSubmit)}
       >
+        {(isProfileUpdating || isLoading) && (
+          <div className="absolute z-10 flex h-full w-full items-center justify-center bg-white bg-opacity-55">
+            <SyncLoader color="#3a643b" margin={5} size={20} />
+          </div>
+        )}
         <div className="my-2 flex w-full flex-col items-center gap-10 p-6 xl:w-11/12 xl:px-10">
           <div className="flex flex-col items-center gap-[15px]">
             <img
