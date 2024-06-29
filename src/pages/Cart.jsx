@@ -54,7 +54,7 @@ const Cart = () => {
   return (
     <div>
       <Header name={"Cart"} show={false} padding={"72px 0"} />
-      <div className="mx-[73px] mb-[36px] mt-[56px] flex items-center justify-between border-b-[1px] border-gray-400 pb-[32px] max-xl:hidden [&_h4]:m-0 [&_h4]:text-[18px] [&_h4]:leading-[27px] [&_h4]:tracking-[0.04em] last:[&_h4]:mr-[50px] even:[&_h4]:ml-[300px]">
+      <div className="mx-[73px] mb-[36px] mt-[56px] flex items-center justify-between border-b-[1px] border-[#e2e2e2] pb-[32px] max-xl:hidden [&_h4]:m-0 [&_h4]:text-[18px] [&_h4]:leading-[27px] [&_h4]:tracking-[0.04em] last:[&_h4]:mr-[50px] even:[&_h4]:ml-[300px]">
         <h4>PRODUCTS</h4>
         <h4>QUANTITY</h4>
         <h4>PRICE</h4>
@@ -69,7 +69,7 @@ const Cart = () => {
                 className="h-[176px] w-[176px] rounded-2xl max-sm:h-[140px] max-sm:w-[140px]"
               />
               <div className="flex flex-col items-start justify-start gap-8 max-xl:w-min max-xl:gap-2.5 max-sm:w-[calc(100%_-_20px)]">
-                <p className="m-0 w-[307px] text-[18px] font-medium leading-[30px] text-customblack-100 max-xl:text-[15px] max-lg:w-[200px] max-sm:w-full max-sm:text-sm">
+                <p className="text-customblack-100 m-0 w-[307px] text-[18px] font-medium leading-[30px] max-xl:text-[15px] max-lg:w-[200px] max-sm:w-full max-sm:text-sm">
                   Amrutam Kuntal Care Hair Spa | Do-It-Yourself Hair Treatment
                 </p>
                 <div className="flex items-center justify-start gap-4 [&_div]:flex [&_div]:items-center [&_span]:text-[18px] [&_span]:leading-[18px] [&_span]:tracking-tight max-sm:[&_span]:text-xs">
@@ -134,7 +134,7 @@ const Cart = () => {
               </div>
             </div>
 
-            <div className="flex h-[58px] w-[193px] items-center justify-between rounded-xl border border-gray-500 px-[22px] py-0 max-lg:w-[150px] max-sm:hidden [&_span]:text-xl [&_span]:leading-[30px] [&_svg]:cursor-pointer">
+            <div className="flex h-[58px] w-[193px] items-center justify-between rounded-xl border border-[#676767] px-[22px] py-0 max-lg:w-[150px] max-sm:hidden [&_span]:text-xl [&_span]:leading-[30px] [&_svg]:cursor-pointer">
               <svg
                 width="20"
                 height="2"
@@ -176,7 +176,7 @@ const Cart = () => {
               </span>
             </div>
           </div>
-          <div className="float-right mr-[20px] hidden h-[32px] w-[94px] items-center justify-between rounded-lg bg-customgreen-100 px-[5px] py-0 text-customgreen-800 max-sm:flex">
+          <div className="bg-customgreen-100 text-customgreen-800 float-right mr-[20px] hidden h-[32px] w-[94px] items-center justify-between rounded-lg px-[5px] py-0 max-sm:flex">
             <svg
               width="16"
               height="2"
@@ -257,12 +257,12 @@ const Cart = () => {
           </span>
         </div>
       </div>
-      <div className="mx-[73px] h-[1px] bg-gray-400 max-sm:mx-[20px]" />
+      <div className="mx-[73px] h-[1px] bg-[#e2e2e2] max-sm:mx-[20px]" />
       <h4 className="m-0 mr-[73px] mt-[44px] text-right text-2xl font-medium uppercase leading-[18px] tracking-tight max-md:text-lg max-md:capitalize max-sm:mx-[20px] max-sm:mb-[50px] max-sm:mt-[30px]">
         Total amount : Rs {totalAmount + ".00"}
       </h4>
       <button
-        className="ml-[73px] mt-[43px] w-[calc(100vw_-_146px)] cursor-pointer rounded-xl border-none bg-customgreen-800 px-0 py-[26.5px] text-[18px] font-medium leading-5 tracking-tight text-white outline-none max-sm:fixed max-sm:bottom-[20px] max-sm:left-[16px] max-sm:z-[1000] max-sm:m-0 max-sm:h-[52px] max-sm:w-[calc(100%_-_32px)] max-sm:p-0"
+        className="bg-customgreen-800 ml-[73px] mt-[43px] w-[calc(100vw_-_146px)] cursor-pointer rounded-xl border-none px-0 py-[26.5px] text-[18px] font-medium leading-5 tracking-tight text-white outline-none max-sm:fixed max-sm:bottom-[20px] max-sm:left-[16px] max-sm:z-[1000] max-sm:m-0 max-sm:h-[52px] max-sm:w-[calc(100%_-_32px)] max-sm:p-0"
         onClick={successHandler}
       >
         Proceed to checkout

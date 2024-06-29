@@ -44,7 +44,7 @@ const Header = (props) => {
       </h1>
       {props.show ? (
         <div className="flex items-center justify-center gap-5 pb-10 max-sm:mt-10 max-sm:pb-0">
-          <div className="flex h-12 w-[539px] items-center justify-start gap-2 rounded-xl border border-gray-300 bg-white max-md:w-[16rem]">
+          <div className="flex h-12 w-[539px] items-center justify-start gap-2 rounded-xl border border-[#f0f0f0] bg-white max-md:w-[16rem]">
             <svg
               width="19"
               height="18"
@@ -63,7 +63,7 @@ const Header = (props) => {
             <input
               type="text"
               placeholder="Search for Kuntal Care"
-              className="bg-transparent placeholder:font-nunito placeholder:text-base placeholder:font-normal placeholder:tracking-tight placeholder:text-darkslategray-300 max-sm:placeholder:text-sm"
+              className="placeholder:text-darkslategray-300 bg-transparent placeholder:font-nunito placeholder:text-base placeholder:font-normal placeholder:tracking-tight max-sm:placeholder:text-sm"
             />
           </div>
           <div

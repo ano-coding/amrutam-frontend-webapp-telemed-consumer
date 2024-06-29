@@ -76,7 +76,7 @@ const FilterContainer = () => {
         />
       </div>
       {moreFilters ? (
-        <div className="absolute top-[474px] z-20 flex w-full items-center justify-center bg-customyellow-200 shadow-md max-sm:hidden">
+        <div className="bg-customyellow-200 absolute top-[474px] z-20 flex w-full items-center justify-center shadow-md max-sm:hidden">
           <div className="flex items-start justify-center gap-16 max-md:flex-col max-md:gap-0 max-md:pb-[50px]">
             <div className="mb-[114px] max-md:mb-0">
               <h4 className="mb-3 mt-12 text-lg font-semibold tracking-tight max-md:text-center">
@@ -153,7 +153,7 @@ const FilterContainer = () => {
                 setSelectedOption={setSelectedOption}
               />
             </div>
-            <div className="mx-[109px] mt-[118px] h-[140px] w-[1px] bg-gray-400 max-xl:hidden" />
+            <div className="mx-[109px] mt-[118px] h-[140px] w-[1px] bg-[#e2e2e2] max-xl:hidden" />
           </div>
           <div className="max-xl:hidden">
             <Product
@@ -170,8 +170,8 @@ const FilterContainer = () => {
               infoSize={"14px"}
               inline={"inline-block"}
             />
-            <div className="absolute right-[99px] top-[33px] flex h-[32px] w-[146px] items-center justify-center rounded-2xl bg-customcream">
-              <span className="text-base tracking-tight text-custommustard">
+            <div className="bg-customcream absolute right-[99px] top-[33px] flex h-[32px] w-[146px] items-center justify-center rounded-2xl">
+              <span className="text-custommustard text-base tracking-tight">
                 Bestseller
               </span>
             </div>

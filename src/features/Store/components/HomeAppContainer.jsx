@@ -1,11 +1,11 @@
 const HomeAppContainer = () => {
   return (
-    <div className="peer-data-[65px] flex items-start justify-center bg-customyellow-200 max-xl:flex-wrap max-sm:hidden">
+    <div className="peer-data-[65px] bg-customyellow-200 flex items-start justify-center max-xl:flex-wrap max-sm:hidden">
       <div className="ml-[146px] pt-[106px] max-2xl:ml-5 max-xl:mx-5 max-xl:my-0 max-xl:text-center">
-        <h2 className="m-0 mb-4 text-3xl font-black text-customgreen-800 max-md:text-2xl">
+        <h2 className="text-customgreen-800 m-0 mb-4 text-3xl font-black max-md:text-2xl">
           Amrutam Home App
         </h2>
-        <p className="text-base font-medium tracking-tight text-gray-500">
+        <p className="text-base font-medium tracking-tight text-[#676767]">
           The Amrutam Home App is your one-stop app for all things Ayurveda!
           Apart from mimicking the significant characteristics of our website,
           this app offers a wide range of additional features.

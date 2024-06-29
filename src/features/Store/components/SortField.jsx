@@ -1,7 +1,7 @@
 const SortField = ({ setSelectedOption, ...props }) => {
   return (
     <div
-      className="flex w-[328px] items-center justify-between border-b border-gray-400 px-0 py-4 max-sm:w-full"
+      className="flex w-[328px] items-center justify-between border-b border-[#e2e2e2] px-0 py-4 max-sm:w-full"
       style={{ borderBottom: props.border }}
     >
       <label htmlFor={props.id} className="text-base tracking-tight">

@@ -26,9 +26,9 @@ const MobileFilters = () => {
   };
 
   return (
-    <div className="relative hidden h-[57px] w-full items-center justify-center gap-[60px] bg-customgreen-100 max-sm:flex [&_span]:font-nunito [&_span]:text-base [&_span]:font-medium [&_span]:tracking-tight [&_span]:text-customgreen-800">
+    <div className="bg-customgreen-100 [&_span]:text-customgreen-800 relative hidden h-[57px] w-full items-center justify-center gap-[60px] max-sm:flex [&_span]:font-nunito [&_span]:text-base [&_span]:font-medium [&_span]:tracking-tight">
       <span onClick={showConcernModalHandler}>Concern</span>
-      <div className="h-[15px] w-[1px] bg-customgreen-800" />
+      <div className="bg-customgreen-800 h-[15px] w-[1px]" />
       <span onClick={showCategoryModalHandler}>Category</span>
 
       {(showCategoryModal || showConcernModal) && (
@@ -37,8 +37,8 @@ const MobileFilters = () => {
       {showConcernModal ? (
         <SortModal isOpen={showConcernModal} onClose={closeConcernModalhandler}>
           <div className="shadow-[0px_-2px_12px_-2px_rgba(0, 0, 0, 0.51)] absolute bottom-[-75px] left-0 z-[100] mx-auto my-0 w-full rounded-t-xl bg-white px-4 py-3">
-            <div className="mx-auto my-0 h-1 w-[41px] rounded bg-gray-400" />
-            <div className="flex items-center justify-between [&_button]:border-none [&_button]:bg-transparent [&_button]:font-nunito [&_button]:text-sm [&_button]:font-bold [&_button]:tracking-tight [&_button]:text-customgreen-800 [&_button]:outline-none">
+            <div className="mx-auto my-0 h-1 w-[41px] rounded bg-[#e2e2e2]" />
+            <div className="[&_button]:text-customgreen-800 flex items-center justify-between [&_button]:border-none [&_button]:bg-transparent [&_button]:font-nunito [&_button]:text-sm [&_button]:font-bold [&_button]:tracking-tight [&_button]:outline-none">
               <h3 className="text-customblack-100 font-nunito text-lg font-bold tracking-tight">
                 Sort by concern
               </h3>
@@ -91,8 +91,8 @@ const MobileFilters = () => {
           onClose={closeCategoryModalhandler}
         >
           <div className="shadow-[0px_-2px_12px_-2px_rgba(0, 0, 0, 0.51)] absolute bottom-[-75px] left-0 z-[100] mx-auto my-0 w-full rounded-t-xl bg-white px-4 py-3">
-            <div className="mx-auto my-0 h-1 w-[41px] rounded bg-gray-400" />
-            <div className="flex items-center justify-between [&_button]:border-none [&_button]:bg-transparent [&_button]:font-nunito [&_button]:text-sm [&_button]:font-bold [&_button]:tracking-tight [&_button]:text-customgreen-800 [&_button]:outline-none">
+            <div className="mx-auto my-0 h-1 w-[41px] rounded bg-[#e2e2e2]" />
+            <div className="[&_button]:text-customgreen-800 flex items-center justify-between [&_button]:border-none [&_button]:bg-transparent [&_button]:font-nunito [&_button]:text-sm [&_button]:font-bold [&_button]:tracking-tight [&_button]:outline-none">
               <h3 className="text-customblack-100 font-nunito text-lg font-bold tracking-tight">
                 Sort by category
               </h3>
