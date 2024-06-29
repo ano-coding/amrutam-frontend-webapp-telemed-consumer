@@ -1,11 +1,11 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import Login from "./pages/Login";
 import Auth from "./features/Auth/components/Auth";
 import Signup from "./pages/Signup";
 import AppLayout from "./components/AppLayout";
 import DashboardLayout from "./components/DashboardLayout";
 import Appointments from "./features/Appointments/components/Appointments";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import AppointmentDetails from "./features/Appointments/components/AppointmentDetails";
 import MedicalRecords from "./features/Medical-Records/components/MedicalRecords";
@@ -26,14 +26,88 @@ import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PatientProfileEdit from "./pages/PatientProfileEdit";
 
+import HomePage from "./pages/HomePage";
+// import MainApp from "./components/MainApp";
+import FindDoctorsPage from "./pages/FindDoctorsPage";
+import DoctorProfilePage from "./pages/DoctorProfile";
+import QuestionnairePage from "./pages/QuestionnairePage";
+import QuestionnaireSingleCard from "./features/Questionnaire/components/QuestionnaireSingleCard";
+import SelfAssessmentQuestions from "./features/Questionnaire/components/SelfAssessmentQuestions";
+import SelfAssessmentResult from "./features/Questionnaire/components/SelfAssessmentResult";
+import TriviaQuestions from "./features/Questionnaire/components/TriviaQuestions";
+import TriviaResult from "./features/Questionnaire/components/TriviaResult";
+import AppointmentBookingPage from "./pages/AppointmentBookingPage";
+import ForumPage from "./pages/ForumPage";
+import SinglePost from "./features/Forum/components/SinglePost";
+
+import Store from "./pages/Store";
+import ProductDetail from "./pages/ProductDetail";
+import Cart from "./pages/Cart";
+import Success from "./pages/Success";
+
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
     children: [
       {
         path: "/",
-        element: <div>Home</div>,
+        element: <HomePage></HomePage>,
       },
+
+      {
+        path: "/find-doctors",
+        element: <FindDoctorsPage></FindDoctorsPage>,
+      },
+      {
+        path: "/profile/:id",
+        element: <DoctorProfilePage></DoctorProfilePage>,
+      },
+      {
+        path: "/appointment-booking",
+        element: <AppointmentBookingPage />,
+      },
+
+      {
+        path: "/questionnaire",
+        element: <QuestionnairePage></QuestionnairePage>,
+      },
+      {
+        path: "/questionnaireSingleCard/:id",
+        element: <QuestionnaireSingleCard></QuestionnaireSingleCard>,
+      },
+      {
+        path: "/selfAssessmentQuestions",
+        element: <SelfAssessmentQuestions />,
+      },
+      {
+        path: "/selfAssessmentResult",
+        element: <SelfAssessmentResult />,
+      },
+      {
+        path: "/triviaQuestions",
+        element: <TriviaQuestions />,
+      },
+      {
+        path: "/triviaResult",
+        element: <TriviaResult />,
+      },
+
+      {
+        path: "/commune",
+        element: <ForumPage></ForumPage>,
+      },
+      {
+        path: "/commune/post/:id",
+        element: <SinglePost />,
+      },
+      {
+        path: "/about",
+        element: <div>About us</div>,
+      },
+      { path: "store", element: <Store /> },
+      { path: "prodDetail", element: <ProductDetail /> },
+      { path: "cart", element: <Cart /> },
+      { path: "success", element: <Success /> },
       {
         element: <DashboardLayout />,
         children: [
