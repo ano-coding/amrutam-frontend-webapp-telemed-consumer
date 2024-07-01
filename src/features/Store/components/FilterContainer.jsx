@@ -1,82 +1,190 @@
-import { useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Filter from "./Filter";
-import Product from "./Product";
-import SortField from "./SortField";
+// import Product from "./Product";
+// import SortField from "./SortField";
 
-const FilterContainer = () => {
-  const location = useLocation();
+const productCategoryList = [
+  {
+    id: "all",
+    name: "All",
+    width: "33px",
+    height: "28px",
+    image: "/all.png",
+  },
+  {
+    id: "400744677629",
+    name: "Hair",
+    width: "78px",
+    height: "78px",
+    image: "/hair.png",
+  },
+  {
+    id: "400746250493",
+    name: "Skin",
+    width: "40.37px",
+    height: "39px",
+    image: "/skin.png",
+  },
+  {
+    id: "400748773629",
+    name: "Digestion",
+    width: "41.86px",
+    height: "37px",
+    image: "/digestion.png",
+  },
+  {
+    id: "400748839165",
+    name: "Bones",
+    width: "35.29px",
+    height: "41px",
+    image: "/bones.png",
+  },
+  {
+    id: "400748740861",
+    name: "Immunity",
+    width: "84px",
+    height: "84px",
+    image: "/immunity1.png",
+  },
+  {
+    id: "400786161917",
+    name: "Women",
+    width: "35.29px",
+    height: "41px",
+    image: "/bones.png",
+  },
+  {
+    id: "400786063613",
+    name: "Sexual",
+    width: "35.29px",
+    height: "41px",
+    image: "/bones.png",
+  },
+  {
+    id: "400748806397",
+    name: "Eye",
+    width: "35.29px",
+    height: "41px",
+    image: "/bones.png",
+  },
+  {
+    id: "400785146109",
+    name: "Liver",
+    width: "35.29px",
+    height: "41px",
+    image: "/bones.png",
+  },
+  {
+    id: "400786030845",
+    name: "Piles",
+    width: "35.29px",
+    height: "41px",
+    image: "/bones.png",
+  },
+  {
+    id: "400786456829",
+    name: "Dental",
+    width: "35.29px",
+    height: "41px",
+    image: "/bones.png",
+  },
+  {
+    id: "400787013885",
+    name: "Gifting",
+    width: "35.29px",
+    height: "41px",
+    image: "/bones.png",
+  },
+];
+
+const FilterContainer = (props) => {
+  const scrollerRef = useRef(null);
 
   //States
-  const [moreFilters, showMoreFilters] = useState(false);
-  const [size, setSize] = useState();
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [visibleCategories, setVisibleCategories] = useState(
+    productCategoryList.slice(0, 6),
+  );
+  const [startIndex, setStartIndex] = useState(0);
+  const [activeCategory, setActiveCategory] = useState("all");
 
   //Handlers
-  const moreFilterHandler = () => {
-    showMoreFilters((prev) => !prev);
+  const moreHandler = () => {
+    console.log("sfn");
+    const newStartIndex = (startIndex + 1) % productCategoryList.length;
+    setStartIndex(newStartIndex);
+    setVisibleCategories(
+      [
+        ...productCategoryList.slice(newStartIndex),
+        ...productCategoryList.slice(0, newStartIndex),
+      ].slice(0, 6),
+    );
+  };
+  const changeCategoryHandler = (id) => {
+    setActiveCategory(id);
+    props.categoryChange(id);
   };
 
   //Effects
   useEffect(() => {
-    const handleResize = () => {
-      setSize(window.innerWidth <= 640);
-    };
-
-    const isSmallScreen = window.innerWidth <= 640;
-    setSize(
-      (location.pathname === "/prodDetail" || location.pathname === "/cart") &&
-        isSmallScreen,
-    );
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [location]);
+    if (scrollerRef.current) {
+      scrollerRef.current.scrollTo({
+        left: 0,
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  }, [visibleCategories]);
 
   return (
-    <>
+    <div className="flex items-center justify-center">
       <div
-        className="no-scrollbar relative mt-9 flex items-center justify-center gap-9 max-md:gap-4 max-sm:mx-auto max-sm:mb-0 max-sm:mt-6 max-sm:w-11/12 max-sm:justify-start max-sm:overflow-scroll max-sm:overflow-y-hidden"
-        style={{ display: size ? "none" : "flex" }}
+        ref={scrollerRef}
+        className="no-scrollbar relative mt-9 flex max-w-[590px] items-center justify-start gap-9 overflow-x-auto max-md:hidden"
       >
-        <Filter src="/all.png" name={"All"} width={"33px"} height={"28px"} />
-        <Filter src="/hair.png" name={"Hair"} width={"78px"} height={"78px"} />
-        <Filter
-          src="/skin.png"
-          name={"Skin"}
-          width={"40.37px"}
-          height={"39px"}
-        />
-        <Filter
-          src="/digestion.png"
-          name={"Digestion"}
-          width={"41.86px"}
-          height={"37px"}
-        />
-        <Filter
-          src="/bones.png"
-          name={"Bones"}
-          width={"35.29px"}
-          height={"41px"}
-        />
-        <Filter
-          src="/immunity1.png"
-          name={"Immunity"}
-          width={"84px"}
-          height={"84px"}
-        />
-        <Filter
-          src="/more.png"
-          name={"More"}
-          width={"10px"}
-          height={"18px"}
-          onClick={moreFilterHandler}
-        />
+        {visibleCategories.map((filter) => {
+          return (
+            <Filter
+              key={filter.id}
+              src={filter.image}
+              name={filter.name}
+              width={filter.width}
+              height={filter.height}
+              id={filter.id}
+              active={activeCategory}
+              onClick={() => changeCategoryHandler(filter.id)}
+            />
+          );
+        })}
       </div>
-      {moreFilters ? (
-        <div className="bg-customyellow-200 absolute top-[474px] z-20 flex w-full items-center justify-center shadow-md max-sm:hidden">
+      <div className="no-scrollbar relative mt-9 hidden items-center justify-start max-md:flex max-md:w-11/12 max-md:gap-4 max-md:overflow-scroll max-md:overflow-y-hidden max-sm:mx-auto max-sm:mb-0 max-sm:mt-6">
+        {productCategoryList.map((filter) => {
+          return (
+            <Filter
+              key={filter.id}
+              src={filter.image}
+              name={filter.name}
+              width={filter.width}
+              height={filter.height}
+              id={filter.id}
+              active={activeCategory}
+              onClick={() => changeCategoryHandler(filter.id)}
+            />
+          );
+        })}
+      </div>
+      <Filter
+        src="/more.png"
+        name={"More"}
+        width={"10px"}
+        height={"18px"}
+        className="ml-7 mt-9 max-md:hidden"
+        id={"more"}
+        active={activeCategory}
+        onClick={moreHandler}
+      />
+
+      {/*{moreFilters ? (
+        <div className="absolute top-[474px] z-20 flex w-full items-center justify-center bg-customyellow-200 shadow-md max-sm:hidden">
           <div className="flex items-start justify-center gap-16 max-md:flex-col max-md:gap-0 max-md:pb-[50px]">
             <div className="mb-[114px] max-md:mb-0">
               <h4 className="mb-3 mt-12 text-lg font-semibold tracking-tight max-md:text-center">
@@ -170,8 +278,8 @@ const FilterContainer = () => {
               infoSize={"14px"}
               inline={"inline-block"}
             />
-            <div className="bg-customcream absolute right-[99px] top-[33px] flex h-[32px] w-[146px] items-center justify-center rounded-2xl">
-              <span className="text-custommustard text-base tracking-tight">
+            <div className="absolute right-[99px] top-[33px] flex h-[32px] w-[146px] items-center justify-center rounded-2xl bg-customcream">
+              <span className="text-base tracking-tight text-custommustard">
                 Bestseller
               </span>
             </div>
@@ -179,8 +287,8 @@ const FilterContainer = () => {
         </div>
       ) : (
         ""
-      )}
-    </>
+      )}*/}
+    </div>
   );
 };
 

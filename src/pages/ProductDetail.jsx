@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import FilterContainer from "../features/Store/components/FilterContainer";
+// import FilterContainer from "../features/Store/components/FilterContainer";
 import Footer from "../features/Store/components/Footer";
 import Header from "../features/Store/components/Header";
 import Highlight from "../features/Store/components/Highlight";
@@ -71,7 +71,6 @@ const ProductDetail = () => {
   return (
     <div>
       <Header name={"Store"} show={true} />
-      <FilterContainer />
       <div className="mt-[74px] flex items-start justify-center gap-[26px] max-xl:flex-col max-xl:items-center max-xl:gap-0 max-sm:mt-[20px]">
         <div className="flex flex-col items-center justify-center gap-[26px]">
           <div className="relative max-xl:flex max-xl:items-center max-xl:justify-center">
@@ -164,17 +163,17 @@ const ProductDetail = () => {
                 fill="#F79624"
               />
             </svg>
-            <span className="text-dimgray-100 ml-1 text-[18px] font-medium leading-[18px] tracking-tight">
+            <span className="ml-1 text-[18px] font-medium leading-[18px] tracking-tight text-dimgray-100">
               (204 reviews)
             </span>
           </div>
           <div className="mb-9 mt-2 flex items-center justify-start max-md:mb-2.5 max-md:ml-5">
             <img src="/ruppee.png" alt="ruppee" className="h-5 w-5" />
-            <span className="text-customblack-100 text-xl font-medium leading-[26px] tracking-tight">
+            <span className="text-xl font-medium leading-[26px] tracking-tight text-customblack-100">
               649
             </span>
           </div>
-          <div className="first:[&_div]:border-customlightgreen-100 first:[&_div]:bg-customgreen-100 last:[&_div]:bg-offWhite-100 last:[&_div]:text-offWhite-300 mb-[52px] flex items-center justify-start gap-2 max-md:ml-5 max-sm:mb-5 [&_div]:rounded-xl [&_div]:px-3 [&_div]:py-2 first:[&_div]:border even:[&_div]:bg-[#f0f0f0] [&_span]:font-nunito [&_span]:text-[18px] [&_span]:font-medium [&_span]:leading-5 [&_span]:tracking-tight">
+          <div className="mb-[52px] flex items-center justify-start gap-2 max-md:ml-5 max-sm:mb-5 [&_div]:rounded-xl [&_div]:px-3 [&_div]:py-2 first:[&_div]:border first:[&_div]:border-customlightgreen-100 first:[&_div]:bg-customgreen-100 last:[&_div]:bg-offWhite-100 last:[&_div]:text-offWhite-300 even:[&_div]:bg-[#f0f0f0] [&_span]:font-nunito [&_span]:text-[18px] [&_span]:font-medium [&_span]:leading-5 [&_span]:tracking-tight">
             <div>
               <span>200 ml</span>
             </div>
@@ -219,7 +218,7 @@ const ProductDetail = () => {
             </div>
             <button
               onClick={() => addToCartHandler(0)}
-              className="bg-customgreen-800 cursor-pointer rounded-xl border-none px-[103px] py-[19px] text-[18px] font-semibold leading-5 tracking-tight text-white outline-none max-xl:px-[50px]"
+              className="cursor-pointer rounded-xl border-none bg-customgreen-800 px-[103px] py-[19px] text-[18px] font-semibold leading-5 tracking-tight text-white outline-none max-xl:px-[50px]"
             >
               Add to cart
             </button>
@@ -239,7 +238,7 @@ const ProductDetail = () => {
             </p>
             <p>It&apos;s time to bring spa home and unwind.</p>
           </div>
-          <div className="bg-offWhite-100 hidden h-[8px] w-full max-sm:block" />
+          <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
           <div className="mb-12 max-sm:my-6">
             <div className="mb-6 flex items-center justify-start gap-[10px] max-md:ml-5">
               <img
@@ -247,7 +246,7 @@ const ProductDetail = () => {
                 alt="recipe"
                 className="h-[32px] w-[42px]"
               />
-              <h4 className="text-darkslategray-300 m-0 text-xl font-medium leading-6 tracking-tight max-md:text-base max-md:leading-6">
+              <h4 className="m-0 text-xl font-medium leading-6 tracking-tight text-darkslategray-300 max-md:text-base max-md:leading-6">
                 Product Highlights
               </h4>
             </div>
@@ -258,7 +257,7 @@ const ProductDetail = () => {
               <Highlight name={"Reduces hairfall, repairs damaged hair"} />
             </div>
           </div>
-          <div className="bg-offWhite-100 hidden h-[8px] w-full max-sm:block" />
+          <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
           <div className="max-sm:mt-6">
             <div className="mb-6 flex items-center justify-start gap-[10px] max-md:ml-5">
               <img
@@ -266,7 +265,7 @@ const ProductDetail = () => {
                 alt="recipe"
                 className="h-[32px] w-[42px]"
               />
-              <h4 className="text-darkslategray-300 m-0 text-xl font-medium leading-6 tracking-tight max-md:text-base max-md:leading-6">
+              <h4 className="m-0 text-xl font-medium leading-6 tracking-tight text-darkslategray-300 max-md:text-base max-md:leading-6">
                 Key Ingredients
               </h4>
             </div>
@@ -289,12 +288,12 @@ const ProductDetail = () => {
               />
             </div>
           </div>
-          <div className="bg-offWhite-100 hidden h-[8px] w-full max-sm:block" />
+          <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
           <div className="mb-12">
             <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
               How to use
             </h4>
-            <div className="bg-offWhite-200 [&_p]:text-dimgray-100 w-[633px] rounded-xl max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight">
+            <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight [&_p]:text-dimgray-100">
               <p className="py-5 pl-3 pr-[18px] text-[18px] leading-[30px]">
                 Mix one or tow tablespoons of Herbal Child Care Malt with milk
                 or 100-200ml warm water and then consume twice a day or consult
@@ -302,25 +301,25 @@ const ProductDetail = () => {
               </p>
             </div>
           </div>
-          <div className="bg-offWhite-100 hidden h-[8px] w-full max-sm:block" />
+          <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
           <div className="mb-12">
             <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
               General Instructions
             </h4>
-            <div className="bg-offWhite-200 [&_p]:text-dimgray-100 w-[633px] rounded-xl max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight">
+            <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight [&_p]:text-dimgray-100">
               <p className="py-5 pl-3 pr-0 text-base leading-[30px]">
                 Store in a cool and dry palce away from direct sunlight. Not
                 advisable for diabetic patients
               </p>
             </div>
           </div>
-          <div className="bg-offWhite-100 hidden h-[8px] w-full max-sm:block" />
-          <div className="[&_h5]:text-darkslategray-300 mb-[38px] [&_h5]:m-0 [&_h5]:pb-[14px] [&_h5]:pl-3 [&_h5]:pr-[15px] [&_h5]:pt-5 [&_h5]:text-base [&_h5]:font-bold [&_h5]:tracking-tight">
+          <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
+          <div className="mb-[38px] [&_h5]:m-0 [&_h5]:pb-[14px] [&_h5]:pl-3 [&_h5]:pr-[15px] [&_h5]:pt-5 [&_h5]:text-base [&_h5]:font-bold [&_h5]:tracking-tight [&_h5]:text-darkslategray-300">
             <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
               Commonly Asked Questions
             </h4>
             <div
-              className="bg-offWhite-200 [&_p]:text-dimgray-100 w-[633px] rounded-xl max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:pb-5 [&_p]:pl-3 [&_p]:pr-[18px] [&_p]:pt-0 [&_p]:text-sm [&_p]:leading-5 [&_p]:tracking-tight"
+              className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:pb-5 [&_p]:pl-3 [&_p]:pr-[18px] [&_p]:pt-0 [&_p]:text-sm [&_p]:leading-5 [&_p]:tracking-tight [&_p]:text-dimgray-100"
               style={{ marginBottom: "12px" }}
             >
               <h5>
@@ -332,7 +331,7 @@ const ProductDetail = () => {
                 their health in a holistic manner
               </p>
             </div>
-            <div className="bg-offWhite-200 [&_p]:text-dimgray-100 w-[633px] rounded-xl max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:pb-5 [&_p]:pl-3 [&_p]:pr-[20px] [&_p]:pt-0 [&_p]:text-sm [&_p]:leading-5 [&_p]:tracking-tight">
+            <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:pb-5 [&_p]:pl-3 [&_p]:pr-[20px] [&_p]:pt-0 [&_p]:text-sm [&_p]:leading-5 [&_p]:tracking-tight [&_p]:text-dimgray-100">
               <h5>
                 Why choose Amrutam Child Care Malt | Herbal Supplement for Child
                 Care
@@ -353,15 +352,15 @@ const ProductDetail = () => {
               </p>
             </div>
           </div>
-          <div className="bg-offWhite-100 hidden h-[8px] w-full max-sm:block" />
+          <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
           <div className="relative mb-[65px] max-sm:my-6">
-            <h5 className="text-darkslategray-300 mb-3 text-[18px] font-medium leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:mt-0">
+            <h5 className="mb-3 text-[18px] font-medium leading-6 tracking-tight text-darkslategray-300 max-md:ml-5 max-md:text-base max-sm:mt-0">
               Trust the voice
             </h5>
             <img
               src="/expert.png"
               alt="expert"
-              className="bg-offWhite-200 h-[320px] w-[599px] rounded-xl max-xl:w-full max-md:mx-5 max-md:h-auto max-md:w-[calc(100%_-_40px)]"
+              className="h-[320px] w-[599px] rounded-xl bg-offWhite-200 max-xl:w-full max-md:mx-5 max-md:h-auto max-md:w-[calc(100%_-_40px)]"
             />
             <img
               src="/play.png"
@@ -371,14 +370,14 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
-      <div className="bg-offWhite-100 hidden h-[8px] w-full max-sm:block" />
+      <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
       <div className="mx-[72px] mb-[88px] mt-0 max-md:mb-0 max-sm:mx-0">
-        <h3 className="text-darkslategray-300 mb-[44px] text-center text-2xl font-semibold leading-6 tracking-tight max-sm:mb-[28px] max-sm:ml-5 max-sm:mt-6 max-sm:text-left max-sm:text-base">
+        <h3 className="mb-[44px] text-center text-2xl font-semibold leading-6 tracking-tight text-darkslategray-300 max-sm:mb-[28px] max-sm:ml-5 max-sm:mt-6 max-sm:text-left max-sm:text-base">
           Reviews and Ratings
         </h3>
         <div className="mb-[34px] flex items-start justify-between max-lg:flex-col max-lg:items-center">
-          <div className="bg-offWhite-100 flex h-[124px] w-[308px] items-center justify-start gap-5 rounded-xl pl-5 max-lg:mb-5 max-lg:w-full max-sm:mx-5 max-sm:w-[calc(100%_-_64px)]">
-            <h2 className="text-customblack-100 font-nunito text-[32px] font-bold leading-[42px] tracking-tight">
+          <div className="flex h-[124px] w-[308px] items-center justify-start gap-5 rounded-xl bg-offWhite-100 pl-5 max-lg:mb-5 max-lg:w-full max-sm:mx-5 max-sm:w-[calc(100%_-_64px)]">
+            <h2 className="font-nunito text-[32px] font-bold leading-[42px] tracking-tight text-customblack-100">
               5.0
             </h2>
             <div>
@@ -444,7 +443,7 @@ const ProductDetail = () => {
                   />
                 </svg>
               </div>
-              <span className="text-darkslategray-300 font-nunito text-sm tracking-tight">
+              <span className="font-nunito text-sm tracking-tight text-darkslategray-300">
                 Based on 20 reviews
               </span>
             </div>
@@ -453,7 +452,7 @@ const ProductDetail = () => {
             <UserReview />
             <UserReview />
           </div>
-          <div className="[&_span]:text-customgreen-800 flex items-center justify-center gap-4 max-lg:mb-5 [&_div]:flex [&_div]:h-[40px] [&_div]:w-[156px] [&_div]:items-center [&_div]:justify-center [&_div]:rounded-xl [&_div]:border [&_div]:border-[#e2e2e2] [&_span]:text-sm [&_span]:font-medium [&_span]:leading-6 [&_span]:tracking-tight">
+          <div className="flex items-center justify-center gap-4 max-lg:mb-5 [&_div]:flex [&_div]:h-[40px] [&_div]:w-[156px] [&_div]:items-center [&_div]:justify-center [&_div]:rounded-xl [&_div]:border [&_div]:border-[#e2e2e2] [&_span]:text-sm [&_span]:font-medium [&_span]:leading-6 [&_span]:tracking-tight [&_span]:text-customgreen-800">
             <div>
               <span>See more reviews</span>
             </div>
@@ -467,21 +466,21 @@ const ProductDetail = () => {
           <UserReview />
         </div>
       </div>
-      <div className="bg-offWhite-100 hidden h-[8px] w-full max-sm:block" />
+      <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
       <SimilarProducts />
-      <div className="bg-offWhite-100 hidden h-[8px] w-full max-sm:block" />
+      <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
       <div className="mt-[137px] max-md:mt-6">
         <h4 className="m-0 mb-[114px] text-center text-2xl font-medium leading-6 tracking-tight max-md:mb-5 max-sm:ml-5 max-sm:text-left max-sm:text-base">
           Meet our Experts
         </h4>
         <div className="no-scrollbar mb-[31px] flex items-center justify-center gap-12 max-xl:mx-auto max-xl:my-0 max-xl:mb-[31px] max-xl:w-[90%] max-xl:justify-start max-xl:gap-4 max-xl:overflow-scroll">
-          <div className="border-customgray-800 flex h-[70px] w-[70px] cursor-pointer items-center justify-center rounded-[50%] border max-lg:hidden [&_img]:w-[23px]">
+          <div className="flex h-[70px] w-[70px] cursor-pointer items-center justify-center rounded-[50%] border border-customgray-800 max-lg:hidden [&_img]:w-[23px]">
             <img src="/leftarrow.png" alt="left-arrow" />
           </div>
           <Doctor />
           <Doctor />
           <Doctor />
-          <div className="border-customgray-800 flex h-[70px] w-[70px] cursor-pointer items-center justify-center rounded-[50%] border max-lg:hidden [&_img]:w-[23px]">
+          <div className="flex h-[70px] w-[70px] cursor-pointer items-center justify-center rounded-[50%] border border-customgray-800 max-lg:hidden [&_img]:w-[23px]">
             <img src="/arrow.png" alt="right-arrow" />
           </div>
         </div>
@@ -514,8 +513,8 @@ const ProductDetail = () => {
             <circle cx="6" cy="6" r="6" fill="#C3C3C3" />
           </svg>
         </div>
-        <button className="border-customgreen-800 bg-customlightgreen-300 mx-auto my-0 mb-14 flex w-[276px] items-center justify-center gap-[10px] rounded-[7px] border px-[25px] py-0 max-sm:mb-[100px] max-sm:w-[200px] max-sm:p-0">
-          <span className="text-customgreen-800 text-lg font-medium leading-[58px] tracking-tight max-sm:text-[15px]">
+        <button className="mx-auto my-0 mb-14 flex w-[276px] items-center justify-center gap-[10px] rounded-[7px] border border-customgreen-800 bg-customlightgreen-300 px-[25px] py-0 max-sm:mb-[100px] max-sm:w-[200px] max-sm:p-0">
+          <span className="text-lg font-medium leading-[58px] tracking-tight text-customgreen-800 max-sm:text-[15px]">
             Find more experts
           </span>
           <svg
@@ -539,29 +538,29 @@ const ProductDetail = () => {
         <div>
           <div className="flex items-center justify-center gap-[5px]">
             <img src="/ruppee.png" alt="ruppee" className="h-5 w-5" />
-            <h5 className="text-customblack-100 m-0 font-nunito text-2xl font-bold tracking-tight">
+            <h5 className="m-0 font-nunito text-2xl font-bold tracking-tight text-customblack-100">
               649
             </h5>
           </div>
-          <span className="text-dimgray-100 font-nunito text-sm font-medium tracking-tight">
+          <span className="font-nunito text-sm font-medium tracking-tight text-dimgray-100">
             200 ml
           </span>
         </div>
         <button
           onClick={() => addToCartHandler(1)}
-          className="bg-customgreen-800 h-[52px] w-[172px] rounded-xl border-none text-center font-nunito text-[18px] font-bold leading-5 tracking-tight text-white outline-none"
+          className="h-[52px] w-[172px] rounded-xl border-none bg-customgreen-800 text-center font-nunito text-[18px] font-bold leading-5 tracking-tight text-white outline-none"
         >
           Add to cart
         </button>
       </div>
       {showSuccess ? (
-        <div className="animate-Morph1 bg-dimgray-400 fixed bottom-20 left-0 mx-[30px] hidden h-[62px] w-[calc(100%_-_60px)] items-center justify-start gap-3 rounded-xl max-sm:flex">
+        <div className="fixed bottom-20 left-0 mx-[30px] hidden h-[62px] w-[calc(100%_-_60px)] animate-Morph1 items-center justify-start gap-3 rounded-xl bg-dimgray-400 max-sm:flex">
           <img
             src="/cartSuccess.png"
             alt="success"
             className="ml-3 h-[32px] w-[32px]"
           />
-          <span className="text-darkslategray-300 font-nunito text-[18px] font-bold leading-[26px] tracking-tight">
+          <span className="font-nunito text-[18px] font-bold leading-[26px] tracking-tight text-darkslategray-300">
             Item added to cart
           </span>
         </div>
@@ -569,14 +568,14 @@ const ProductDetail = () => {
         ""
       )}
       {showCart ? (
-        <div className="animate-Morph2 bg-customblue fixed bottom-[78px] left-0 hidden w-full items-center justify-between px-5 py-3 max-sm:flex">
+        <div className="fixed bottom-[78px] left-0 hidden w-full animate-Morph2 items-center justify-between bg-customblue px-5 py-3 max-sm:flex">
           <div className="flex items-center justify-start gap-3">
             <img src="/recipe.png" alt="recipe" className="h-8 w-8" />
             <div>
               <h5 className="m-0 font-nunito text-sm font-bold tracking-tight text-white">
                 Proceed to Checkout
               </h5>
-              <div className="[&_span]:text-offWhite-100 flex items-center justify-start gap-2 [&_div]:flex [&_div]:items-center [&_div]:justify-center [&_div]:gap-[2px] [&_span]:font-nunito [&_span]:text-xs [&_span]:leading-[18px] [&_span]:tracking-tight">
+              <div className="flex items-center justify-start gap-2 [&_div]:flex [&_div]:items-center [&_div]:justify-center [&_div]:gap-[2px] [&_span]:font-nunito [&_span]:text-xs [&_span]:leading-[18px] [&_span]:tracking-tight [&_span]:text-offWhite-100">
                 <span>
                   {itemCount} {itemCount <= 1 ? "item" : "items"}
                 </span>
@@ -636,7 +635,7 @@ const ProductDetail = () => {
           </div>
           <button
             onClick={viewCartHandler}
-            className="text-customgreen-800 border-none bg-white px-4 py-2 font-nunito text-xs font-bold leading-[18px] tracking-tight outline-none"
+            className="border-none bg-white px-4 py-2 font-nunito text-xs font-bold leading-[18px] tracking-tight text-customgreen-800 outline-none"
           >
             View Cart
           </button>

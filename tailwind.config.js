@@ -1,4 +1,4 @@
-import formsPlugin from "@tailwindcss/forms";
+// import formsPlugin from "@tailwindcss/forms";
 import flowbite from "flowbite-react/tailwind";
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -166,5 +166,5 @@ export default {
     },
   },
 
-  plugins: [formsPlugin(), flowbite.plugin()],
+  // plugins: [formsPlugin(), flowbite.plugin()],
 };

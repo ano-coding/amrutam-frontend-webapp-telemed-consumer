@@ -8,7 +8,7 @@ const Product = (props) => {
         src={props.src}
         alt={props.src}
         style={{ width: props.imageWidth, height: props.imageHeight }}
-        className="h-[410px] w-[365px] rounded-2xl max-xl:h-[281px] max-xl:w-[250px] max-lg:h-[200px] max-lg:w-[200px] max-sm:h-[140px] max-sm:w-[140px]"
+        className="h-[410px] w-[365px] max-w-[365px] rounded-2xl max-xl:h-[281px] max-xl:w-[250px] max-lg:h-[200px] max-lg:w-[200px] max-sm:h-[140px] max-sm:w-[140px]"
       />
       <div className="relative flex flex-col items-center justify-center text-center max-md:w-[60%] max-md:items-start max-md:text-left max-sm:mr-4">
         <h5
