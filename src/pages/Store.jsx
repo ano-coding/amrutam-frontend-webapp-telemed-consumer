@@ -4,7 +4,6 @@ import Header from "../features/Store/components/Header";
 import Footer from "../features/Store/components/Footer";
 import HomeAppContainer from "../features/Store/components/HomeAppContainer";
 import FilterContainer from "../features/Store/components/FilterContainer";
-import BottomNavigation from "../features/Store/components/BottomNavigation";
 import MobileFilters from "../features/Store/components/MobileFilters";
 
 const Store = () => {
@@ -33,7 +32,7 @@ const Store = () => {
             rating={"52"}
             onClick={prodDetailHandler}
           />
-          <div className="bg-offWhite-100 mx-auto my-0 h-[1px] w-full md:hidden" />
+          <div className="mx-auto my-0 h-[1px] w-full bg-offWhite-100 md:hidden" />
 
           <Product
             src="/product2.png"
@@ -44,7 +43,7 @@ const Store = () => {
             amount={"200ml"}
             rating={"52"}
           />
-          <div className="bg-offWhite-100 mx-auto my-0 h-[1px] w-full md:hidden" />
+          <div className="mx-auto my-0 h-[1px] w-full bg-offWhite-100 md:hidden" />
 
           <Product
             src="/product3.png"
@@ -55,9 +54,9 @@ const Store = () => {
             amount={"200ml"}
             rating={"52"}
           />
-          <div className="bg-offWhite-100 mx-auto my-0 h-[1px] w-full md:hidden" />
+          <div className="mx-auto my-0 h-[1px] w-full bg-offWhite-100 md:hidden" />
 
-          <div className="border-customgray-800 ml-[37px] mt-[148px] flex h-[70px] w-[70px] items-center justify-center rounded-full border hover:cursor-pointer max-xl:my-[105px] max-xl:ml-0 max-lg:my-[140px] max-lg:h-[40px] max-lg:w-[40px] max-md:hidden">
+          <div className="ml-[37px] mt-[148px] flex h-[70px] w-[70px] items-center justify-center rounded-full border border-customgray-800 hover:cursor-pointer max-xl:my-[105px] max-xl:ml-0 max-lg:my-[140px] max-lg:h-[40px] max-lg:w-[40px] max-md:hidden">
             <img src="/arrow.png" alt="arrow" className="w-[23px]" />
           </div>
         </div>
@@ -77,7 +76,7 @@ const Store = () => {
             amount={"200ml"}
             rating={"52"}
           />
-          <div className="bg-offWhite-100 mx-auto my-0 h-[1px] w-full md:hidden" />
+          <div className="mx-auto my-0 h-[1px] w-full bg-offWhite-100 md:hidden" />
           <Product
             src="/product2.png"
             name={
@@ -87,7 +86,7 @@ const Store = () => {
             amount={"200ml"}
             rating={"52"}
           />
-          <div className="bg-offWhite-100 mx-auto my-0 h-[1px] w-full md:hidden" />
+          <div className="mx-auto my-0 h-[1px] w-full bg-offWhite-100 md:hidden" />
 
           <Product
             src="/product3.png"
@@ -98,18 +97,13 @@ const Store = () => {
             amount={"200ml"}
             rating={"52"}
           />
-          <div className="border-customgray-800 mb-[126px] ml-[37px] flex h-[70px] w-[70px] items-center justify-center rounded-full border hover:cursor-pointer max-xl:my-[105px] max-xl:ml-0 max-lg:my-[80px] max-lg:h-[40px] max-lg:w-[40px] max-md:hidden">
+          <div className="mb-[126px] ml-[37px] flex h-[70px] w-[70px] items-center justify-center rounded-full border border-customgray-800 hover:cursor-pointer max-xl:my-[105px] max-xl:ml-0 max-lg:my-[80px] max-lg:h-[40px] max-lg:w-[40px] max-md:hidden">
             <img src="/arrow.png" alt="arrow" className="w-[23px]" />
           </div>
         </div>
       </div>
       <MobileFilters />
-      <div
-        style={{ background: " #EAF2EA", width: "100%", height: "75px" }}
-        className="sm:hidden"
-      >
-        <BottomNavigation />
-      </div>
+
       <HomeAppContainer />
       <Footer />
     </div>

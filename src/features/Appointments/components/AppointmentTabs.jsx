@@ -390,8 +390,21 @@ const AppointmentTabs = () => {
   );
 
   if (isLoading) return <div>Loading...</div>;
-  // const appointments = data?.data ?? {};
-  const appointments = appointmentsStatic;
+  const appointments = data?.data ?? {};
+  // const appointments = appointmentsStatic;
+
+  if (error) {
+    if (
+      error.response.data.message ===
+      "No upcoming appointments found for the patient"
+    )
+      return (
+        <div className="text-center">
+          No upcoming appointments found for the patient
+        </div>
+      );
+    return <div>Error...</div>;
+  }
 
   console.log(appointments);
 
