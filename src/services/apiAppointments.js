@@ -17,7 +17,6 @@ export const getUpcomingAppointments = async (patientId, token) => {
     return response.data;
   } catch (error) {
     console.log(error);
-
     throw error;
   }
 };

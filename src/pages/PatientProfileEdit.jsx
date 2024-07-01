@@ -5,15 +5,24 @@ import ContentBoxLayout from "../components/ContentBoxLayout";
 import useUpdatePatientProfile from "../hooks/useUpdatePatientProfile";
 import { PhoneInputPatient } from "../features/PatientProfile/PhoneInputPatient";
 import { useLocation, useNavigate } from "react-router-dom";
-
+import { useEffect, useRef, useState } from "react";
+import uploadFileToS3 from "../services/apiUpload";
+import SyncLoader from "react-spinners/SyncLoader";
 const PatientProfileEdit = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
   const data = state?.data;
   const token = state.token;
   const { updatePatientProfileMutate, updatePatientProfileStatus } =
     useUpdatePatientProfile();
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorPhoto, setErrorPhoto] = useState(null);
+  const isProfileUpdating = updatePatientProfileStatus === "pending";
+
   const defaultValues = data
     ? {
         dob: data.data?.dob,
@@ -30,6 +39,8 @@ const PatientProfileEdit = () => {
       }
     : {};
 
+  let photoData = data?.data?.photo;
+
   const {
     register,
     handleSubmit,
@@ -41,55 +52,137 @@ const PatientProfileEdit = () => {
     defaultValues,
   });
 
-  const onSubmit = (data) => {
-    updatePatientProfileMutate(
-      {
-        token: token,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        phone: data.phoneNumber,
-        email: data.email,
-        dob: data.dob,
-        gender: data.gender,
-        state: data.stateName,
-        country: data.countryName,
-        heightUnit: "cm",
-        heightValue: data.height,
-        weightUnit: "kg",
-        weightValue: data.weight,
-      },
-      {
-        onSuccess: (data) => {
-          console.log(data);
+  useEffect(() => {
+    if (!selectedFile) return;
+    setValue("photo", selectedFile);
+  }, [selectedFile, setValue]);
 
-          console.log("Success, Profile Updated");
-          navigate("/profile");
+  const handleDivClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+
+    // Check if the file exists
+    if (!file) {
+      setErrorPhoto("No file selected.");
+      return;
+    }
+
+    // Check file type
+    const fileTypes = ["image/jpeg", "image/png"];
+    if (!fileTypes.includes(file.type)) {
+      setErrorPhoto("Only JPG and PNG files are allowed.");
+      return;
+    }
+
+    // Check file size (2MB = 2 * 1024 * 1024 bytes)
+    const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setErrorPhoto("File size should be less than 2MB.");
+      return;
+    }
+
+    setErrorPhoto(null); // Clear any previous errors
+    setSelectedFile(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const onSubmit = async (data) => {
+    console.log(data);
+    console.log(selectedFile);
+
+    try {
+      setIsLoading(true);
+      if (isProfileUpdating) return;
+
+      if (selectedFile !== null) {
+        const response = await uploadFileToS3(selectedFile, token);
+        photoData = response.data;
+      }
+
+      updatePatientProfileMutate(
+        {
+          token: token,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          phone: data.phoneNumber,
+          email: data.email,
+          dob: data.dob,
+          gender: data.gender,
+          state: data.stateName,
+          country: data.countryName,
+          heightUnit: "cm",
+          heightValue: data.height,
+          weightUnit: "kg",
+          weightValue: data.weight,
+          photo: photoData,
         },
-        onError: (error) => {
-          console.log("Error Profile Not Updated", error);
+        {
+          onSuccess: (data) => {
+            console.log(data);
+
+            console.log("Success, Profile Updated");
+            navigate("/profile");
+          },
+          onError: (error) => {
+            console.log("Error Profile Not Updated", error);
+          },
         },
-      },
-    );
+      );
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <ContentBoxLayout title={"Personal & Contact Details"}>
       <form
-        className="flex w-full items-center justify-center"
+        className="relative flex w-full items-center justify-center"
         onSubmit={handleSubmit(onSubmit)}
       >
+        {(isProfileUpdating || isLoading) && (
+          <div className="absolute z-10 flex h-full w-full items-center justify-center bg-white bg-opacity-55">
+            <SyncLoader color="#3a643b" margin={5} size={20} />
+          </div>
+        )}
         <div className="my-2 flex w-full flex-col items-center gap-10 p-6 xl:w-11/12 xl:px-10">
           <div className="flex flex-col items-center gap-[15px]">
             <img
-              src={watch("photo") ? watch("photo") : "/user-avatar-2.png"}
+              src={
+                previewUrl
+                  ? previewUrl
+                  : watch("photo")
+                    ? watch("photo")
+                    : "/user-avatar-2.png"
+              }
               className="aspect-square h-[113px] rounded-full object-cover"
             />
-            <div className="flex cursor-pointer items-center justify-center gap-2 rounded-[29px] border-[1px] border-solid border-[#d0d0d0] bg-[#fcfcff] px-[22px] py-[10px]">
+            <div
+              onClick={handleDivClick}
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-[29px] border-[1px] border-solid border-[#d0d0d0] bg-[#fcfcff] px-[22px] py-[10px]"
+            >
               <UploadSvg className="size-5" />
               <span className="text-[15px] text-[#3a3a3a]">Upload a Photo</span>
             </div>
+            <input
+              type="file"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+            />
 
-            <div className="text-[14px] text-[#5f5f5f]">
+            <div
+              className={`text-[14px] ${errorPhoto ? `font-medium italic text-red-700` : `text-[#5f5f5f]`}`}
+            >
               Allowed JPG, GIF or PNG. Max size of 2MB
             </div>
           </div>

@@ -7,7 +7,6 @@ import Header from "../features/Store/components/Header";
 import Footer from "../features/Store/components/Footer";
 import HomeAppContainer from "../features/Store/components/HomeAppContainer";
 import FilterContainer from "../features/Store/components/FilterContainer";
-import BottomNavigation from "../features/Store/components/BottomNavigation";
 import MobileFilters from "../features/Store/components/MobileFilters";
 import Scroll from "../features/Store/components/Scroll";
 import Spinner from "../features/Store/components/Spinner";
@@ -103,12 +102,7 @@ const Store = () => {
       )}
 
       <MobileFilters />
-      <div
-        style={{ background: " #EAF2EA", width: "100%", height: "75px" }}
-        className="sm:hidden"
-      >
-        <BottomNavigation />
-      </div>
+
       <HomeAppContainer />
       <Footer />
     </div>
