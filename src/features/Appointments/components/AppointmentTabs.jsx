@@ -6,11 +6,7 @@ import MessageSvg from "../../../assets/message.svg?react";
 import EditSvg from "../../../assets/edit.svg?react";
 import useGetUpcomingAppointments from "../../../hooks/useGetUpcomingAppointments";
 import { UserContext } from "../../../context/UserContext";
-import {
-  calculateDuration,
-  formatDateToString,
-  formatDateWithWeek,
-} from "../../../helper/helper";
+import { calculateDuration, formatDateWithWeek } from "../../../helper/helper";
 
 const appointmentsStatic = [
   {
@@ -384,14 +380,11 @@ const appointmentsStatic = [
 const AppointmentTabs = () => {
   const [tab, setTab] = useState(0);
   const { userId, token } = useContext(UserContext);
-  const { data, error, isSuccess, isLoading } = useGetUpcomingAppointments(
-    userId,
-    token,
-  );
+  const { data, error, isLoading } = useGetUpcomingAppointments(userId, token);
 
   if (isLoading) return <div>Loading...</div>;
-  const appointments = data?.data ?? {};
-  // const appointments = appointmentsStatic;
+  // const appointments = data?.data ?? {};
+  const appointments = appointmentsStatic;
 
   if (error) {
     if (

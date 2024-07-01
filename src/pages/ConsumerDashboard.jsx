@@ -12,10 +12,24 @@ import { calculateDuration, formatDateWithWeek } from "../helper/helper";
 
 const ConsumerDashboard = () => {
   const { userId, token } = useContext(UserContext);
-  const { data, isLoading } = useGetUpcomingAppointments(userId, token);
+  const { data, error, isLoading } = useGetUpcomingAppointments(userId, token);
 
   if (isLoading) return <div>Loading...</div>;
+
+  if (error) {
+    if (
+      error.response.data.message ===
+      "No upcoming appointments found for the patient"
+    )
+      return (
+        <div className="text-center">
+          No upcoming appointments found for the patient
+        </div>
+      );
+    return <div>Error...</div>;
+  }
   const appointments = data?.data ?? {};
+
   console.log(appointments);
 
   return (
