@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getProductsByCategory, getTopProducts } from "../services/Shopify";
 import Product from "../features/Store/components/Product";
@@ -12,12 +12,7 @@ import Scroll from "../features/Store/components/Scroll";
 import Spinner from "../features/Store/components/Spinner";
 
 const Store = () => {
-  // const navigate = useNavigate();
-
-  //Handlers
-  // const prodDetailHandler = () => {
-  //   navigate("/prodDetail");
-  // };
+  const navigate = useNavigate();
 
   //States
   const [allProductsData, setAllProductsData] = useState();
@@ -55,6 +50,9 @@ const Store = () => {
   const categoryChange = (category) => {
     setActiveCategory(category);
   };
+  const prodDetailHandler = (id) => {
+    navigate(`/prodDetail/${id}`);
+  };
 
   //Effects
   useEffect(() => {
@@ -66,6 +64,7 @@ const Store = () => {
   useEffect(() => {
     if (!categoryProductsLoading && categoryProducts) {
       setCategoryProductsData(categoryProducts?.data?.data);
+      console.log(categoryProducts?.data?.data);
     }
   }, [categoryProducts, categoryProductsLoading]);
 
@@ -91,7 +90,11 @@ const Store = () => {
           {categoryProductsData ? (
             categoryProductsData.map((product) => {
               return (
-                <div key={product?.id} className="max-md:ml-4">
+                <div
+                  key={product?.id}
+                  className="max-md:ml-4"
+                  onClick={() => prodDetailHandler(product.shopify_product_id)}
+                >
                   <Product
                     src={product?.image?.src || ""}
                     name={product?.title || ""}
@@ -130,7 +133,13 @@ const Store = () => {
 };
 
 const ProductRow = ({ section }) => {
+  const navigate = useNavigate();
   const containerRef = useRef(null);
+
+  //Handlers
+  const prodDetailHandler = (id) => {
+    navigate(`/prodDetail/${id}`);
+  };
   return (
     <div key={section?.id}>
       <h3 className="m-0 mb-[60px] text-xl font-medium tracking-tight max-md:hidden">
@@ -143,7 +152,11 @@ const ProductRow = ({ section }) => {
         >
           {section?.ProductList?.map((product) => {
             return (
-              <div key={product?.id} className="max-md:ml-4">
+              <div
+                key={product?.id}
+                className="max-md:ml-4"
+                onClick={() => prodDetailHandler(product.shopify_product_id)}
+              >
                 <Product
                   src={product?.image?.src || ""}
                   name={product?.title || ""}

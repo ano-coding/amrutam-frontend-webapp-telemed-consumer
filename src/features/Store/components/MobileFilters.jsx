@@ -60,20 +60,23 @@ const MobileFilters = (props) => {
               </h3>
               <button onClick={clearHandler}>Clear</button>
             </div>
-            {category[
-              props.activeCategory === "400744677629" ? 0 : 1
-            ].subcat[0].concern.map((concern) => {
-              return (
-                <SortField
-                  key={concern.id}
-                  id={concern.id}
-                  name={concern.name}
-                  grpName={"Concern"}
-                  selectedOption={selectedOption}
-                  setSelectedOption={setSelectedOption}
-                />
-              );
-            })}
+            {props.activeCategory === "400746250493" ||
+            props.activeCategory === "400744677629"
+              ? category[
+                  props.activeCategory === "400744677629" ? 0 : 1
+                ].subcat[0].concern.map((concern) => {
+                  return (
+                    <SortField
+                      key={concern.id}
+                      id={concern.id}
+                      name={concern.name}
+                      grpName={"Concern"}
+                      selectedOption={selectedOption}
+                      setSelectedOption={setSelectedOption}
+                    />
+                  );
+                })
+              : ""}
           </div>
         </SortModal>
       ) : (
@@ -92,20 +95,23 @@ const MobileFilters = (props) => {
               </h3>
               <button onClick={clearHandler}>Clear</button>
             </div>
-            {category[
-              props.activeCategory === "400744677629" ? 0 : 1
-            ].subcat[0].category.map((category) => {
-              return (
-                <SortField
-                  key={category.id}
-                  id={category.id}
-                  name={category.name}
-                  grpName={"Concern"}
-                  selectedOption={selectedOption}
-                  setSelectedOption={setSelectedOption}
-                />
-              );
-            })}
+            {props.activeCategory === "400746250493" ||
+            props.activeCategory === "400744677629"
+              ? category[
+                  props.activeCategory === "400744677629" ? 0 : 1
+                ].subcat[0].category.map((category) => {
+                  return (
+                    <SortField
+                      key={category.id}
+                      id={category.id}
+                      name={category.name}
+                      grpName={"Concern"}
+                      selectedOption={selectedOption}
+                      setSelectedOption={setSelectedOption}
+                    />
+                  );
+                })
+              : ""}
           </div>
         </SortModal>
       ) : (

@@ -31,3 +31,17 @@ export async function getProductsByCategory(categoryId) {
     console.error(error);
   }
 }
+
+export async function getSingleProduct(productId) {
+  try {
+    const response = await axios.get(
+      `/api/v1/products/single/${productId}`,
+      config,
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}
+//  export async function addToCart()
+// 7507006587133

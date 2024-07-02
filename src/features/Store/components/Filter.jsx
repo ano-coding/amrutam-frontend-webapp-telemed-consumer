@@ -14,10 +14,10 @@ const Filter = (props) => {
           src={props.src}
           alt={props.name}
           style={{
-            width: `${props.width}`,
-            height: `${props.height}`,
+            width: props.width,
+            height: props.height,
           }}
-          className="max-w-max"
+          className="h-[84px] w-[84px] max-w-max rounded-full"
         />
       </div>
       <span

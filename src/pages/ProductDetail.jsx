@@ -1,6 +1,8 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-// import FilterContainer from "../features/Store/components/FilterContainer";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { getSingleProduct } from "../services/Shopify";
+import parse from "html-react-parser";
 import Footer from "../features/Store/components/Footer";
 import Header from "../features/Store/components/Header";
 import Highlight from "../features/Store/components/Highlight";
@@ -9,17 +11,19 @@ import HomeAppContainer from "../features/Store/components/HomeAppContainer";
 import UserReview from "../features/Store/components/UserReview";
 import SimilarProducts from "../features/Store/components/SimilarProducts";
 import Doctor from "../features/Store/components/Doctor";
+import Spinner from "../features/Store/components/Spinner";
 
 const ProductDetail = () => {
   const navigate = useNavigate();
-
-  const carouselImages = [
-    { id: 0, src: "/product1.png" },
-    { id: 1, src: "/product2.png" },
-    { id: 2, src: "/product3.png" },
-  ];
+  const { id } = useParams();
+  const carouselRef = useRef(null);
 
   //States
+  const [singleProductData, setSingleProductData] = useState();
+  const [carouselImages, setCarouselImages] = useState([]);
+  const [activeVariant, setActiveVariant] = useState(0);
+  const [variants, setVariants] = useState([]);
+  const [price, setPrice] = useState();
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [index, setIndex] = useState(0);
@@ -30,7 +34,17 @@ const ProductDetail = () => {
 
   //Handlers
   const nextImageHandler = () => {
-    setActiveImage((prev) => (prev + 1) % 3);
+    setActiveImage((prev) => (prev + 1) % carouselImages.length);
+    if (activeImage + 1 === carouselImages.length) {
+      console.log("dugh");
+      carouselRef?.current?.scrollTo({
+        left: 0,
+        top: 0,
+        behavior: "smooth",
+      });
+    } else {
+      carouselRef?.current?.scrollBy({ left: 223, top: 0, behavior: "smooth" });
+    }
   };
   const incrementHandler = () => {
     setQuantity((prev) => prev + 1);
@@ -68,404 +82,444 @@ const ProductDetail = () => {
     navigate("/cart");
   };
 
+  const { data: singleProduct, isLoading: singleProductLoading } = useQuery({
+    queryFn: () => getSingleProduct(id),
+    queryKey: ["singleProductData"],
+  });
+
+  //Effects
+  useEffect(() => {
+    if (!singleProductLoading && singleProduct) {
+      setSingleProductData(singleProduct?.data?.data?.ProductData);
+      console.log(singleProduct);
+    }
+  }, [singleProduct, singleProductLoading]);
+
+  useEffect(() => {
+    console.log(singleProductData);
+    setCarouselImages(
+      singleProductData?.[0] &&
+        singleProductData?.[0].images?.map((img, id) => {
+          return { src: img.src, id: id, alt: img.alt };
+        }),
+    );
+    setVariants(
+      singleProductData?.[0] &&
+        singleProductData?.[0].variants.map((variant) => {
+          return { option: variant.option1, price: variant.price };
+        }),
+    );
+    setPrice(
+      singleProductData?.[0] && singleProductData?.[0].variants?.[0]?.price,
+    );
+  }, [singleProductData]);
+
   return (
     <div>
       <Header name={"Store"} show={true} />
-      <div className="mt-[74px] flex items-start justify-center gap-[26px] max-xl:flex-col max-xl:items-center max-xl:gap-0 max-sm:mt-[20px]">
-        <div className="flex flex-col items-center justify-center gap-[26px]">
-          <div className="relative max-xl:flex max-xl:items-center max-xl:justify-center">
-            <img
-              src={carouselImages[activeImage]?.src}
-              alt="product"
-              className="h-[626px] w-[636px] rounded-2xl max-xl:h-[75%] max-xl:w-[75%] max-md:h-[344px] max-md:w-[344px]"
-            />
-            <img
-              src="/carouselArrow.png"
-              alt="arrow"
-              className="absolute right-[23px] top-[50%] h-[55px] w-[55px] cursor-pointer rounded-full border border-transparent transition-all hover:scale-105 hover:border-white max-xl:right-[15%] max-md:right-[1%] max-md:top-[45%]"
-              onClick={nextImageHandler}
-            />
-          </div>
-          <div className="flex w-[636px] items-center justify-between max-xl:hidden">
-            {carouselImages.map((item) => (
-              <img
-                key={item.id}
-                src={item.src}
-                alt="product"
-                style={{ opacity: activeImage === item.id ? "100%" : "40%" }}
-                className="h-[191px] w-[191px] rounded-2xl"
-              />
-            ))}
-          </div>
-        </div>
-        <div>
-          <h3 className="mx-0 mb-[7px] mt-[12px] w-[606px] text-[22px] font-medium leading-[30px] tracking-tight max-xl:mb-0 max-xl:mt-[53px] max-md:mx-[20px] max-md:w-[calc(100%_-_40px)] max-md:text-lg max-md:leading-[18px]">
-            Amrutam Kuntal Care Hair Spa | Do-It-Yourself Hair Treatment
-          </h3>
-          <div className="mb-[7px] mt-2.5 flex items-center justify-start gap-1 max-md:ml-5">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                fill="#F79624"
-              />
-            </svg>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                fill="#F79624"
-              />
-            </svg>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                fill="#F79624"
-              />
-            </svg>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                fill="#F79624"
-              />
-            </svg>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                fill="#F79624"
-              />
-            </svg>
-            <span className="ml-1 text-[18px] font-medium leading-[18px] tracking-tight text-dimgray-100">
-              (204 reviews)
-            </span>
-          </div>
-          <div className="mb-9 mt-2 flex items-center justify-start max-md:mb-2.5 max-md:ml-5">
-            <img src="/ruppee.png" alt="ruppee" className="h-5 w-5" />
-            <span className="text-xl font-medium leading-[26px] tracking-tight text-customblack-100">
-              649
-            </span>
-          </div>
-          <div className="mb-[52px] flex items-center justify-start gap-2 max-md:ml-5 max-sm:mb-5 [&_div]:rounded-xl [&_div]:px-3 [&_div]:py-2 first:[&_div]:border first:[&_div]:border-customlightgreen-100 first:[&_div]:bg-customgreen-100 last:[&_div]:bg-offWhite-100 last:[&_div]:text-offWhite-300 even:[&_div]:bg-[#f0f0f0] [&_span]:font-nunito [&_span]:text-[18px] [&_span]:font-medium [&_span]:leading-5 [&_span]:tracking-tight">
-            <div>
-              <span>200 ml</span>
-            </div>
-            <div>
-              <span>100 ml</span>
-            </div>
-            <div>
-              <span>Pack of 3</span>
-            </div>
-          </div>
-          <div className="mb-[49px] flex items-center justify-start gap-[26px] max-md:ml-5 max-sm:hidden">
-            <div className="flex h-[58px] w-[262px] items-center justify-between rounded-xl border border-[#676767] px-[22px] py-0 max-xl:w-[162px] [&_svg]:cursor-pointer">
-              <svg
-                width="20"
-                height="2"
-                viewBox="0 0 20 2"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                onClick={decrementHandler}
-              >
-                <path
-                  d="M1 1H19"
-                  stroke="black"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
+      {singleProductData ? (
+        <>
+          <div className="mt-[74px] flex items-start justify-center gap-[26px] max-xl:flex-col max-xl:items-center max-xl:gap-0 max-sm:mt-[20px]">
+            <div className="flex flex-col items-center justify-center gap-[26px]">
+              <div className="relative max-xl:flex max-xl:items-center max-xl:justify-center">
+                <img
+                  src={carouselImages?.[activeImage]?.src}
+                  alt={carouselImages?.[activeImage]?.alt}
+                  className="h-[626px] w-[636px] rounded-2xl max-xl:h-[75%] max-xl:w-[75%] max-md:h-[344px] max-md:w-[344px]"
                 />
-              </svg>
-              <span className="text-xl leading-[30px]">{quantity}</span>
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                onClick={incrementHandler}
-              >
-                <path
-                  d="M17.1 8.1H9.9V0.9C9.9 0.405 9.495 0 9 0C8.505 0 8.1 0.405 8.1 0.9V8.1H0.9C0.405 8.1 0 8.505 0 9C0 9.495 0.405 9.9 0.9 9.9H8.1V17.1C8.1 17.595 8.505 18 9 18C9.495 18 9.9 17.595 9.9 17.1V9.9H17.1C17.595 9.9 18 9.495 18 9C18 8.505 17.595 8.1 17.1 8.1Z"
-                  fill="black"
+                <img
+                  src="/carouselArrow.png"
+                  alt="arrow"
+                  className="absolute right-[23px] top-[50%] h-[55px] w-[55px] cursor-pointer rounded-full border border-transparent transition-all hover:scale-105 hover:border-white max-xl:right-[15%] max-md:right-[1%] max-md:top-[45%]"
+                  onClick={nextImageHandler}
                 />
-              </svg>
-            </div>
-            <button
-              onClick={() => addToCartHandler(0)}
-              className="cursor-pointer rounded-xl border-none bg-customgreen-800 px-[103px] py-[19px] text-[18px] font-semibold leading-5 tracking-tight text-white outline-none max-xl:px-[50px]"
-            >
-              Add to cart
-            </button>
-          </div>
-          <div className="[&_p]:text-dimgray-100[18px] [&_p]:text-dimgray-100darkslategray-300 max-sm:[&_p]:text-dimgray-100sm mb-12 w-[606px] max-md:mx-5 max-md:w-[calc(100%_-_40px)] max-sm:mb-6 [&_p]:m-0 [&_p]:leading-[30px] [&_p]:tracking-tight max-sm:[&_p]:leading-5">
-            <p>
-              Amrutam&apos;s Kuntal Care Do-It-Yourself Hair Spa is an ayurvedic
-              marvel filled to the brim with revitalizing herbs and essential
-              oils like Eucalyptus oil, Triphala, Balchhad and Bhringraj.{" "}
-            </p>
-            <p>
-              These Ayurvedic ingredients when fused together make a potent
-              dollop that nourishes dry and frizzy hair making it soft and
-              bouncy! This spa treatment revitalizes the roots, promotes growth,
-              provides shine, coats hair with a moisturizing layer and is the
-              best stress reliever!
-            </p>
-            <p>It&apos;s time to bring spa home and unwind.</p>
-          </div>
-          <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
-          <div className="mb-12 max-sm:my-6">
-            <div className="mb-6 flex items-center justify-start gap-[10px] max-md:ml-5">
-              <img
-                src="/recipe.png"
-                alt="recipe"
-                className="h-[32px] w-[42px]"
-              />
-              <h4 className="m-0 text-xl font-medium leading-6 tracking-tight text-darkslategray-300 max-md:text-base max-md:leading-6">
-                Product Highlights
-              </h4>
-            </div>
-            <div className="flex items-center justify-start gap-3 max-xl:justify-center max-md:flex-wrap">
-              <Highlight name={"Helps with Dry, Frizzy Hair"} />
-              <Highlight name={"Relaxes the scalp, improves hair health"} />
-              <Highlight name={"Makes the hair smooth and shiny"} />
-              <Highlight name={"Reduces hairfall, repairs damaged hair"} />
-            </div>
-          </div>
-          <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
-          <div className="max-sm:mt-6">
-            <div className="mb-6 flex items-center justify-start gap-[10px] max-md:ml-5">
-              <img
-                src="/recipe.png"
-                alt="recipe"
-                className="h-[32px] w-[42px]"
-              />
-              <h4 className="m-0 text-xl font-medium leading-6 tracking-tight text-darkslategray-300 max-md:text-base max-md:leading-6">
-                Key Ingredients
-              </h4>
-            </div>
-            <div className="mb-12 flex items-center justify-start gap-3 max-xl:justify-center max-md:flex-wrap max-sm:mb-6">
-              <Ingredient
-                name={"Triphala"}
-                desc={"Naturally Repairs and strengthens hair"}
-              />
-              <Ingredient
-                name={"Triphala"}
-                desc={"Naturally Repairs and strengthens hair"}
-              />
-              <Ingredient
-                name={"Triphala"}
-                desc={"Naturally Repairs and strengthens hair"}
-              />
-              <Ingredient
-                name={"Triphala"}
-                desc={"Naturally Repairs and strengthens hair"}
-              />
-            </div>
-          </div>
-          <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
-          <div className="mb-12">
-            <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
-              How to use
-            </h4>
-            <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight [&_p]:text-dimgray-100">
-              <p className="py-5 pl-3 pr-[18px] text-[18px] leading-[30px]">
-                Mix one or tow tablespoons of Herbal Child Care Malt with milk
-                or 100-200ml warm water and then consume twice a day or consult
-                our Ayurvedic Expert to find the right Ayurvedic recipe for you.
-              </p>
-            </div>
-          </div>
-          <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
-          <div className="mb-12">
-            <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
-              General Instructions
-            </h4>
-            <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight [&_p]:text-dimgray-100">
-              <p className="py-5 pl-3 pr-0 text-base leading-[30px]">
-                Store in a cool and dry palce away from direct sunlight. Not
-                advisable for diabetic patients
-              </p>
-            </div>
-          </div>
-          <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
-          <div className="mb-[38px] [&_h5]:m-0 [&_h5]:pb-[14px] [&_h5]:pl-3 [&_h5]:pr-[15px] [&_h5]:pt-5 [&_h5]:text-base [&_h5]:font-bold [&_h5]:tracking-tight [&_h5]:text-darkslategray-300">
-            <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
-              Commonly Asked Questions
-            </h4>
-            <div
-              className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:pb-5 [&_p]:pl-3 [&_p]:pr-[18px] [&_p]:pt-0 [&_p]:text-sm [&_p]:leading-5 [&_p]:tracking-tight [&_p]:text-dimgray-100"
-              style={{ marginBottom: "12px" }}
-            >
-              <h5>
-                Who should be using Amrutam Child Care Malt | Herbal Supplement
-                for Child Care
-              </h5>
-              <p>
-                This product is ideal for growing babies and kids to nurture
-                their health in a holistic manner
-              </p>
-            </div>
-            <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:pb-5 [&_p]:pl-3 [&_p]:pr-[20px] [&_p]:pt-0 [&_p]:text-sm [&_p]:leading-5 [&_p]:tracking-tight [&_p]:text-dimgray-100">
-              <h5>
-                Why choose Amrutam Child Care Malt | Herbal Supplement for Child
-                Care
-              </h5>
-              <p>
-                Amrutam&apos;s Child Care Malt helps improve immunity and is
-                useful in enhancing vitality and vigor in children.
-                <br /> This 100% natural Ayurvedic jam is extremely effective in
-                fighting chronic diseases.
-                <br /> Giving your little one Amrutam&apos;s Child Care Malt
-                daily will help them Improve their appetite and digestion.
-                <br /> It is useful in treating anemia, general debility and
-                maintaining a healthy weight. <br />
-                100% Natural and Ayurvedic
-                <br /> PETA certified cruelty-free <br />
-                Hand-picked and ethically sourced ingredients <br />
-                AYUSH certified and US FDA approved
-              </p>
-            </div>
-          </div>
-          <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
-          <div className="relative mb-[65px] max-sm:my-6">
-            <h5 className="mb-3 text-[18px] font-medium leading-6 tracking-tight text-darkslategray-300 max-md:ml-5 max-md:text-base max-sm:mt-0">
-              Trust the voice
-            </h5>
-            <img
-              src="/expert.png"
-              alt="expert"
-              className="h-[320px] w-[599px] rounded-xl bg-offWhite-200 max-xl:w-full max-md:mx-5 max-md:h-auto max-md:w-[calc(100%_-_40px)]"
-            />
-            <img
-              src="/play.png"
-              alt="play"
-              className="absolute right-[45%] top-[45%] h-[64px] w-[64px] cursor-pointer rounded-xl bg-none"
-            />
-          </div>
-        </div>
-      </div>
-      <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
-      <div className="mx-[72px] mb-[88px] mt-0 max-md:mb-0 max-sm:mx-0">
-        <h3 className="mb-[44px] text-center text-2xl font-semibold leading-6 tracking-tight text-darkslategray-300 max-sm:mb-[28px] max-sm:ml-5 max-sm:mt-6 max-sm:text-left max-sm:text-base">
-          Reviews and Ratings
-        </h3>
-        <div className="mb-[34px] flex items-start justify-between max-lg:flex-col max-lg:items-center">
-          <div className="flex h-[124px] w-[308px] items-center justify-start gap-5 rounded-xl bg-offWhite-100 pl-5 max-lg:mb-5 max-lg:w-full max-sm:mx-5 max-sm:w-[calc(100%_-_64px)]">
-            <h2 className="font-nunito text-[32px] font-bold leading-[42px] tracking-tight text-customblack-100">
-              5.0
-            </h2>
-            <div>
-              <div className="flex items-center [&_svg]:mx-1 [&_svg]:my-0">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                    fill="#F79624"
-                  />
-                </svg>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                    fill="#F79624"
-                  />
-                </svg>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                    fill="#F79624"
-                  />
-                </svg>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                    fill="#F79624"
-                  />
-                </svg>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                    fill="#F79624"
-                  />
-                </svg>
               </div>
-              <span className="font-nunito text-sm tracking-tight text-darkslategray-300">
-                Based on 20 reviews
-              </span>
+              <div
+                ref={carouselRef}
+                className="no-scrollbar flex max-w-[636px] items-center justify-start gap-8 overflow-x-auto max-xl:hidden"
+              >
+                {carouselImages?.map((item) => (
+                  <img
+                    key={item.id}
+                    src={item.src}
+                    alt={item.alt}
+                    style={{
+                      opacity: activeImage === item.id ? "100%" : "40%",
+                    }}
+                    className="h-[191px] w-[191px] rounded-2xl"
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="hidden flex-col items-center max-lg:flex">
-            <UserReview />
-            <UserReview />
-          </div>
-          <div className="flex items-center justify-center gap-4 max-lg:mb-5 [&_div]:flex [&_div]:h-[40px] [&_div]:w-[156px] [&_div]:items-center [&_div]:justify-center [&_div]:rounded-xl [&_div]:border [&_div]:border-[#e2e2e2] [&_span]:text-sm [&_span]:font-medium [&_span]:leading-6 [&_span]:tracking-tight [&_span]:text-customgreen-800">
             <div>
-              <span>See more reviews</span>
-            </div>
-            <div>
-              <span>Write a review</span>
+              <h3 className="mx-0 mb-[7px] mt-[12px] w-[606px] text-[22px] font-medium leading-[30px] tracking-tight max-xl:mb-0 max-xl:mt-[53px] max-md:mx-[20px] max-md:w-[calc(100%_-_40px)] max-md:text-lg max-md:leading-[18px]">
+                {singleProductData?.[0]?.title}
+              </h3>
+              <div className="mb-[7px] mt-2.5 flex items-center justify-start gap-1 max-md:ml-5">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
+                    fill="#F79624"
+                  />
+                </svg>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
+                    fill="#F79624"
+                  />
+                </svg>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
+                    fill="#F79624"
+                  />
+                </svg>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
+                    fill="#F79624"
+                  />
+                </svg>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
+                    fill="#F79624"
+                  />
+                </svg>
+                <span className="ml-1 text-[18px] font-medium leading-[18px] tracking-tight text-dimgray-100">
+                  (204 reviews)
+                </span>
+              </div>
+              <div className="mb-9 mt-2 flex items-center justify-start max-md:mb-2.5 max-md:ml-5">
+                <img src="/ruppee.png" alt="ruppee" className="h-5 w-5" />
+                <span className="text-xl font-medium leading-[26px] tracking-tight text-customblack-100">
+                  {price}
+                </span>
+              </div>
+              <div className="mb-[52px] flex items-center justify-start gap-2 max-md:ml-5 max-sm:mb-5 [&_div]:rounded-xl [&_div]:bg-[#f0f0f0] [&_div]:px-3 [&_div]:py-2 [&_span]:font-nunito [&_span]:text-[18px] [&_span]:font-medium [&_span]:leading-5 [&_span]:tracking-tight">
+                {variants?.map((variant, id) => (
+                  <div
+                    key={id}
+                    style={{
+                      border: activeVariant === id ? "1px solid #9DB29D" : "",
+                      background: activeVariant === id ? "#EAF2EA" : "",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => {
+                      setActiveVariant(id);
+                      setPrice(variant.price);
+                    }}
+                  >
+                    <span>{variant.option}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mb-[49px] flex items-center justify-start gap-[26px] max-md:ml-5 max-sm:hidden">
+                <div className="flex h-[58px] w-[262px] items-center justify-between rounded-xl border border-[#676767] px-[22px] py-0 max-xl:w-[162px] [&_svg]:cursor-pointer">
+                  <svg
+                    width="20"
+                    height="2"
+                    viewBox="0 0 20 2"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    onClick={decrementHandler}
+                  >
+                    <path
+                      d="M1 1H19"
+                      stroke="black"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span className="text-xl leading-[30px]">{quantity}</span>
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 18 18"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    onClick={incrementHandler}
+                  >
+                    <path
+                      d="M17.1 8.1H9.9V0.9C9.9 0.405 9.495 0 9 0C8.505 0 8.1 0.405 8.1 0.9V8.1H0.9C0.405 8.1 0 8.505 0 9C0 9.495 0.405 9.9 0.9 9.9H8.1V17.1C8.1 17.595 8.505 18 9 18C9.495 18 9.9 17.595 9.9 17.1V9.9H17.1C17.595 9.9 18 9.495 18 9C18 8.505 17.595 8.1 17.1 8.1Z"
+                      fill="black"
+                    />
+                  </svg>
+                </div>
+                <button
+                  onClick={() => addToCartHandler(0)}
+                  className="cursor-pointer rounded-xl border-none bg-customgreen-800 px-[103px] py-[19px] text-[18px] font-semibold leading-5 tracking-tight text-white outline-none max-xl:px-[50px]"
+                >
+                  Add to cart
+                </button>
+              </div>
+              <div className="[&_p]:text-dimgray-100[18px] [&_p]:text-dimgray-100darkslategray-300 max-sm:[&_p]:text-dimgray-100sm mb-12 w-[606px] max-md:mx-5 max-md:w-[calc(100%_-_40px)] max-sm:mb-6 [&_p]:m-0 [&_p]:leading-[30px] [&_p]:tracking-tight max-sm:[&_p]:leading-5">
+                {parse(singleProductData?.[0]?.body_html)}
+              </div>
+              <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
+              <div className="mb-12 max-sm:my-6">
+                <div className="mb-6 flex items-center justify-start gap-[10px] max-md:ml-5">
+                  <img
+                    src="/recipe.png"
+                    alt="recipe"
+                    className="h-[32px] w-[42px]"
+                  />
+                  <h4 className="m-0 text-xl font-medium leading-6 tracking-tight text-darkslategray-300 max-md:text-base max-md:leading-6">
+                    Product Highlights
+                  </h4>
+                </div>
+                <div className="flex items-center justify-start gap-3 max-xl:justify-center max-md:flex-wrap">
+                  <Highlight name={"Helps with Dry, Frizzy Hair"} />
+                  <Highlight name={"Relaxes the scalp, improves hair health"} />
+                  <Highlight name={"Makes the hair smooth and shiny"} />
+                  <Highlight name={"Reduces hairfall, repairs damaged hair"} />
+                </div>
+              </div>
+              <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
+              <div className="max-sm:mt-6">
+                <div className="mb-6 flex items-center justify-start gap-[10px] max-md:ml-5">
+                  <img
+                    src="/recipe.png"
+                    alt="recipe"
+                    className="h-[32px] w-[42px]"
+                  />
+                  <h4 className="m-0 text-xl font-medium leading-6 tracking-tight text-darkslategray-300 max-md:text-base max-md:leading-6">
+                    Key Ingredients
+                  </h4>
+                </div>
+                <div className="mb-12 flex items-center justify-start gap-3 max-xl:justify-center max-md:flex-wrap max-sm:mb-6">
+                  <Ingredient
+                    name={"Triphala"}
+                    desc={"Naturally Repairs and strengthens hair"}
+                  />
+                  <Ingredient
+                    name={"Triphala"}
+                    desc={"Naturally Repairs and strengthens hair"}
+                  />
+                  <Ingredient
+                    name={"Triphala"}
+                    desc={"Naturally Repairs and strengthens hair"}
+                  />
+                  <Ingredient
+                    name={"Triphala"}
+                    desc={"Naturally Repairs and strengthens hair"}
+                  />
+                </div>
+              </div>
+              <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
+              <div className="mb-12">
+                <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
+                  How to use
+                </h4>
+                <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight [&_p]:text-dimgray-100">
+                  <p className="py-5 pl-3 pr-[18px] text-[18px] leading-[30px]">
+                    Mix one or tow tablespoons of Herbal Child Care Malt with
+                    milk or 100-200ml warm water and then consume twice a day or
+                    consult our Ayurvedic Expert to find the right Ayurvedic
+                    recipe for you.
+                  </p>
+                </div>
+              </div>
+              <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
+              <div className="mb-12">
+                <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
+                  General Instructions
+                </h4>
+                <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight [&_p]:text-dimgray-100">
+                  <p className="py-5 pl-3 pr-0 text-base leading-[30px]">
+                    Store in a cool and dry palce away from direct sunlight. Not
+                    advisable for diabetic patients
+                  </p>
+                </div>
+              </div>
+              <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
+              <div className="mb-[38px] [&_h5]:m-0 [&_h5]:pb-[14px] [&_h5]:pl-3 [&_h5]:pr-[15px] [&_h5]:pt-5 [&_h5]:text-base [&_h5]:font-bold [&_h5]:tracking-tight [&_h5]:text-darkslategray-300">
+                <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
+                  Commonly Asked Questions
+                </h4>
+                <div
+                  className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:pb-5 [&_p]:pl-3 [&_p]:pr-[18px] [&_p]:pt-0 [&_p]:text-sm [&_p]:leading-5 [&_p]:tracking-tight [&_p]:text-dimgray-100"
+                  style={{ marginBottom: "12px" }}
+                >
+                  <h5>
+                    Who should be using Amrutam Child Care Malt | Herbal
+                    Supplement for Child Care
+                  </h5>
+                  <p>
+                    This product is ideal for growing babies and kids to nurture
+                    their health in a holistic manner
+                  </p>
+                </div>
+                <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:pb-5 [&_p]:pl-3 [&_p]:pr-[20px] [&_p]:pt-0 [&_p]:text-sm [&_p]:leading-5 [&_p]:tracking-tight [&_p]:text-dimgray-100">
+                  <h5>
+                    Why choose Amrutam Child Care Malt | Herbal Supplement for
+                    Child Care
+                  </h5>
+                  <p>
+                    Amrutam&apos;s Child Care Malt helps improve immunity and is
+                    useful in enhancing vitality and vigor in children.
+                    <br /> This 100% natural Ayurvedic jam is extremely
+                    effective in fighting chronic diseases.
+                    <br /> Giving your little one Amrutam&apos;s Child Care Malt
+                    daily will help them Improve their appetite and digestion.
+                    <br /> It is useful in treating anemia, general debility and
+                    maintaining a healthy weight. <br />
+                    100% Natural and Ayurvedic
+                    <br /> PETA certified cruelty-free <br />
+                    Hand-picked and ethically sourced ingredients <br />
+                    AYUSH certified and US FDA approved
+                  </p>
+                </div>
+              </div>
+              <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
+              <div className="relative mb-[65px] max-sm:my-6">
+                <h5 className="mb-3 text-[18px] font-medium leading-6 tracking-tight text-darkslategray-300 max-md:ml-5 max-md:text-base max-sm:mt-0">
+                  Trust the voice
+                </h5>
+                <img
+                  src="/expert.png"
+                  alt="expert"
+                  className="h-[320px] w-[599px] rounded-xl bg-offWhite-200 max-xl:w-full max-md:mx-5 max-md:h-auto max-md:w-[calc(100%_-_40px)]"
+                />
+                <img
+                  src="/play.png"
+                  alt="play"
+                  className="absolute right-[45%] top-[45%] h-[64px] w-[64px] cursor-pointer rounded-xl bg-none"
+                />
+              </div>
             </div>
           </div>
-        </div>
-        <div className="block max-lg:hidden">
-          <UserReview />
-          <UserReview />
-        </div>
-      </div>
+          <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
+          <div className="mx-[72px] mb-[88px] mt-0 max-md:mb-0 max-sm:mx-0">
+            <h3 className="mb-[44px] text-center text-2xl font-semibold leading-6 tracking-tight text-darkslategray-300 max-sm:mb-[28px] max-sm:ml-5 max-sm:mt-6 max-sm:text-left max-sm:text-base">
+              Reviews and Ratings
+            </h3>
+            <div className="mb-[34px] flex items-start justify-between max-lg:flex-col max-lg:items-center">
+              <div className="flex h-[124px] w-[308px] items-center justify-start gap-5 rounded-xl bg-offWhite-100 pl-5 max-lg:mb-5 max-lg:w-full max-sm:mx-5 max-sm:w-[calc(100%_-_64px)]">
+                <h2 className="font-nunito text-[32px] font-bold leading-[42px] tracking-tight text-customblack-100">
+                  5.0
+                </h2>
+                <div>
+                  <div className="flex items-center [&_svg]:mx-1 [&_svg]:my-0">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
+                        fill="#F79624"
+                      />
+                    </svg>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
+                        fill="#F79624"
+                      />
+                    </svg>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
+                        fill="#F79624"
+                      />
+                    </svg>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
+                        fill="#F79624"
+                      />
+                    </svg>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
+                        fill="#F79624"
+                      />
+                    </svg>
+                  </div>
+                  <span className="font-nunito text-sm tracking-tight text-darkslategray-300">
+                    Based on 20 reviews
+                  </span>
+                </div>
+              </div>
+              <div className="hidden flex-col items-center max-lg:flex">
+                <UserReview />
+                <UserReview />
+              </div>
+              <div className="flex items-center justify-center gap-4 max-lg:mb-5 [&_div]:flex [&_div]:h-[40px] [&_div]:w-[156px] [&_div]:items-center [&_div]:justify-center [&_div]:rounded-xl [&_div]:border [&_div]:border-[#e2e2e2] [&_span]:text-sm [&_span]:font-medium [&_span]:leading-6 [&_span]:tracking-tight [&_span]:text-customgreen-800">
+                <div>
+                  <span>See more reviews</span>
+                </div>
+                <div>
+                  <span>Write a review</span>
+                </div>
+              </div>
+            </div>
+            <div className="block max-lg:hidden">
+              <UserReview />
+              <UserReview />
+            </div>
+          </div>
+        </>
+      ) : (
+        <Spinner />
+      )}
+
       <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
       <SimilarProducts />
       <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
