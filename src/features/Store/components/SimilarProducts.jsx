@@ -35,7 +35,6 @@ const SimilarProducts = () => {
 
   useEffect(() => {
     if (!similarProductsLoading && similarProducts) {
-      console.log(similarProducts);
       setSimilarProductsData(similarProducts?.data?.data);
     }
   }, [similarProductsLoading, similarProducts]);

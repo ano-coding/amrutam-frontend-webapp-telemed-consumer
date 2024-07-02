@@ -11,7 +11,7 @@ const BottomNavigation = () => {
   const hideBottomNavigationBar =
     location.pathname === "/cart" || location.pathname === "/prodDetail";
 
-  const [screen, setScreen] = useState(2);
+  const [screen, setScreen] = useState(1);
   const screenHandler = (id) => {
     setScreen(id);
   };

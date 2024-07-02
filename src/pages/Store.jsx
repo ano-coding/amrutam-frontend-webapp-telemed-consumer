@@ -23,22 +23,36 @@ const Store = () => {
   const [allProductsData, setAllProductsData] = useState();
   const [activeCategory, setActiveCategory] = useState("all");
   const [categoryProductsData, setCategoryProductsData] = useState();
+  const [subCategory, setSubCategory] = useState();
+  const [mobileSubCategory, setMobileSubCategory] = useState();
 
   const { data: topProdData, isLoading: topProdLoading } = useQuery({
     queryFn: () => getTopProducts("Store"),
     queryKey: ["topStoreProducts"],
     enabled: activeCategory === "all",
   });
+
   const { data: categoryProducts, isLoading: categoryProductsLoading } =
     useQuery({
-      queryFn: () => getProductsByCategory(activeCategory),
-      queryKey: ["categorywiseProducts", activeCategory],
+      queryFn: () =>
+        getProductsByCategory(
+          mobileSubCategory
+            ? mobileSubCategory
+            : subCategory
+              ? subCategory
+              : activeCategory,
+        ),
+      queryKey: [
+        "categoryWiseProducts",
+        activeCategory,
+        subCategory,
+        mobileSubCategory,
+      ],
       enabled: activeCategory !== "all",
     });
 
   //Handlers
   const categoryChange = (category) => {
-    console.log(category);
     setActiveCategory(category);
   };
 
@@ -48,9 +62,9 @@ const Store = () => {
       setAllProductsData(topProdData?.data?.data);
     }
   }, [topProdLoading, topProdData]);
+
   useEffect(() => {
     if (!categoryProductsLoading && categoryProducts) {
-      console.log(categoryProducts);
       setCategoryProductsData(categoryProducts?.data?.data);
     }
   }, [categoryProducts, categoryProductsLoading]);
@@ -58,7 +72,10 @@ const Store = () => {
   return (
     <div>
       <Header name={"Store"} show={true} />
-      <FilterContainer categoryChange={categoryChange} />
+      <FilterContainer
+        categoryChange={categoryChange}
+        setSubCategory={setSubCategory}
+      />
       {activeCategory === "all" ? (
         <div className="mt-[60px] flex flex-col items-center justify-center">
           {allProductsData ? (
@@ -70,7 +87,7 @@ const Store = () => {
           )}
         </div>
       ) : (
-        <div className="my-[60px] flex flex-wrap items-start justify-center gap-6 gap-y-14 max-sm:gap-y-6">
+        <div className="my-[60px] flex flex-wrap items-start justify-center gap-6 gap-y-14 max-sm:mb-40 max-sm:gap-y-6">
           {categoryProductsData ? (
             categoryProductsData.map((product) => {
               return (
@@ -101,7 +118,10 @@ const Store = () => {
         </div>
       )}
 
-      <MobileFilters />
+      <MobileFilters
+        activeCategory={activeCategory}
+        setMobileSubCategory={setMobileSubCategory}
+      />
 
       <HomeAppContainer />
       <Footer />

@@ -1,101 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import Filter from "./Filter";
-// import Product from "./Product";
-// import SortField from "./SortField";
-
-const productCategoryList = [
-  {
-    id: "all",
-    name: "All",
-    width: "33px",
-    height: "28px",
-    image: "/all.png",
-  },
-  {
-    id: "400744677629",
-    name: "Hair",
-    width: "78px",
-    height: "78px",
-    image: "/hair.png",
-  },
-  {
-    id: "400746250493",
-    name: "Skin",
-    width: "40.37px",
-    height: "39px",
-    image: "/skin.png",
-  },
-  {
-    id: "400748773629",
-    name: "Digestion",
-    width: "41.86px",
-    height: "37px",
-    image: "/digestion.png",
-  },
-  {
-    id: "400748839165",
-    name: "Bones",
-    width: "35.29px",
-    height: "41px",
-    image: "/bones.png",
-  },
-  {
-    id: "400748740861",
-    name: "Immunity",
-    width: "84px",
-    height: "84px",
-    image: "/immunity1.png",
-  },
-  {
-    id: "400786161917",
-    name: "Women",
-    width: "35.29px",
-    height: "41px",
-    image: "/bones.png",
-  },
-  {
-    id: "400786063613",
-    name: "Sexual",
-    width: "35.29px",
-    height: "41px",
-    image: "/bones.png",
-  },
-  {
-    id: "400748806397",
-    name: "Eye",
-    width: "35.29px",
-    height: "41px",
-    image: "/bones.png",
-  },
-  {
-    id: "400785146109",
-    name: "Liver",
-    width: "35.29px",
-    height: "41px",
-    image: "/bones.png",
-  },
-  {
-    id: "400786030845",
-    name: "Piles",
-    width: "35.29px",
-    height: "41px",
-    image: "/bones.png",
-  },
-  {
-    id: "400786456829",
-    name: "Dental",
-    width: "35.29px",
-    height: "41px",
-    image: "/bones.png",
-  },
-  {
-    id: "400787013885",
-    name: "Gifting",
-    width: "35.29px",
-    height: "41px",
-    image: "/bones.png",
-  },
-];
+import SortField from "./SortField";
+import Product from "./Product";
+import { category, productCategoryList } from "../../../data/subcategory";
 
 const FilterContainer = (props) => {
   const scrollerRef = useRef(null);
@@ -106,10 +13,12 @@ const FilterContainer = (props) => {
   );
   const [startIndex, setStartIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState("all");
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [hairSubcategoryDropdown, setHairSubcategoryDropdown] = useState(false);
+  const [skinSubcategoryDropdown, setSkinSubcategoryDropdown] = useState(false);
 
   //Handlers
   const moreHandler = () => {
-    console.log("sfn");
     const newStartIndex = (startIndex + 1) % productCategoryList.length;
     setStartIndex(newStartIndex);
     setVisibleCategories(
@@ -119,9 +28,19 @@ const FilterContainer = (props) => {
       ].slice(0, 6),
     );
   };
+
   const changeCategoryHandler = (id) => {
     setActiveCategory(id);
     props.categoryChange(id);
+    if (id === "400744677629") {
+      setHairSubcategoryDropdown((prev) => !prev);
+    } else if (id === "400746250493") {
+      setSkinSubcategoryDropdown((prev) => !prev);
+    } else {
+      setSelectedOption(null);
+      setHairSubcategoryDropdown(false);
+      setSkinSubcategoryDropdown(false);
+    }
   };
 
   //Effects
@@ -134,6 +53,10 @@ const FilterContainer = (props) => {
       });
     }
   }, [visibleCategories]);
+
+  useEffect(() => {
+    props.setSubCategory(selectedOption);
+  }, [selectedOption, props]);
 
   return (
     <div className="flex items-center justify-center">
@@ -183,83 +106,46 @@ const FilterContainer = (props) => {
         onClick={moreHandler}
       />
 
-      {/*{moreFilters ? (
+      {skinSubcategoryDropdown || hairSubcategoryDropdown ? (
         <div className="absolute top-[474px] z-20 flex w-full items-center justify-center bg-customyellow-200 shadow-md max-sm:hidden">
           <div className="flex items-start justify-center gap-16 max-md:flex-col max-md:gap-0 max-md:pb-[50px]">
             <div className="mb-[114px] max-md:mb-0">
               <h4 className="mb-3 mt-12 text-lg font-semibold tracking-tight max-md:text-center">
                 Sort by concern
               </h4>
-              <SortField
-                id={1}
-                name={"Color Protection"}
-                grpName={"Concern"}
-                selectedOption={selectedOption}
-                setSelectedOption={setSelectedOption}
-              />
-              <SortField
-                id={2}
-                name={"Dry and Frizzy Hair"}
-                grpName={"Concern"}
-                selectedOption={selectedOption}
-                setSelectedOption={setSelectedOption}
-              />
-              <SortField
-                id={3}
-                name={"Shine & Luster"}
-                grpName={"Concern"}
-                selectedOption={selectedOption}
-                setSelectedOption={setSelectedOption}
-              />
-              <SortField
-                id={4}
-                name={"Hair Growth"}
-                grpName={"Concern"}
-                selectedOption={selectedOption}
-                setSelectedOption={setSelectedOption}
-              />
-              <SortField
-                id={5}
-                name={"Hair loss and thinning"}
-                border={"none"}
-                grpName={"Concern"}
-                selectedOption={selectedOption}
-                setSelectedOption={setSelectedOption}
-              />
+              {category[
+                activeCategory === "400744677629" ? 0 : 1
+              ].subcat[0].concern.map((concern) => {
+                return (
+                  <SortField
+                    key={concern.id}
+                    id={concern.id}
+                    name={concern.name}
+                    grpName={"Concern"}
+                    selectedOption={selectedOption}
+                    setSelectedOption={setSelectedOption}
+                  />
+                );
+              })}
             </div>
             <div>
               <h4 className="mb-3 mt-12 text-lg font-semibold tracking-tight max-md:text-center">
                 Sort by category
               </h4>
-              <SortField
-                id={6}
-                name={"Hair Care - Spa/Hair Mask"}
-                grpName={"Category"}
-                selectedOption={selectedOption}
-                setSelectedOption={setSelectedOption}
-              />
-              <SortField
-                id={7}
-                name={"Haire Care - Shampoo & Conditioner"}
-                grpName={"Category"}
-                selectedOption={selectedOption}
-                setSelectedOption={setSelectedOption}
-              />
-              <SortField
-                id={8}
-                name={"Hair Care - Hair Oils"}
-                grpName={"Category"}
-                selectedOption={selectedOption}
-                setSelectedOption={setSelectedOption}
-              />
-              <SortField
-                id={9}
-                name={"Hair Care - Hair Malt"}
-                border={"none"}
-                grpName={"Category"}
-                selectedOption={selectedOption}
-                setSelectedOption={setSelectedOption}
-              />
+              {category[
+                activeCategory === "400744677629" ? 0 : 1
+              ].subcat[0].category.map((category) => {
+                return (
+                  <SortField
+                    key={category.id}
+                    id={category.id}
+                    name={category.name}
+                    grpName={"Concern"}
+                    selectedOption={selectedOption}
+                    setSelectedOption={setSelectedOption}
+                  />
+                );
+              })}
             </div>
             <div className="mx-[109px] mt-[118px] h-[140px] w-[1px] bg-[#e2e2e2] max-xl:hidden" />
           </div>
@@ -287,7 +173,7 @@ const FilterContainer = (props) => {
         </div>
       ) : (
         ""
-      )}*/}
+      )}
     </div>
   );
 };
