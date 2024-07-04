@@ -3,7 +3,7 @@ let config = {
   baseURL: "https://amrutam-shopify-nodejs-dev.azurewebsites.net",
   headers: {
     "X-Requested-With": "XMLHttpRequest",
-    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZGU0YTZjMWEzZTI1N2ExY2JmMmE1NCIsImlhdCI6MTcxOTU2Nzk4MywiZXhwIjoxNzI3MzQzOTgzfQ.whBFbofx3bpxBOMs7JJRN0xRSLTRKEty6utFKMXz31M`,
+    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZGU0YTZjMWEzZTI1N2ExY2JmMmE1NCIsImlhdCI6MTcyMDA2NzQxMCwiZXhwIjoxNzI3ODQzNDEwfQ.tyMp4I-gninhfeteF23mJof17B3Bm_4kSrLo0IpvXPk`,
   },
   maxBodyLength: Infinity,
 };
@@ -43,5 +43,40 @@ export async function getSingleProduct(productId) {
     console.error(error);
   }
 }
-//  export async function addToCart()
-// 7507006587133
+export async function addToCart(data) {
+  try {
+    const response = await axios.post(
+      "/api/v1/cart/add-to-cart",
+      { ...data, userId: 6773619261693, cartId: 4583 },
+      config,
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function fetchCartByUserId() {
+  try {
+    const response = await axios.get(
+      `/api/v1/cart/cart-items/6773619261693`,
+      config,
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function updateCart(data) {
+  try {
+    const response = await axios.post(
+      "/api/v1/cart/update-cart",
+      { ...data, userId: 6773619261693, cartId: 4583 },
+      config,
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}

@@ -1,7 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { getSingleProduct } from "../services/Shopify";
+import {
+  getSingleProduct,
+  addToCart,
+  fetchCartByUserId,
+  updateCart,
+} from "../services/Shopify";
+import { toast } from "react-toastify";
 import parse from "html-react-parser";
 import Footer from "../features/Store/components/Footer";
 import Header from "../features/Store/components/Header";
@@ -21,22 +27,72 @@ const ProductDetail = () => {
   //States
   const [singleProductData, setSingleProductData] = useState();
   const [carouselImages, setCarouselImages] = useState([]);
-  const [activeVariant, setActiveVariant] = useState(0);
+  const [activeVariantId, setActiveVariantId] = useState();
+  const [activeVariant, setActiveVariant] = useState();
   const [variants, setVariants] = useState([]);
   const [price, setPrice] = useState();
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [index, setIndex] = useState(0);
+  const [cartData, setCartData] = useState();
+  // const [index, setIndex] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showCart, setShowCart] = useState(false);
   //For Mobile
   const [itemCount, setItemCount] = useState(0);
 
+  //API calls
+  const { data: singleProduct, isLoading: singleProductLoading } = useQuery({
+    queryFn: () => getSingleProduct(id),
+    queryKey: ["singleProductData"],
+  });
+
+  const {
+    data: cart,
+    isLoading: cartLoading,
+    refetch: cartRefetch,
+  } = useQuery({
+    queryFn: () => fetchCartByUserId(),
+    queryKey: ["cart"],
+  });
+
+  const {
+    data: addToCartResponse,
+    isLoading: addToCartLoading,
+    error: addToCartError,
+    refetch: addToCartRefetch,
+  } = useQuery({
+    queryFn: () =>
+      addToCart({
+        productId: Number(id),
+        variationId: activeVariantId,
+        quantity: quantity,
+      }),
+    queryKey: [`addToCart/${id}`],
+    enabled: false,
+    gcTime: 100,
+  });
+
+  const {
+    data: updateCartResponse,
+    isLoading: updateCartLoading,
+    error: updateCartError,
+    refetch: updateCartRefetch,
+  } = useQuery({
+    queryFn: () =>
+      updateCart({
+        productId: Number(id),
+        variationId: activeVariantId,
+        quantity: quantity,
+      }),
+    queryKey: [`updateCart/${id}`],
+    enabled: false,
+    gcTime: 100,
+  });
+
   //Handlers
   const nextImageHandler = () => {
     setActiveImage((prev) => (prev + 1) % carouselImages.length);
     if (activeImage + 1 === carouselImages.length) {
-      console.log("dugh");
       carouselRef?.current?.scrollTo({
         left: 0,
         top: 0,
@@ -46,57 +102,51 @@ const ProductDetail = () => {
       carouselRef?.current?.scrollBy({ left: 223, top: 0, behavior: "smooth" });
     }
   };
+
   const incrementHandler = () => {
     setQuantity((prev) => prev + 1);
   };
+
   const decrementHandler = () => {
-    setQuantity((prev) => (prev === 0 ? 0 : prev - 1));
+    setQuantity((prev) => (prev === 1 ? 1 : prev - 1));
   };
+
   const addToCartHandler = (type) => {
+    const present = cartData?.data?.cart?.items?.some((item) => {
+      return (
+        item.productId === Number(id) && item.variationId === activeVariantId
+      );
+    });
+    console.log(present);
+    if (present) {
+      updateCartRefetch();
+    } else {
+      addToCartRefetch();
+    }
+
     if (type) {
       setItemCount((prev) => prev + 1);
       setShowCart(false);
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
-
         setShowCart(true);
       }, 3000);
     }
-    if (localStorage.getItem("amrutam")) {
-      const arr = JSON.parse(localStorage.getItem("amrutam"));
-      arr.push({ quantity: type ? 1 : quantity, price: 649.0, index: index });
-      localStorage.setItem("amrutam", JSON.stringify(arr));
-      setIndex((prev) => prev + 1);
-    } else {
-      localStorage.setItem(
-        "amrutam",
-        JSON.stringify([
-          { quantity: type ? 1 : quantity, price: 649.0, index: index },
-        ]),
-      );
-      setIndex((prev) => prev + 1);
-    }
   };
+
   const viewCartHandler = () => {
     navigate("/cart");
   };
-
-  const { data: singleProduct, isLoading: singleProductLoading } = useQuery({
-    queryFn: () => getSingleProduct(id),
-    queryKey: ["singleProductData"],
-  });
 
   //Effects
   useEffect(() => {
     if (!singleProductLoading && singleProduct) {
       setSingleProductData(singleProduct?.data?.data?.ProductData);
-      console.log(singleProduct);
     }
   }, [singleProduct, singleProductLoading]);
 
   useEffect(() => {
-    console.log(singleProductData);
     setCarouselImages(
       singleProductData?.[0] &&
         singleProductData?.[0].images?.map((img, id) => {
@@ -106,14 +156,49 @@ const ProductDetail = () => {
     setVariants(
       singleProductData?.[0] &&
         singleProductData?.[0].variants.map((variant) => {
-          return { option: variant.option1, price: variant.price };
+          return {
+            option: variant.option1,
+            price: variant.price,
+            id: variant.id,
+          };
         }),
     );
     setPrice(
       singleProductData?.[0] && singleProductData?.[0].variants?.[0]?.price,
     );
+    setActiveVariantId(
+      singleProductData?.[0] && singleProductData?.[0].variants?.[0]?.id,
+    );
+    setActiveVariant(
+      singleProductData?.[0] && singleProductData?.[0].variants?.[0]?.option1,
+    );
   }, [singleProductData]);
 
+  useEffect(() => {
+    if (!addToCartLoading && addToCartResponse) {
+      console.log("add to cart", addToCartResponse);
+      toast.success("Item added to cart");
+      cartRefetch();
+    } else if (addToCartError) {
+      toast.error("Item cannot be added");
+    }
+  }, [addToCartLoading, addToCartResponse, addToCartError, cartRefetch]);
+
+  useEffect(() => {
+    if (!cartLoading && cart) {
+      console.log("cart fetch=", cart);
+      setCartData(cart);
+    }
+  }, [cartLoading, cart]);
+
+  useEffect(() => {
+    if (!updateCartLoading && updateCartResponse) {
+      console.log("update cart", updateCartResponse);
+      toast.success("Updated cart successfully");
+    } else if (updateCartError) {
+      toast.error("Cannot update cart");
+    }
+  }, [updateCartResponse, updateCartError, updateCartLoading]);
   return (
     <div>
       <Header name={"Store"} show={true} />
@@ -155,67 +240,12 @@ const ProductDetail = () => {
               <h3 className="mx-0 mb-[7px] mt-[12px] w-[606px] text-[22px] font-medium leading-[30px] tracking-tight max-xl:mb-0 max-xl:mt-[53px] max-md:mx-[20px] max-md:w-[calc(100%_-_40px)] max-md:text-lg max-md:leading-[18px]">
                 {singleProductData?.[0]?.title}
               </h3>
-              <div className="mb-[7px] mt-2.5 flex items-center justify-start gap-1 max-md:ml-5">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                    fill="#F79624"
-                  />
-                </svg>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                    fill="#F79624"
-                  />
-                </svg>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                    fill="#F79624"
-                  />
-                </svg>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                    fill="#F79624"
-                  />
-                </svg>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                    fill="#F79624"
-                  />
-                </svg>
+              <div className="mb-[7px] mt-2.5 flex items-center justify-start gap-1 max-md:ml-5 [&_img]:h-[18px] [&_img]:w-[18px]">
+                <img src="/star.svg" alt="star" />
+                <img src="/star.svg" alt="star" />
+                <img src="/star.svg" alt="star" />
+                <img src="/star.svg" alt="star" />
+                <img src="/star.svg" alt="star" />
                 <span className="ml-1 text-[18px] font-medium leading-[18px] tracking-tight text-dimgray-100">
                   (204 reviews)
                 </span>
@@ -223,20 +253,25 @@ const ProductDetail = () => {
               <div className="mb-9 mt-2 flex items-center justify-start max-md:mb-2.5 max-md:ml-5">
                 <img src="/ruppee.png" alt="ruppee" className="h-5 w-5" />
                 <span className="text-xl font-medium leading-[26px] tracking-tight text-customblack-100">
-                  {price}
+                  {price * quantity}
                 </span>
               </div>
               <div className="mb-[52px] flex items-center justify-start gap-2 max-md:ml-5 max-sm:mb-5 [&_div]:rounded-xl [&_div]:bg-[#f0f0f0] [&_div]:px-3 [&_div]:py-2 [&_span]:font-nunito [&_span]:text-[18px] [&_span]:font-medium [&_span]:leading-5 [&_span]:tracking-tight">
-                {variants?.map((variant, id) => (
+                {variants?.map((variant) => (
                   <div
-                    key={id}
+                    key={variant.id}
                     style={{
-                      border: activeVariant === id ? "1px solid #9DB29D" : "",
-                      background: activeVariant === id ? "#EAF2EA" : "",
+                      border:
+                        activeVariantId === variant.id
+                          ? "1px solid #9DB29D"
+                          : "",
+                      background:
+                        activeVariantId === variant.id ? "#EAF2EA" : "",
                       cursor: "pointer",
                     }}
                     onClick={() => {
-                      setActiveVariant(id);
+                      setActiveVariantId(variant.id);
+                      setActiveVariant(variant.option);
                       setPrice(variant.price);
                     }}
                   >
@@ -245,36 +280,14 @@ const ProductDetail = () => {
                 ))}
               </div>
               <div className="mb-[49px] flex items-center justify-start gap-[26px] max-md:ml-5 max-sm:hidden">
-                <div className="flex h-[58px] w-[262px] items-center justify-between rounded-xl border border-[#676767] px-[22px] py-0 max-xl:w-[162px] [&_svg]:cursor-pointer">
-                  <svg
-                    width="20"
-                    height="2"
-                    viewBox="0 0 20 2"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+                <div className="flex h-[58px] w-[262px] items-center justify-between rounded-xl border border-[#676767] px-[22px] py-0 max-xl:w-[162px] [&_img]:cursor-pointer">
+                  <img
+                    src="/minus.svg"
+                    alt="minus"
                     onClick={decrementHandler}
-                  >
-                    <path
-                      d="M1 1H19"
-                      stroke="black"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
+                  />
                   <span className="text-xl leading-[30px]">{quantity}</span>
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 18 18"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    onClick={incrementHandler}
-                  >
-                    <path
-                      d="M17.1 8.1H9.9V0.9C9.9 0.405 9.495 0 9 0C8.505 0 8.1 0.405 8.1 0.9V8.1H0.9C0.405 8.1 0 8.505 0 9C0 9.495 0.405 9.9 0.9 9.9H8.1V17.1C8.1 17.595 8.505 18 9 18C9.495 18 9.9 17.595 9.9 17.1V9.9H17.1C17.595 9.9 18 9.495 18 9C18 8.505 17.595 8.1 17.1 8.1Z"
-                      fill="black"
-                    />
-                  </svg>
+                  <img src="/plus.svg" alt="plus" onClick={incrementHandler} />
                 </div>
                 <button
                   onClick={() => addToCartHandler(0)}
@@ -593,11 +606,11 @@ const ProductDetail = () => {
           <div className="flex items-center justify-center gap-[5px]">
             <img src="/ruppee.png" alt="ruppee" className="h-5 w-5" />
             <h5 className="m-0 font-nunito text-2xl font-bold tracking-tight text-customblack-100">
-              649
+              {price}
             </h5>
           </div>
           <span className="font-nunito text-sm font-medium tracking-tight text-dimgray-100">
-            200 ml
+            {activeVariant}
           </span>
         </div>
         <button
@@ -682,7 +695,7 @@ const ProductDetail = () => {
                     />
                   </svg>
 
-                  <span>{itemCount * 649}</span>
+                  <span>{itemCount * price}</span>
                 </div>
               </div>
             </div>
