@@ -75,9 +75,13 @@ const Header = (props) => {
             className="relative rounded-lg bg-white py-[6px] pl-[8.5px] pr-[7.5px] hover:cursor-pointer"
             onClick={cartHandler}
           >
-            <span className="absolute -right-2 top-1 h-6 w-6 rounded-full bg-[#e4b1ab] text-center text-xs leading-6 text-black">
-              {cartItems}
-            </span>
+            {cartItems > 0 ? (
+              <span className="absolute -right-2 top-1 h-6 w-6 rounded-full bg-[#e4b1ab] text-center text-xs leading-6 text-black">
+                {cartItems}
+              </span>
+            ) : (
+              ""
+            )}
             <img
               src="/cart.svg"
               alt="cart"

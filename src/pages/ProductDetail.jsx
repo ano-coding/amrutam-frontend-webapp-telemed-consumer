@@ -34,11 +34,12 @@ const ProductDetail = () => {
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [cartData, setCartData] = useState();
-  // const [index, setIndex] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showCart, setShowCart] = useState(false);
   //For Mobile
-  const [itemCount, setItemCount] = useState(0);
+  const [type, setType] = useState(0);
+  const [showAddBtn, setShowAddBtn] = useState(true);
+  const [showRanger, setShowRanger] = useState(false);
 
   //API calls
   const { data: singleProduct, isLoading: singleProductLoading } = useQuery({
@@ -108,10 +109,26 @@ const ProductDetail = () => {
   };
 
   const decrementHandler = () => {
+    if (type === 1) {
+      setQuantity((prev) => prev - 1);
+      return;
+    }
     setQuantity((prev) => (prev === 1 ? 1 : prev - 1));
   };
 
   const addToCartHandler = (type) => {
+    if (type) {
+      setQuantity(1);
+      setShowAddBtn(false);
+      setShowRanger(true);
+      setShowCart(false);
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        setShowCart(true);
+      }, 3000);
+    }
+    setType(type);
     const present = cartData?.data?.cart?.items?.some((item) => {
       return (
         item.productId === Number(id) && item.variationId === activeVariantId
@@ -122,16 +139,6 @@ const ProductDetail = () => {
       updateCartRefetch();
     } else {
       addToCartRefetch();
-    }
-
-    if (type) {
-      setItemCount((prev) => prev + 1);
-      setShowCart(false);
-      setShowSuccess(true);
-      setTimeout(() => {
-        setShowSuccess(false);
-        setShowCart(true);
-      }, 3000);
     }
   };
 
@@ -177,7 +184,9 @@ const ProductDetail = () => {
   useEffect(() => {
     if (!addToCartLoading && addToCartResponse) {
       console.log("add to cart", addToCartResponse);
-      toast.success("Item added to cart");
+      if (type === 0) {
+        toast.success("Item added to cart");
+      }
       cartRefetch();
     } else if (addToCartError) {
       toast.error("Item cannot be added");
@@ -194,11 +203,25 @@ const ProductDetail = () => {
   useEffect(() => {
     if (!updateCartLoading && updateCartResponse) {
       console.log("update cart", updateCartResponse);
-      toast.success("Updated cart successfully");
+      toast.success("Cart updated successfully");
     } else if (updateCartError) {
       toast.error("Cannot update cart");
     }
   }, [updateCartResponse, updateCartError, updateCartLoading]);
+
+  // useEffect(() => {
+  //   const present = cartData?.data?.cart?.items?.some((item) => {
+  //     return (
+  //       item.productId === Number(id) && item.variationId === activeVariantId
+  //     );
+  //   });
+  //   console.log(present);
+  //   if (present) {
+  //     updateCartRefetch();
+  //   } else {
+  //     return;
+  //   }
+  // }, [quantity, updateCartRefetch, cartData, activeVariantId, id]);
   return (
     <div>
       <Header name={"Store"} show={true} />
@@ -613,12 +636,63 @@ const ProductDetail = () => {
             {activeVariant}
           </span>
         </div>
-        <button
-          onClick={() => addToCartHandler(1)}
-          className="h-[52px] w-[172px] rounded-xl border-none bg-customgreen-800 text-center font-nunito text-[18px] font-bold leading-5 tracking-tight text-white outline-none"
-        >
-          Add to cart
-        </button>
+        {showAddBtn ? (
+          <button
+            onClick={() => addToCartHandler(1)}
+            className="h-[52px] w-[172px] rounded-xl border-none bg-customgreen-800 text-center font-nunito text-[18px] font-bold leading-5 tracking-tight text-white outline-none"
+          >
+            Add to cart
+          </button>
+        ) : (
+          ""
+        )}
+        {showRanger ? (
+          <div className="flex h-[52px] w-[172px] items-center justify-between rounded-xl border-none bg-[#EAF2EA] px-4 py-0 outline-none">
+            <svg
+              width="16"
+              height="2"
+              viewBox="0 0 16 2"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              onClick={decrementHandler}
+            >
+              <path
+                d="M1 1H15"
+                stroke="#3A643B"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span>{quantity}</span>
+
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              onClick={incrementHandler}
+            >
+              <path
+                d="M5 12H19"
+                stroke="#3A643B"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 5V19"
+                stroke="#3A643B"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
       {showSuccess ? (
         <div className="fixed bottom-20 left-0 mx-[30px] hidden h-[62px] w-[calc(100%_-_60px)] animate-Morph1 items-center justify-start gap-3 rounded-xl bg-dimgray-400 max-sm:flex">
@@ -644,7 +718,7 @@ const ProductDetail = () => {
               </h5>
               <div className="flex items-center justify-start gap-2 [&_div]:flex [&_div]:items-center [&_div]:justify-center [&_div]:gap-[2px] [&_span]:font-nunito [&_span]:text-xs [&_span]:leading-[18px] [&_span]:tracking-tight [&_span]:text-offWhite-100">
                 <span>
-                  {itemCount} {itemCount <= 1 ? "item" : "items"}
+                  {quantity} {quantity <= 1 ? "item" : "items"}
                 </span>
                 <svg
                   width="4"
@@ -695,7 +769,7 @@ const ProductDetail = () => {
                     />
                   </svg>
 
-                  <span>{itemCount * price}</span>
+                  <span>{price}</span>
                 </div>
               </div>
             </div>
