@@ -47,7 +47,7 @@ export async function addToCart(data) {
   try {
     const response = await axios.post(
       "/api/v1/cart/add-to-cart",
-      { ...data, userId: 6773619261693, cartId: 4590 },
+      { ...data, userId: 6773619261693, cartId: 4595 },
       config,
     );
     return response;
@@ -72,7 +72,7 @@ export async function updateCart(data) {
   try {
     const response = await axios.post(
       "/api/v1/cart/update-cart",
-      { ...data, userId: 6773619261693, cartId: 4590 },
+      { ...data, userId: 6773619261693, cartId: 4595 },
       config,
     );
     return response;
@@ -84,7 +84,7 @@ export async function updateCart(data) {
 export async function clearCart() {
   try {
     const response = await axios.post(
-      "/api/v1/cart/empty-cart/6773619261693/4590",
+      "/api/v1/cart/empty-cart/6773619261693/4595",
       {},
       config,
     );

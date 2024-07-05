@@ -23,6 +23,7 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const carouselRef = useRef(null);
+  const quantityRef = useRef();
 
   //States
   const [singleProductData, setSingleProductData] = useState();
@@ -53,7 +54,7 @@ const ProductDetail = () => {
     refetch: cartRefetch,
   } = useQuery({
     queryFn: () => fetchCartByUserId(),
-    queryKey: ["cart"],
+    queryKey: ["cart", id, activeVariantId, quantity],
   });
 
   const {
@@ -66,7 +67,7 @@ const ProductDetail = () => {
       addToCart({
         productId: Number(id),
         variationId: activeVariantId,
-        quantity: quantity,
+        quantity: type === 1 ? quantityRef.current : quantity,
       }),
     queryKey: [`addToCart/${id}`],
     enabled: false,
@@ -83,7 +84,7 @@ const ProductDetail = () => {
       updateCart({
         productId: Number(id),
         variationId: activeVariantId,
-        quantity: quantity,
+        quantity: type === 1 ? quantityRef.current : quantity,
       }),
     queryKey: [`updateCart/${id}`],
     enabled: false,
@@ -105,30 +106,24 @@ const ProductDetail = () => {
   };
 
   const incrementHandler = () => {
+    quantityRef.current = quantity + 1;
     setQuantity((prev) => prev + 1);
+    if (type === 1) {
+      updateCartRefetch();
+    }
   };
 
   const decrementHandler = () => {
+    quantityRef.current = quantity - 1;
     if (type === 1) {
       setQuantity((prev) => prev - 1);
+      updateCartRefetch();
       return;
     }
     setQuantity((prev) => (prev === 1 ? 1 : prev - 1));
   };
 
-  const addToCartHandler = (type) => {
-    if (type) {
-      setQuantity(1);
-      setShowAddBtn(false);
-      setShowRanger(true);
-      setShowCart(false);
-      setShowSuccess(true);
-      setTimeout(() => {
-        setShowSuccess(false);
-        setShowCart(true);
-      }, 3000);
-    }
-    setType(type);
+  const addToCartHandler = () => {
     const present = cartData?.data?.cart?.items?.some((item) => {
       return (
         item.productId === Number(id) && item.variationId === activeVariantId
@@ -140,6 +135,12 @@ const ProductDetail = () => {
     } else {
       addToCartRefetch();
     }
+  };
+
+  const addToCartHandlerMobile = () => {
+    quantityRef.current = 1;
+    setQuantity(1);
+    addToCartRefetch();
   };
 
   const viewCartHandler = () => {
@@ -186,12 +187,20 @@ const ProductDetail = () => {
       console.log("add to cart", addToCartResponse);
       if (type === 0) {
         toast.success("Item added to cart");
+      } else if (type == 1) {
+        setShowSuccess(true);
+        setTimeout(() => {
+          setShowSuccess(false);
+          setShowCart(true);
+        }, 4000);
+        setShowAddBtn(false);
+        setShowRanger(true);
       }
       cartRefetch();
     } else if (addToCartError) {
       toast.error("Item cannot be added");
     }
-  }, [addToCartLoading, addToCartResponse, addToCartError, cartRefetch]);
+  }, [addToCartLoading, addToCartResponse, addToCartError, cartRefetch, type]);
 
   useEffect(() => {
     if (!cartLoading && cart) {
@@ -205,23 +214,56 @@ const ProductDetail = () => {
       console.log("update cart", updateCartResponse);
       toast.success("Cart updated successfully");
     } else if (updateCartError) {
+      console.log(updateCartError);
       toast.error("Cannot update cart");
     }
   }, [updateCartResponse, updateCartError, updateCartLoading]);
 
-  // useEffect(() => {
-  //   const present = cartData?.data?.cart?.items?.some((item) => {
-  //     return (
-  //       item.productId === Number(id) && item.variationId === activeVariantId
-  //     );
-  //   });
-  //   console.log(present);
-  //   if (present) {
-  //     updateCartRefetch();
-  //   } else {
-  //     return;
-  //   }
-  // }, [quantity, updateCartRefetch, cartData, activeVariantId, id]);
+  useEffect(() => {
+    if (window.innerWidth <= 640) {
+      setType(1);
+      console.log("dfhj");
+      const present = cartData?.data?.cart?.items?.some((item) => {
+        return (
+          item.productId === Number(id) && item.variationId === activeVariantId
+        );
+      });
+      if (present) {
+        setShowCart(true);
+        setShowAddBtn(false);
+        setShowRanger(true);
+      } else {
+        setShowCart(false);
+        setShowAddBtn(true);
+        setShowRanger(false);
+      }
+    } else {
+      setType(0);
+    }
+  }, [cartData, id, activeVariantId]);
+
+  useEffect(() => {
+    console.log("fjjrh");
+    const items = cartData?.data?.cart?.items || [];
+    for (let i = 0; i < items.length; i++) {
+      if (
+        items[i].productId === Number(id) &&
+        items[i].variationId === activeVariantId
+      ) {
+        console.log("fjeg");
+        setQuantity(items[i].quantity);
+        break;
+      }
+    }
+  }, [activeVariantId, cartData, id]);
+
+  useEffect(() => {
+    if (type === 1 && quantity === 0) {
+      setShowRanger(false);
+      setShowAddBtn(true);
+      setShowCart(false);
+    }
+  }, [quantity, type]);
   return (
     <div>
       <Header name={"Store"} show={true} />
@@ -276,7 +318,7 @@ const ProductDetail = () => {
               <div className="mb-9 mt-2 flex items-center justify-start max-md:mb-2.5 max-md:ml-5">
                 <img src="/ruppee.png" alt="ruppee" className="h-5 w-5" />
                 <span className="text-xl font-medium leading-[26px] tracking-tight text-customblack-100">
-                  {price * quantity}
+                  {price}
                 </span>
               </div>
               <div className="mb-[52px] flex items-center justify-start gap-2 max-md:ml-5 max-sm:mb-5 [&_div]:rounded-xl [&_div]:bg-[#f0f0f0] [&_div]:px-3 [&_div]:py-2 [&_span]:font-nunito [&_span]:text-[18px] [&_span]:font-medium [&_span]:leading-5 [&_span]:tracking-tight">
@@ -313,7 +355,7 @@ const ProductDetail = () => {
                   <img src="/plus.svg" alt="plus" onClick={incrementHandler} />
                 </div>
                 <button
-                  onClick={() => addToCartHandler(0)}
+                  onClick={addToCartHandler}
                   className="cursor-pointer rounded-xl border-none bg-customgreen-800 px-[103px] py-[19px] text-[18px] font-semibold leading-5 tracking-tight text-white outline-none max-xl:px-[50px]"
                 >
                   Add to cart
@@ -638,7 +680,7 @@ const ProductDetail = () => {
         </div>
         {showAddBtn ? (
           <button
-            onClick={() => addToCartHandler(1)}
+            onClick={addToCartHandlerMobile}
             className="h-[52px] w-[172px] rounded-xl border-none bg-customgreen-800 text-center font-nunito text-[18px] font-bold leading-5 tracking-tight text-white outline-none"
           >
             Add to cart

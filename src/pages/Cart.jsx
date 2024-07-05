@@ -117,11 +117,10 @@ const Cart = () => {
       toast.error("Cannot empty cart");
     }
   }, [clearCartError, clearCartLoading, clearCartData]);
-
   return (
     <div>
       <Header name={"Cart"} show={false} padding={"72px 0"} />
-      {cartProducts ? (
+      {cartProducts?.data?.cart?.items?.length ? (
         <>
           <div className="my-[56px] mr-24 flex items-center justify-end max-md:mr-5 max-sm:mb-0 max-sm:mt-5">
             <button
