@@ -1,3 +1,15 @@
+const googlePlayLink = () => {
+  window.open(
+    "https://play.google.com/store/apps/details?id=com.amrutam",
+    "_blank",
+  );
+};
+const appStoreLink = () => {
+  window.open(
+    "https://apps.apple.com/in/app/amrutam-ayurveda/id1604393598",
+    "_blank",
+  );
+};
 const HomeAppContainer = () => {
   return (
     <div className="peer-data-[65px] flex items-start justify-center bg-customyellow-200 max-xl:flex-wrap max-sm:hidden">
@@ -18,8 +30,12 @@ const HomeAppContainer = () => {
           Get the App now
         </h1>
         <div className="mb-[117px] flex items-center justify-start gap-[17px] max-xl:justify-center [&>*]:h-[80px] [&>*]:w-[270px] [&>*]:cursor-pointer max-md:[&>*]:h-[50px] max-md:[&>*]:w-[170px]">
-          <img src="/googlePlay.png" alt="google-play" />
-          <img src="/appStore.png" alt="app-store" />
+          <img
+            src="/googlePlay.png"
+            alt="google-play"
+            onClick={googlePlayLink}
+          />
+          <img src="/appStore.png" alt="app-store" onClick={appStoreLink} />
         </div>
       </div>
       <div className="relative pt-[65px]">

@@ -93,3 +93,31 @@ export async function clearCart() {
     console.error(error);
   }
 }
+
+export async function shopfloCheckout() {
+  try {
+    const response = await axios.post(
+      "/api/v1/cart/create-checkout",
+      {
+        cartId: "668773c74d83b3b4b89a9ef2",
+        backUrl: "www.amrutam.global",
+      },
+      config,
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function searchWizzy(query) {
+  try {
+    const response = await axios.get(
+      `/api/v1/products/searchProducts?q=${query}`,
+      config,
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}

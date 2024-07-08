@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchCartByUserId, updateCart, clearCart } from "../services/Shopify";
+import {
+  fetchCartByUserId,
+  updateCart,
+  clearCart,
+  shopfloCheckout,
+} from "../services/Shopify";
 import { formatNumber } from "../helper/formatNumber";
 import Header from "../features/Store/components/Header";
 import HomeAppContainer from "../features/Store/components/HomeAppContainer";
@@ -10,11 +15,12 @@ import SimilarProducts from "../features/Store/components/SimilarProducts";
 import { toast } from "react-toastify";
 
 const Cart = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   //States
   const [cartProducts, setCartProducts] = useState();
   const [updatedItem, setUpdatedItem] = useState(null);
+  const [redirectURL, setRedirectURL] = useState();
 
   //APIs
   const {
@@ -55,6 +61,17 @@ const Cart = () => {
     gcTime: 100,
   });
 
+  const {
+    data: shopfloCheckoutResponse,
+    isLoading: shopfloCheckoutLoading,
+    error: shopflowCheckoutError,
+    refetch: shopfloCheckoutRefetch,
+  } = useQuery({
+    queryFn: () => shopfloCheckout(),
+    queryKey: ["cart"],
+    enabled: false,
+  });
+
   //Handlers
   const incrementHandler = (productId, variationId, quantity) => {
     setUpdatedItem({
@@ -73,7 +90,8 @@ const Cart = () => {
   };
 
   const successHandler = () => {
-    navigate("/success");
+    // navigate("/success");
+    shopfloCheckoutRefetch();
   };
 
   const clearCartHandler = () => {
@@ -117,6 +135,24 @@ const Cart = () => {
       toast.error("Cannot empty cart");
     }
   }, [clearCartError, clearCartLoading, clearCartData]);
+
+  useEffect(() => {
+    if (!shopfloCheckoutLoading && shopfloCheckoutResponse) {
+      console.log(shopfloCheckoutResponse);
+      setRedirectURL(
+        shopfloCheckoutResponse?.data?.data?.response?.checkout_url || "",
+      );
+    } else if (shopflowCheckoutError) {
+      console.log(shopflowCheckoutError);
+      toast.error("Can't proceed at the moment");
+    }
+  }, [shopfloCheckoutLoading, shopfloCheckoutResponse, shopflowCheckoutError]);
+
+  useEffect(() => {
+    if (redirectURL) {
+      window.open(redirectURL, "_blank");
+    }
+  }, [redirectURL]);
   return (
     <div>
       <Header name={"Cart"} show={false} padding={"72px 0"} />

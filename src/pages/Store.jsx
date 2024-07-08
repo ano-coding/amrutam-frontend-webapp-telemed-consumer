@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { getProductsByCategory, getTopProducts } from "../services/Shopify";
+import {
+  getProductsByCategory,
+  getTopProducts,
+  searchWizzy,
+} from "../services/Shopify";
 import Product from "../features/Store/components/Product";
 import Header from "../features/Store/components/Header";
 import Footer from "../features/Store/components/Footer";
@@ -20,6 +24,8 @@ const Store = () => {
   const [categoryProductsData, setCategoryProductsData] = useState();
   const [subCategory, setSubCategory] = useState();
   const [mobileSubCategory, setMobileSubCategory] = useState();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchData, setSearchData] = useState();
 
   const { data: topProdData, isLoading: topProdLoading } = useQuery({
     queryFn: () => getTopProducts("Store"),
@@ -27,6 +33,7 @@ const Store = () => {
     enabled: activeCategory === "all",
   });
 
+  //APIs
   const { data: categoryProducts, isLoading: categoryProductsLoading } =
     useQuery({
       queryFn: () =>
@@ -46,12 +53,28 @@ const Store = () => {
       enabled: activeCategory !== "all",
     });
 
+  const {
+    data: searchResponse,
+    isLoading: searchLoading,
+    error: searchError,
+  } = useQuery({
+    queryFn: () => searchWizzy(searchTerm),
+    queryKey: ["search"],
+    enabled: searchTerm?.length >= 3,
+  });
+
   //Handlers
   const categoryChange = (category) => {
     setActiveCategory(category);
   };
+
   const prodDetailHandler = (id) => {
     navigate(`/prodDetail/${id}`);
+  };
+
+  const searchHandler = (query) => {
+    setSearchTerm(query);
+    query?.length < 3 ? setSearchData() : "";
   };
 
   //Effects
@@ -68,14 +91,45 @@ const Store = () => {
     }
   }, [categoryProducts, categoryProductsLoading]);
 
+  useEffect(() => {
+    if (!searchLoading && searchResponse) {
+      console.log(searchResponse);
+      setSearchData(searchResponse?.data?.data?.payload?.result);
+    } else if (searchError) {
+      console.log(searchError);
+    }
+  }, [searchError, searchLoading, searchResponse]);
+
+  useEffect(() => {
+    console.log("searctTerm=", searchTerm, "searchData=", searchData);
+  }, [searchTerm, searchData]);
+
   return (
     <div>
-      <Header name={"Store"} show={true} />
+      <Header name={"Store"} show={true} searchHandler={searchHandler} />
       <FilterContainer
         categoryChange={categoryChange}
         setSubCategory={setSubCategory}
       />
-      {activeCategory === "all" ? (
+      {searchTerm?.length > 0 ? (
+        searchData ? (
+          <div className="my-[60px] flex flex-wrap items-start justify-center gap-6 gap-y-14 max-sm:mb-40 max-sm:gap-y-6">
+            {searchData.map((product) => (
+              <Product
+                key={product.id}
+                src={product?.mainImage}
+                name={product?.name || ""}
+                cost={product?.sellingPrice || 0}
+                onClick={() => prodDetailHandler(product.groupId)}
+              />
+            ))}
+          </div>
+        ) : (
+          <h1 className="mx-auto my-24 text-center text-2xl">
+            No search results found
+          </h1>
+        )
+      ) : activeCategory === "all" ? (
         <div className="mt-[60px] flex flex-col items-center justify-center">
           {allProductsData ? (
             allProductsData.map((section) => {
