@@ -11,6 +11,7 @@ export default {
 				dmsans: ['DM Sans', 'sans-serif'],
 				roboto: ['Roboto', 'sans-serif'],
 				inter: ['Inter', 'sans-serif'],
+				montserrat: ['Montserrat', 'sans-serif'],
 			},
 			backgroundImage: {
 				"header-leaves": "url('/background.png')",

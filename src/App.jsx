@@ -26,6 +26,9 @@ import Store from "./pages/Store";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Success from "./pages/Success";
+import AppointmentBookingForm from "./features/Appointments/components/AppointmentBookingForm";
+import CouponsPage from "./pages/CouponsPage";
+import AppointmentSuccessPage from "./pages/AppointmentSuccessPage";
 
 const router = createBrowserRouter([
 	{
@@ -49,7 +52,18 @@ const router = createBrowserRouter([
 				path: "/appointment-booking",
 				element: <AppointmentBookingPage />
 			},
-			
+			{
+				path: '/appointment/:doctorId',
+				element: <AppointmentBookingForm></AppointmentBookingForm>
+			},
+			{
+				path: '/coupons',
+				element: <CouponsPage></CouponsPage>
+			},
+			{
+				path: '/appointment-success',
+				element: <AppointmentSuccessPage></AppointmentSuccessPage>
+			},
 			{
 				path: "/questionnaire",
 				element: <QuestionnairePage></QuestionnairePage>

@@ -32,8 +32,8 @@ export default function Modal({ children, show, setShow }) {
 							leaveFrom="opacity-100 translate-y-0 sm:scale-100"
 							leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
 						>
-							<DialogPanel className="relative p-4 transform  overflow-hidden rounded-[8px] bg-white shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-								<img src='/close-circle.png' alt='close circle' className="absolute right-4 top-2 cursor-pointer" onClick={() => setShowReportForm(false)} />
+							<DialogPanel className="relative flex justify-center p-4 transform  overflow-hidden rounded-[8px]  transition-all sm:my-8 sm:w-full sm:max-w-[380px]">
+								{/* <img src='/cross.png' alt='close circle' className="absolute right-4 top-4 cursor-pointer" onClick={() => setShow(false)} /> */}
 								{children}
 							</DialogPanel>
 						</TransitionChild>

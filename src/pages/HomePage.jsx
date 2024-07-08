@@ -6,6 +6,8 @@ import Reviews from '../components/HomePage/Reviews';
 import Experts from '../components/HomePage/Experts';
 import HomeApp from '../components/HomePage/HomeApp';
 import Footer from '../components/HomePage/Footer';
+import Concerns from '../components/HomePage/Concerns';
+import FAQ from '../components/HomePage/FAQ';
 
 
 
@@ -16,9 +18,11 @@ function HomePage() {
 			<LandingPage></LandingPage>
 			<Main></Main>
 			<Specialities></Specialities>
+			<Concerns></Concerns>
 			<Approach></Approach>
 			<Reviews></Reviews>
 			<Experts></Experts>
+			<FAQ></FAQ>
 			<HomeApp></HomeApp>
 			<Footer></Footer>
 		</div>
