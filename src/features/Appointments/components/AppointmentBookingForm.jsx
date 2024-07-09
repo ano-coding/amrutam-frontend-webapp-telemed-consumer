@@ -26,7 +26,7 @@ import Coupons from './Coupons';
 
 function AppointmentBookingForm() {
 	const [appointmentDetails, setAppointmentDetails] = useState({});
-	const [currentStep, setCurrentStep] = useState(4);
+	const [currentStep, setCurrentStep] = useState(0);
 
 	const location = useLocation();
 	const from = location.state?.from;

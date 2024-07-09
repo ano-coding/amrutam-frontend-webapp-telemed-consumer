@@ -66,7 +66,9 @@ function AppointmentSuccess() {
 
 	return (
 		<div className='px-2 py-16 bg-[#E4F1F0]'>
-			<ProgressBar currentStep={6}></ProgressBar>
+			<div className='flex justify-center'>
+				<ProgressBar currentStep={6}></ProgressBar>
+			</div>
 			<h2 className='font-sans text-center text-[#161736] mt-[75px] text-2xl'>
 				Great! You have successfully completed all your Health details.
 			</h2>

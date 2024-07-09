@@ -11,7 +11,7 @@ const progressBarSteps = [
 export function ProgressBar({ currentStep }) {
 	const lastIndex = progressBarSteps.length - 1;
 	return (
-		<div className='px-10 pb-8 overflow-x-scroll border  flex justify-start gap-2 mx-auto'>
+		<div className='px-10 pb-8 overflow-x-scroll no-scrollbar flex justify-start gap-2 mx-auto'>
 			{progressBarSteps.map((step, index) => {
 				return (
 					<div
