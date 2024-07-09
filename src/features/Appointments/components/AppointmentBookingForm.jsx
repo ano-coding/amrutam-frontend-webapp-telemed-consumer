@@ -21,7 +21,6 @@ import arrowR from '../../../assets/appointments/arrow-r.svg';
 import PhotoFrame from '../../../assets/appointments/photo-frame.svg';
 import RedCross from '../../../assets/appointments/red-cross.svg';
 import Coupons from './Coupons';
-// import { AppointmentContext, useAppointment } from '../AppointmentContext.jsx';
 
 
 function AppointmentBookingForm() {
@@ -30,12 +29,6 @@ function AppointmentBookingForm() {
 
 	const location = useLocation();
 	const from = location.state?.from;
-
-	console.log('from ', from);
-
-	// console.log('appointment Data ', location.state?.data);
-
-
 
 	useEffect(() => {
 		if (location.state?.data) {
@@ -97,7 +90,6 @@ function AppointmentBookingForm() {
 
 	return (
 		<div className='relative sm:grid grid-cols-2'>
-			{/* <AppointmentContext> */}
 			<AppointmentDetails
 				from={from}
 				currentStep={currentStep}
@@ -118,8 +110,6 @@ function AppointmentBookingForm() {
 			<div className='absolute z-10 top-0 left-[50%] translate-x-[-50%] sm:right-[200px] md:right-[400px] xl:right-[600px] w-[100%] max-w-[500px] sm:w-[300px] xl:w-[500px]'>
 				{currentStep === 4 && <Lottie loop={false} animationData={Confetti} />}
 			</div>
-			{/* </AppointmentContext> */}
-
 		</div>
 
 	);

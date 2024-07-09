@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchSingleDoctor, extractSessions } from '../../../services/Doctor';
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import {  fetchDateByAppointmentType, DAYS, MONTHS } from '../../../services/Doctor';
-// import { useAppointment } from "../AppointmentContext";
 
 
 
@@ -14,7 +13,6 @@ export default function AppointmentSection({ setStep, appointmentDetails, setApp
 		queryFn: () => fetchSingleDoctor(doctorId),
 		queryKey: ['doctor']
 	});
-	// const { appointmentDetails, setAppointmentDetails } = useAppointment();
 
 	const [sessionModeIndex, setSessionModeIndex] = useState(-1);
 	const [slotIndex, setSlotIndex] = useState(0);
@@ -80,7 +78,7 @@ export default function AppointmentSection({ setStep, appointmentDetails, setApp
 	const dates = data?.map(date => new Date(Date.parse(date.date)));
 
 
-	console.log('appointments ', data);
+	// console.log('appointments ', data);
 
 
 
@@ -132,17 +130,6 @@ export default function AppointmentSection({ setStep, appointmentDetails, setApp
 			... Appointments & Slots are loading
 		</div>
 	}
-
-	// console.log('sessions ', sessions);
-
-  
-	/* Function to set
-	 --> session Mode
-	 --> session Duration
-	 --> Appointment Fee
-	 */
-
-	console.log('appointmentDetails ', appointmentDetails);
 
 
 	return (
