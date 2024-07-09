@@ -1,157 +1,110 @@
-import arrowRight from '../../../assets/appointments/arrow-right.svg';
-import arrowLeft from '../../../assets/appointments/arrow-left.svg';
-// import { useAppointment } from '../useAppointment.js';
-import { useNavigate,  useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { fetchSingleDoctor } from '../../../services/Doctor.js';
-import { extractSpeciality, processNames, calculateTotalExperience } from '../../../services/Doctor.js';
-import { DAYS, MONTHS } from '../../../services/Doctor.js';
+import ContentBoxLayout from "../../../components/ContentBoxLayout";
+import BookAppointmentBanner from "./BookAppointmentBanner";
+import SearchBar from "./SearchBar";
+const AppointmentDetails = () => {
+  return (
+    <div className="flex flex-col gap-[37px] pt-4">
+      <BookAppointmentBanner />
+      <SearchBar />
+      <ContentBoxLayout title="Appointment Detail">
+        <div className="flex w-full items-center justify-center">
+          <div className="mb-6 flex w-[100%] flex-col items-center gap-5 p-6 sm:flex-row sm:items-start sm:justify-center sm:gap-16">
+            <div className="flex flex-col items-center text-center">
+              <img
+                src="/user-default.png"
+                alt="Dr. Prerna Narang"
+                className="mb-2 size-32 rounded-full object-cover md:size-[182px]"
+              />
+              <h3 className="w-full text-[20px] font-medium leading-[28px] tracking-[-0.01em]">
+                Dr. Prerna Narang
+              </h3>
+              <p className="text-[16px] font-medium leading-[28px] tracking-[-0.01em] text-[#7c7c7c]">
+                Gynecologist (MBBS, MD)
+              </p>
+            </div>
+            <div className="flex flex-col items-center">
+              <img
+                src="/user-default-2.png"
+                alt="Sharan Shikhar"
+                className="mb-2 size-32 rounded-full object-cover md:size-[182px]"
+              />
+              <h3 className="text-[20px] font-medium leading-[28px] tracking-[-0.01em]">
+                Sharan Shikhar
+              </h3>
+            </div>
+          </div>
+        </div>
+        <div className="flex w-[100%] flex-col items-center justify-center border-t border-gray-200 p-6">
+          <h3 className="mb-2 w-full text-[20px] font-medium leading-[28px] tracking-[-0.01em] text-[#2e2f2e] md:w-[90%]">
+            Details
+          </h3>
+          <div className="content justify- flex w-[100%] flex-col items-center">
+            <div className="mt-6 grid w-full grid-cols-2 items-center justify-between gap-6 text-gray-700 md:w-[90%] md:grid-cols-3">
+              <div className="col-span-1 flex flex-col items-start justify-center">
+                <p className="text-[14px] font-light text-black">
+                  Date and Time
+                </p>
+                <h2 className="text-[16px] font-medium">
+                  Mon 15 April 2024, at 5:38 pm
+                </h2>
+              </div>
+              <div className="col-span-1 flex flex-col items-start justify-center">
+                <p className="text-[14px] font-light text-black">Booked by</p>
+                <p className="text-[16px] font-medium">Admin</p>
+              </div>
+              <div className="col-span-1 flex flex-col items-start justify-center">
+                <p className="text-[14px] font-light text-black">Source</p>
+                <p className="text-[16px] font-medium">Web</p>
+              </div>
+              <div className="col-span-1 flex flex-col items-start justify-center">
+                <p className="text-[14px] font-light text-black">
+                  Appointment Type
+                </p>
+                <p className="text-[16px] font-medium">Video Call, 30 min</p>
+              </div>
+              <div className="col-span-1 flex flex-col items-start justify-center">
+                <p className="text-[14px] font-light text-black">
+                  Appointment Status
+                </p>
+                <p className="text-[16px] font-medium">Booked: Unpaid</p>
+              </div>
+              <div className="col-span-1 flex flex-col items-start justify-center">
+                <p className="text-[14px] font-light text-black">Amount</p>
+                <p className="text-[16px] font-medium">Rs. 400.00</p>
+              </div>
+            </div>
+          </div>
 
+          <div className="mt-6 flex items-end justify-end md:w-[90%]">
+            <button className="rounded-lg bg-[#3a643b] px-5 py-2 text-[16px] font-medium leading-[22.5px] text-white focus:outline-none">
+              Pay Now
+            </button>
+          </div>
+        </div>
 
-
-function AppointmentDetails({ from, currentStep, setCurrentStep, appointmentDetails }) {
-	const navigate = useNavigate();
-	const date = new Date(Date.parse(appointmentDetails.appointmentDate));
-
-
-	// Disabling going back after payment
-	const backNotAllowed = currentStep === 4;
-
-	
-	// const { appointmentDetails } = useAppointment();
-	const { doctorId } = useParams();
-
-	const { data, isLoading } = useQuery({
-		queryFn: () => fetchSingleDoctor(doctorId),
-		queryKey: ['doctor', doctorId]
-	});
-
-
-
-
-	if (isLoading) {
-		return <div>... Doctor details loading</div>
-	}
-
-	const Doctor = data.doctor;
-	const specialities = data.specialities.map(extractSpeciality);
-	const workExperience = data.workExperiences;
-	const totalExprience = calculateTotalExperience(workExperience);
-
-
-	let speciality = 'General Physician';
-
-	if (specialities.length !== 0) {
-		speciality = specialities[0];
-	}
-
-
-
-	const {
-		firstname,
-		lastname,
-		photo,
-	} = Doctor;
-
-
-	const [firstName, lastName] = processNames(firstname, lastname);
-
-
-	function handleClick() {
-		if (currentStep === 0) {
-			navigate(from);
-			return;
-		}
-		
-		if (backNotAllowed) {
-			return;
-		}
-
-		setCurrentStep(currentStep - 1);
-	}
-	
-
-
-
-	return (
-		<div className='sm:min-h-[100vh] bg-[#E4F1F0]'>
-			<div className='flex items-center justify-center '>
-				<div className='mt-2 my-4 sm:my-0 sm:mt-10 space-y-4'>
-					<img
-						onClick={handleClick}
-						src={arrowLeft}
-						alt='Arrow Left'
-						className={`w-8 h-8 ${backNotAllowed? 'cursor-not-allowed': 'cursor-pointer'} mr-auto lg:w-12 lg:h-12`}
-					/>
-					<div className='relative w-[300px] md:w-[350px] lg:w-[450px] xl:w-[491px] px-4 md:px-6 py-2 md:py-4 flex gap-2 md:gap-4 bg-white rounded-[25px] font-nunito'>
-						<img
-							src={arrowRight}
-							alt='Arrow Right'
-							className='absolute w-8 h-8 lg:w-12 lg:h-12 top-8 md:top-10 right-4'
-						/>
-						<div className='w-[70px] h-[80px] lg:w-[97px] lg:h-[106px] rounded-xl overflow-hidden'>
-							<img
-								className="w-full h-full object-cover"
-								alt="Doctor photo"
-								src={photo}
-							/>
-						</div>
-
-						<div className="space-y-1">
-							<h3 className="text-lg lg:text-[20px] font-bold text-[#2E2F2E]">
-								Dr. {firstName} {lastName}
-							</h3>
-							<div className="flex items-center gap-[10px]">
-								<img
-									className="h-4 w-4 shrink-0 overflow-hidden"
-									loading="lazy"
-									alt="speciality"
-									src="/frame.svg"
-								/>
-								<div className="text-xs lg:text-base text-[#646665]">
-									{speciality}
-								</div>
-							</div>
-							<div className="flex items-center gap-[7px]">
-								<img
-									className="h-5 w-5 shrink-0 overflow-hidden"
-									alt="experience"
-									src="/hat.svg"
-								/>
-								<div className="text-xs lg:text-base text-[#646665]">
-									{totalExprience} years of Experience
-								</div>
-							</div>
-						</div>
-
-					</div>
-					<div className='relative w-[300px] md:w-[350px] lg:w-[450px] xl:w-[491px] px-4 md:px-6 py-2 md:py-4 bg-white rounded-[25px] font-inter'>
-						<h3 className='lg:text-[20px] font-semibold mb-4'>Session Details</h3>
-						<img
-							src={arrowRight}
-							alt='Arrow Right'
-							className='absolute w-8 h-8 lg:w-12 lg:h-12 top-3 md:top-4 right-4'
-						/>
-						<div className='flex items-center gap-4'>
-							<div className='w-[179px] sm:w-[150px] lg:w-[179px] lg:h-[117px] bg-[#F5F8ED] rounded-md px-[17px] py-[15px] border border-[#D6E5D6]'>
-								<h4 className='text-[#2B2E2B] mb-2 text-xs md:text-sm lg:text-[18px] font-semibold'>Session Mode</h4>
-								<p className='text-[#3A643B] text-[10px] md:text-xs lg:text-base font-medium'>{appointmentDetails.appointmentType || 'Not Selected'}</p>
-								<p className='text-[#3A643B] text-[10px] md:text-xs lg:text-base font-medium'>{appointmentDetails.appointmentDuration && appointmentDetails.appointmentDuration +' Mins'}  </p>
-							</div>
-							<div className='w-[179px] sm:w-[150px] lg:w-[179px] lg:h-[117px] bg-[#F5F8ED] rounded-md px-[17px] py-[15px] border border-[#D6E5D6]'>
-								<h4 className='text-[#2B2E2B] mb-2 text-xs md:text-sm lg:text-[18px] font-semibold'>Date & Time</h4>
-								<p className='text-[#3A643B] text-[10px] md:text-xs lg:text-base font-medium'>{appointmentDetails.appointmentDate ? `${DAYS[date.getDay()]}, ${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`: 'Not Selected' }</p>
-								<p className='text-[#3A643B] text-[10px] md:text-xs lg:text-base font-medium'>{appointmentDetails.appointmentTime || 'Not selected'}</p>
-							</div>
-
-						</div>
-					</div>
-				</div>
-
-			</div>
-		</div>
-	)
-}
-
+        <div className="mt-6 flex w-[100%] items-center justify-center border-t border-gray-200 p-6">
+          <div className="grid w-full grid-cols-2 gap-4 md:w-[90%] md:grid-cols-3">
+            <div>
+              <p className="text-[14px] font-light text-black">Description</p>
+              <p className="text-[16px] font-medium">Pains at night</p>
+            </div>
+            <div>
+              <p className="text-[14px] font-light text-black">Severity</p>
+              <p className="text-[16px] font-medium">Very Bad</p>
+            </div>
+            <div>
+              <p className="text-[14px] font-light text-black">Duration</p>
+              <p className="text-[16px] font-medium">2 weeks</p>
+            </div>
+            <div>
+              <p className="text-[14px] font-light text-black">Sleep Pattern</p>
+              <p className="text-[16px] font-medium">Once a Day</p>
+            </div>
+          </div>
+        </div>
+      </ContentBoxLayout>
+    </div>
+  );
+};
 
 export default AppointmentDetails;

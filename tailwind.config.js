@@ -1,6 +1,8 @@
+// import formsPlugin from "@tailwindcss/forms";
+import flowbite from "flowbite-react/tailwind";
 /** @type {import('tailwindcss').Config} */
 export default {
-	content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+	content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}", flowbite.content()],
 	theme: {
 		extend: {
 			fontFamily: {
@@ -12,6 +14,7 @@ export default {
 				roboto: ['Roboto', 'sans-serif'],
 				inter: ['Inter', 'sans-serif'],
 				montserrat: ['Montserrat', 'sans-serif'],
+				mulish: ["Mulish Variable", "ui-sans-serif", "system-ui", "sans-serif"],
 			},
 			backgroundImage: {
 				"header-leaves": "url('/background.png')",
@@ -77,7 +80,12 @@ export default {
 				mintcream: {
 					200: "#FFFBF2",
 				},
-
+				cyan: {
+					800: "#345a35",
+					700: "#3a643b",
+					600: "#4e744f",
+					300: "#89a289",
+				},
 				darkolivegreen: {
 					100: "rgba(58, 100, 59, 0.39)",
 					200: "#3a643b",
@@ -115,14 +123,15 @@ export default {
 					200: "#0b0b0b",
 					300: "#838383",
 				},
-				gray: {
-					100: "#7b7b7b",
-					200: "#767676",
-					300: "#f0f0f0",
-					400: "#e2e2e2",
-					500: "#676767",
-				},
+				// gray: {
+				//   100: "#7b7b7b",
+				//   200: "#767676",
+				//   300: "#f0f0f0",
+				//   400: "#e2e2e2",
+				//   500: "#676767",
+				// },
 				antiquewhite: "#e6dec9",
+				customWhite: "#fff7e2",
 				offWhite: {
 					100: "#fafafa",
 					200: "#f5f3fc",
@@ -136,6 +145,24 @@ export default {
 				customblue: "#0c140c",
 			},
 		},
+		screens: {
+			xs: "400px",
+			sm: "640px",
+			// => @media (min-width: 640px) { ... }
+
+			md: "768px",
+			// => @media (min-width: 768px) { ... }
+
+			lg: "1025px",
+			// => @media (min-width: 1024px) { ... }
+
+			xl: "1280px",
+			// => @media (min-width: 1280px) { ... }
+
+			"2xl": "1536px",
+			// => @media (min-width: 1536px) { ... }
+		},
 	},
-	plugins: [],
+
+	// plugins: [formsPlugin(), flowbite.plugin()],
 };

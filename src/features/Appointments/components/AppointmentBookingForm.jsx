@@ -10,7 +10,7 @@ import Confetti from '../../../assets/appointments/confetti.json';
 
 
 import AppointmentSection from './AppointmentSection';
-import AppointmentDetails from './AppointmentDetails';
+import AppointmentDetails from './SessionDetails.jsx';
 import { DAYS, fetchSingleDoctor, processNames, MONTHS } from '../../../services/Doctor';
 import { fetchSingleCouponStatus, uploadFile } from '../../../services/Appointments';
 import ProgressBar from './ProgressBar';

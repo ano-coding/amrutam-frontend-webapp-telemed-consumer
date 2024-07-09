@@ -1,3 +1,15 @@
+const googlePlayLink = () => {
+  window.open(
+    "https://play.google.com/store/apps/details?id=com.amrutam",
+    "_blank",
+  );
+};
+const appStoreLink = () => {
+  window.open(
+    "https://apps.apple.com/in/app/amrutam-ayurveda/id1604393598",
+    "_blank",
+  );
+};
 const HomeAppContainer = () => {
   return (
     <div className="peer-data-[65px] flex items-start justify-center bg-customyellow-200 max-xl:flex-wrap max-sm:hidden">
@@ -5,7 +17,7 @@ const HomeAppContainer = () => {
         <h2 className="m-0 mb-4 text-3xl font-black text-customgreen-800 max-md:text-2xl">
           Amrutam Home App
         </h2>
-        <p className="text-base font-medium tracking-tight text-gray-500">
+        <p className="text-base font-medium tracking-tight text-[#676767]">
           The Amrutam Home App is your one-stop app for all things Ayurveda!
           Apart from mimicking the significant characteristics of our website,
           this app offers a wide range of additional features.
@@ -18,18 +30,22 @@ const HomeAppContainer = () => {
           Get the App now
         </h1>
         <div className="mb-[117px] flex items-center justify-start gap-[17px] max-xl:justify-center [&>*]:h-[80px] [&>*]:w-[270px] [&>*]:cursor-pointer max-md:[&>*]:h-[50px] max-md:[&>*]:w-[170px]">
-          <img src="/googlePlay.png" alt="google-play" />
-          <img src="/appStore.png" alt="app-store" />
+          <img
+            src="/googlePlay.png"
+            alt="google-play"
+            onClick={googlePlayLink}
+          />
+          <img src="/appStore.png" alt="app-store" onClick={appStoreLink} />
         </div>
       </div>
       <div className="relative pt-[65px]">
         <img
-          src="iPhone13.png"
+          src="/iPhone13.png"
           alt="iPhone13"
           className="relative z-10 max-w-max max-2xl:w-[650px] max-md:hidden"
         />
-        <div className="bg-customgreen-600 absolute bottom-[275px] left-[150px] h-[258px] w-[258px] rounded-full max-xl:hidden" />
-        <div className="bg-customgreen-600 absolute left-[390px] top-[290px] h-[258px] w-[258px] rounded-full max-xl:hidden" />
+        <div className="absolute bottom-[275px] left-[150px] h-[258px] w-[258px] rounded-full bg-customgreen-600 max-xl:hidden" />
+        <div className="absolute left-[390px] top-[290px] h-[258px] w-[258px] rounded-full bg-customgreen-600 max-xl:hidden" />
       </div>
     </div>
   );
