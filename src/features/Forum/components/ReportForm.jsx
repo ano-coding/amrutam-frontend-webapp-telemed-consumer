@@ -33,7 +33,7 @@ function ReportForm() {
 
 
 	return (
-		<ModalWindow>
+		<ModalWindow show={false}>
 			<div
 				className="bg-white rounded py-4 space-y-4"
 			>

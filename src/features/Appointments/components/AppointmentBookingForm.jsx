@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -5,7 +6,6 @@ import Lottie from 'lottie-react';
 import useWindowSize from "react-use/lib/useWindowSize";
 import { useForm } from "react-hook-form";
 import { useLocation } from 'react-router-dom';
-import Confetti2 from '../../../assets/appointments/confetti2.json';
 import Confetti from '../../../assets/appointments/confetti.json';
 
 
@@ -105,7 +105,7 @@ function AppointmentBookingForm() {
 				appointmentDetails={appointmentDetails}
 			/>
 			<div className='py-10'>
-				<div className='sm:px-4 mb-16 '>
+				<div className='sm:px-4 mb-16 flex justify-center'>
 					{currentStep < formSteps.length - 1 && <ProgressBar currentStep={currentStep}></ProgressBar>}
 				</div>
 				<div
@@ -382,7 +382,7 @@ function Payment({ setStep, appointmentDetails }) {
 			</div>
 
 			{couponStatus === 'Success' ? (
-				<AppliedCouponDetails coupon={data} setStep={setStep}></AppliedCouponDetails>
+				<AppliedCouponDetails data={data} setStep={setStep}></AppliedCouponDetails>
 			) : (
 				<SearchCoupons
 					searchParams={searchParams}
@@ -469,7 +469,9 @@ function SearchCoupons({ searchParams, setSearchParams, setStep, setShow }) {
 }
 
 
-function AppliedCouponDetails({setStep }) {
+function AppliedCouponDetails({ data, setStep }) {
+	console.log('coupon ', data);
+	
 	return (
 		<div className='bg-[#EAF2EA] rounded-2xl'>
 			<div className='rounded-t-2xl border-[1.5px] border-dashed border-[#D9D9D9]'>
@@ -480,8 +482,8 @@ function AppliedCouponDetails({setStep }) {
 						className='shrink-0 scale-50 -mt-4'
 					/>
 					<div>
-						<p className='text-[#101018] font-dmsans font-semibold text-sm'>Amazing 30% OFF deals</p>
-						<p className='text-[#646665] font-sans text-[10px]'>Save another $100 using this coupon</p>
+						<p className='text-[#101018] font-dmsans font-semibold text-sm'>{data.data.couponCode}</p>
+						<p className='text-[#646665] font-sans text-[10px]'>{data.data.description}</p>
 					</div>
 
 					<p className='ml-auto text-[#28643B] font-nunito font-bold text-sm'>Applied</p>
@@ -608,9 +610,11 @@ function BasicInfo({ appointmentDetails, setAppointmentDetails }) {
 }
 
 function PhotoUploader({ appointmentDetails, setAppointmentDetails }) {
-	const [selectedFile, setSelectedFile] = useState(null);
+	const [selectedFile, setSelectedFile] = useState('');
+	const [attachmentUrl, setAttachmentUrl] = useState('');
 	const [previewUrl, setPreviewUrl] = useState(null);
 	const fileInputRef = useRef(null);
+	
 
 	const handleFileChange = (event) => {
 		const file = event.target.files[0];
@@ -629,24 +633,46 @@ function PhotoUploader({ appointmentDetails, setAppointmentDetails }) {
 	const handleDivClick = () => {
 		fileInputRef.current.click();
 	};
+	
 
-	const formData = new FormData();
-	formData.append('file', selectedFile);
+	useEffect(() => {
+		console.log('attachementUrl ', attachmentUrl);
+		console.log('appointmentDetails ', appointmentDetails);
 
-	// const { data, isLoading } = useQuery({
-	// 	queryFn: () => uploadFile(formData),
-	// 	queryKey: ['file', selectedFile]
-	// });
+		if (attachmentUrl && attachmentUrl !== appointmentDetails.attachments?.[0]) {
+			setAppointmentDetails({
+				...appointmentDetails,
+				attachments: [
+					attachmentUrl
+				]
+			})
+		}
+	}, [attachmentUrl])
+
+
+
+	const { data, isLoading } = useQuery({
+		queryFn: () => uploadFile(selectedFile),
+		queryKey: ['file', selectedFile]
+	});
 
 
 
 
 
-	// if (isLoading) {
-	// 	return <div>...Loading</div>
-	// }
+	if (isLoading) {
+		return <div>...Loading</div>
+	}
 
-	// console.log('data', data);
+	console.log('data ', data);
+
+	if (data?.success && (!attachmentUrl || attachmentUrl !== data.data)) {
+		console.log('This code run');
+		setAttachmentUrl(data.data)
+	}
+
+
+
 
 
 	return (
