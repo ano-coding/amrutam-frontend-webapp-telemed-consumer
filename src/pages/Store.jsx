@@ -113,16 +113,27 @@ const Store = () => {
       />
       {searchTerm?.length > 0 ? (
         searchData ? (
-          <div className="my-[60px] flex flex-wrap items-start justify-center gap-6 gap-y-14 max-sm:mb-40 max-sm:gap-y-6">
-            {searchData.map((product) => (
-              <Product
-                key={product.id}
-                src={product?.mainImage}
-                name={product?.name || ""}
-                cost={product?.sellingPrice || 0}
-                onClick={() => prodDetailHandler(product.groupId)}
-              />
-            ))}
+          <div>
+            <h1 className="my-[70px] ml-[80px] text-2xl font-medium text-black max-xl:ml-[40px] max-xl:text-xl max-sm:my-[30px] max-sm:ml-4 max-sm:text-lg">
+              Showing results for {'"' + searchTerm + '"'}
+            </h1>
+            <div className="mb-[60px] flex flex-wrap items-start justify-center gap-6 gap-y-14 max-sm:mb-40 max-sm:gap-y-6">
+              {searchData.map((product) => (
+                <div
+                  key={product?.id}
+                  className="max-md:ml-4"
+                  onClick={() => prodDetailHandler(product.groupId)}
+                >
+                  <Product
+                    key={product.id}
+                    src={product?.mainImage}
+                    name={product?.name || ""}
+                    cost={product?.sellingPrice || 0}
+                  />
+                  <div className="mb-0 mt-5 h-[1px] w-[calc(100vw_-_40px)] bg-offWhite-100 md:hidden" />
+                </div>
+              ))}
+            </div>
           </div>
         ) : (
           <h1 className="mx-auto my-24 text-center text-2xl">

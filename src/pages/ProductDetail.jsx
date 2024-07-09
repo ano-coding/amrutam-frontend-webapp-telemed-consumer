@@ -6,6 +6,8 @@ import {
   addToCart,
   fetchCartByUserId,
   updateCart,
+  getInternalProductID,
+  mostReviewedDoctors,
 } from "../services/Shopify";
 import { toast } from "react-toastify";
 import parse from "html-react-parser";
@@ -24,6 +26,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const carouselRef = useRef(null);
   const quantityRef = useRef();
+  const containerRef = useRef();
 
   //States
   const [singleProductData, setSingleProductData] = useState();
@@ -37,6 +40,9 @@ const ProductDetail = () => {
   const [cartData, setCartData] = useState();
   const [showSuccess, setShowSuccess] = useState(false);
   const [showCart, setShowCart] = useState(false);
+  const [doctors, setDoctors] = useState();
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const [maxScroll, setMaxScroll] = useState(0);
   //For Mobile
   const [type, setType] = useState(0);
   const [showAddBtn, setShowAddBtn] = useState(true);
@@ -91,6 +97,24 @@ const ProductDetail = () => {
     gcTime: 100,
   });
 
+  const {
+    data: internalProductId,
+    isLoading: internalProductIdLoading,
+    error: internalProductIdError,
+  } = useQuery({
+    queryFn: () => getInternalProductID(id),
+    queryKey: ["internalProductId"],
+  });
+
+  const {
+    data: mostReviewedDoctorsResponse,
+    isLoading: mostReviewedDoctorsLoading,
+    error: mostReviewedDoctorsError,
+  } = useQuery({
+    queryFn: () => mostReviewedDoctors(),
+    queryKey: ["mostReviewedDoctors"],
+  });
+
   //Handlers
   const nextImageHandler = () => {
     setActiveImage((prev) => (prev + 1) % carouselImages.length);
@@ -129,7 +153,7 @@ const ProductDetail = () => {
         item.productId === Number(id) && item.variationId === activeVariantId
       );
     });
-    console.log(present);
+    // console.log(present);
     if (present) {
       updateCartRefetch();
     } else {
@@ -145,6 +169,25 @@ const ProductDetail = () => {
 
   const viewCartHandler = () => {
     navigate("/cart");
+  };
+
+  const moreExpertsHandler = () => {
+    navigate("/find-doctors");
+  };
+
+  const scrollHandler = (direction) => {
+    const itemWidth = 400;
+    let newPosition = scrollPosition + direction * itemWidth;
+
+    if (newPosition < 0) newPosition = 0;
+    if (newPosition >= maxScroll) newPosition = maxScroll;
+
+    setScrollPosition(newPosition);
+    containerRef?.current?.scrollTo({
+      left: newPosition,
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   //Effects
@@ -184,7 +227,7 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (!addToCartLoading && addToCartResponse) {
-      console.log("add to cart", addToCartResponse);
+      // console.log("add to cart", addToCartResponse);
       if (type === 0) {
         toast.success("Item added to cart");
       } else if (type == 1) {
@@ -204,14 +247,14 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (!cartLoading && cart) {
-      console.log("cart fetch=", cart);
+      // console.log("cart fetch=", cart);
       setCartData(cart);
     }
   }, [cartLoading, cart]);
 
   useEffect(() => {
     if (!updateCartLoading && updateCartResponse) {
-      console.log("update cart", updateCartResponse);
+      // console.log("update cart", updateCartResponse);
       toast.success("Cart updated successfully");
     } else if (updateCartError) {
       console.log(updateCartError);
@@ -222,7 +265,7 @@ const ProductDetail = () => {
   useEffect(() => {
     if (window.innerWidth <= 640) {
       setType(1);
-      console.log("dfhj");
+      // console.log("dfhj");
       const present = cartData?.data?.cart?.items?.some((item) => {
         return (
           item.productId === Number(id) && item.variationId === activeVariantId
@@ -243,14 +286,14 @@ const ProductDetail = () => {
   }, [cartData, id, activeVariantId]);
 
   useEffect(() => {
-    console.log("fjjrh");
+    // console.log("fjjrh");
     const items = cartData?.data?.cart?.items || [];
     for (let i = 0; i < items.length; i++) {
       if (
         items[i].productId === Number(id) &&
         items[i].variationId === activeVariantId
       ) {
-        console.log("fjeg");
+        // console.log("fjeg");
         setQuantity(items[i].quantity);
         break;
       }
@@ -264,6 +307,36 @@ const ProductDetail = () => {
       setShowCart(false);
     }
   }, [quantity, type]);
+
+  useEffect(() => {
+    if (!internalProductIdLoading && internalProductId) {
+      console.log(internalProductId);
+    } else if (internalProductIdError) {
+      console.log(internalProductIdError);
+    }
+  }, [internalProductId, internalProductIdError, internalProductIdLoading]);
+
+  useEffect(() => {
+    if (!mostReviewedDoctorsLoading && mostReviewedDoctorsResponse) {
+      // console.log(mostReviewedDoctorsResponse);
+      setDoctors(mostReviewedDoctorsResponse?.data?.data);
+    } else if (mostReviewedDoctorsError) {
+      console.log(mostReviewedDoctorsError);
+    }
+  }, [
+    mostReviewedDoctorsResponse,
+    mostReviewedDoctorsError,
+    mostReviewedDoctorsLoading,
+  ]);
+
+  useEffect(() => {
+    if (containerRef?.current) {
+      const container = containerRef.current;
+      const scrollWidth = container.scrollWidth;
+      setMaxScroll(scrollWidth);
+    }
+  }, [containerRef]);
+
   return (
     <div>
       <Header name={"Store"} show={true} />
@@ -605,47 +678,57 @@ const ProductDetail = () => {
         <h4 className="m-0 mb-[114px] text-center text-2xl font-medium leading-6 tracking-tight max-md:mb-5 max-sm:ml-5 max-sm:text-left max-sm:text-base">
           Meet our Experts
         </h4>
-        <div className="no-scrollbar mb-[31px] flex items-center justify-center gap-12 max-xl:mx-auto max-xl:my-0 max-xl:mb-[31px] max-xl:w-[90%] max-xl:justify-start max-xl:gap-4 max-xl:overflow-scroll">
-          <div className="flex h-[70px] w-[70px] cursor-pointer items-center justify-center rounded-[50%] border border-customgray-800 max-lg:hidden [&_img]:w-[23px]">
+        <div className="mb-[31px] flex items-center justify-center gap-5 max-xl:mx-auto max-xl:my-0 max-xl:mb-[31px]">
+          <div
+            onClick={() => scrollHandler(-1)}
+            style={{
+              opacity: scrollPosition === 0 ? 0 : 100,
+              cursor: scrollPosition === 0 ? "default" : "pointer",
+            }}
+            className="flex h-[70px] w-[70px] cursor-pointer items-center justify-center rounded-[50%] border border-customgray-800 max-md:hidden [&_img]:w-[23px]"
+          >
             <img src="/leftarrow.png" alt="left-arrow" />
           </div>
-          <Doctor />
-          <Doctor />
-          <Doctor />
-          <div className="flex h-[70px] w-[70px] cursor-pointer items-center justify-center rounded-[50%] border border-customgray-800 max-lg:hidden [&_img]:w-[23px]">
+          <div
+            ref={containerRef}
+            className="no-scrollbar flex max-w-[calc(100vw_-_364px)] items-start justify-start gap-12 overflow-scroll max-xl:w-[90%] max-xl:gap-4 max-lg:max-w-[calc(100vw_-_264px)] max-md:max-w-[calc(100vw_-_40px)] max-sm:ml-4 max-sm:max-w-[calc(100%_-_32px)]"
+          >
+            {doctors ? (
+              doctors?.map((doctor) => {
+                return (
+                  <Doctor
+                    key={doctor._id}
+                    id={doctor._id}
+                    name={doctor?.firstname ?? "" + doctor?.lastname ?? ""}
+                    rating={doctor?.averageRating ?? 0}
+                    speciality={doctor?.specialities?.[0] ?? 0}
+                    experience={doctor?.experience ?? 0}
+                    bio={doctor?.bio ?? ""}
+                    image={doctor?.photo || 0}
+                  />
+                );
+              })
+            ) : (
+              <Spinner />
+            )}
+          </div>
+          <div
+            onClick={() => scrollHandler(1)}
+            style={{
+              opacity: scrollPosition + 1164 >= maxScroll ? 0 : 100,
+              cursor:
+                scrollPosition + 1164 >= maxScroll ? "default" : "pointer",
+            }}
+            className="flex h-[70px] w-[70px] cursor-pointer items-center justify-center rounded-[50%] border border-customgray-800 max-md:hidden [&_img]:w-[23px]"
+          >
             <img src="/arrow.png" alt="right-arrow" />
           </div>
         </div>
-        <div className="mb-10 flex items-center justify-center gap-[30px] max-lg:hidden [&_svg]:h-3 [&_svg]:w-3">
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle cx="6" cy="6" r="6" fill="#3A643B" />
-          </svg>
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle cx="6" cy="6" r="6" fill="#C3C3C3" />
-          </svg>
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle cx="6" cy="6" r="6" fill="#C3C3C3" />
-          </svg>
-        </div>
-        <button className="mx-auto my-0 mb-14 flex w-[276px] items-center justify-center gap-[10px] rounded-[7px] border border-customgreen-800 bg-customlightgreen-300 px-[25px] py-0 max-sm:mb-[100px] max-sm:w-[200px] max-sm:p-0">
+
+        <button
+          onClick={moreExpertsHandler}
+          className="mx-auto my-0 mb-14 flex w-[276px] items-center justify-center gap-[10px] rounded-[7px] border border-customgreen-800 bg-customlightgreen-300 px-[25px] py-0 max-sm:mb-[100px] max-sm:w-[200px] max-sm:p-0"
+        >
           <span className="text-lg font-medium leading-[58px] tracking-tight text-customgreen-800 max-sm:text-[15px]">
             Find more experts
           </span>

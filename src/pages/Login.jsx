@@ -16,7 +16,8 @@ const Login = () => {
     formState: { errors },
   } = useForm();
 
-  const { setToken, setUserId } = useContext(UserContext);
+  const { setToken, setUserId, setPhoneNumber, setName } =
+    useContext(UserContext);
   const { sendOTPMutate, sendOTPStatus } = useSendOTP();
   const { verifyOTPMutate, verifyOTPStatus } = useVerifyOTP();
 
@@ -43,10 +44,25 @@ const Login = () => {
       // Verify OTP
       verifyOTPMutate([countryCallingCode, nationalNumber, data.otp], {
         onSuccess: (res) => {
+          console.log(res);
           setToken(res.data.token);
           localStorage.setItem("token", res.data.token);
           setUserId(res.data.info._id);
           localStorage.setItem("userId", res.data.info._id);
+          setPhoneNumber(countryCallingCode + " " + nationalNumber);
+          localStorage.setItem(
+            "phoneNumber",
+            countryCallingCode + " " + nationalNumber,
+          );
+          setName(
+            res?.data?.info?.first_name + " " + res?.data?.info?.last_name ??
+              "",
+          );
+          localStorage.setItem(
+            "name",
+            res?.data?.info?.first_name + " " + res?.data?.info?.last_name ??
+              "",
+          );
           toast.success("Logged in successfully!");
         },
         onError: (error) => {

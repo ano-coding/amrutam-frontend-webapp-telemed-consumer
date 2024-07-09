@@ -49,191 +49,191 @@ import CouponsPage from "./pages/CouponsPage";
 import AppointmentSuccessPage from "./pages/AppointmentSuccessPage";
 
 const router = createBrowserRouter([
-	{
-		element: <AppLayout />,
-		children: [
-			{
-				path: "/",
-				element: <HomePage></HomePage>,
-			},
+  {
+    element: <AppLayout />,
+    children: [
+      {
+        path: "/",
+        element: <HomePage></HomePage>,
+      },
 
-			{
-				path: "/find-doctors",
-				element: <FindDoctorsPage></FindDoctorsPage>
-			},
-			{
-				path: "/profile/:id",
-				element: <DoctorProfilePage></DoctorProfilePage>
-			},
-			{
-				path: "/appointment-booking",
-				element: <AppointmentBookingPage />
-			},
-			{
-				path: '/appointment/:doctorId',
-				element: <AppointmentBookingForm></AppointmentBookingForm>
-			},
-			{
-				path: '/coupons',
-				element: <CouponsPage></CouponsPage>
-			},
-			{
-				path: '/appointment-success',
-				element: <AppointmentSuccessPage></AppointmentSuccessPage>
-			},
-			{
-				path: "/questionnaire",
-				element: <QuestionnairePage></QuestionnairePage>
-			},
-			{
-				path: "/questionnaireSingleCard/:id",
-				element: <QuestionnaireSingleCard></QuestionnaireSingleCard>
-			},
-			{
-				path: "/selfAssessmentQuestions",
-				element: <SelfAssessmentQuestions />,
-			},
-			{
-				path: "/selfAssessmentResult",
-				element: <SelfAssessmentResult />,
-			},
-			{
-				path: "/triviaQuestions",
-				element: <TriviaQuestions />,
-			},
-			{
-				path: "/triviaResult",
-				element: <TriviaResult />,
-			},
+      {
+        path: "/find-doctors",
+        element: <FindDoctorsPage></FindDoctorsPage>,
+      },
+      {
+        path: "/profile/:id",
+        element: <DoctorProfilePage></DoctorProfilePage>,
+      },
+      {
+        path: "/appointment-booking",
+        element: <AppointmentBookingPage />,
+      },
+      {
+        path: "/appointment/:doctorId",
+        element: <AppointmentBookingForm></AppointmentBookingForm>,
+      },
+      {
+        path: "/coupons",
+        element: <CouponsPage></CouponsPage>,
+      },
+      {
+        path: "/appointment-success",
+        element: <AppointmentSuccessPage></AppointmentSuccessPage>,
+      },
+      {
+        path: "/questionnaire",
+        element: <QuestionnairePage></QuestionnairePage>,
+      },
+      {
+        path: "/questionnaireSingleCard/:id",
+        element: <QuestionnaireSingleCard></QuestionnaireSingleCard>,
+      },
+      {
+        path: "/selfAssessmentQuestions",
+        element: <SelfAssessmentQuestions />,
+      },
+      {
+        path: "/selfAssessmentResult",
+        element: <SelfAssessmentResult />,
+      },
+      {
+        path: "/triviaQuestions",
+        element: <TriviaQuestions />,
+      },
+      {
+        path: "/triviaResult",
+        element: <TriviaResult />,
+      },
 
-			{
-				path: "/commune",
-				element: <ForumPage></ForumPage>
-			},
-			{
-				path: "/commune/post/:id",
-				element: <SinglePost />,
-			},
-			{
-				path: "/about",
-				element: <div>About us</div>
-			},
-			{ path: "/store", element: <Store /> },
-			{ path: "prodDetail", element: <ProductDetail /> },
-			{ path: "cart", element: <Cart /> },
-			{ path: "success", element: <Success /> },
-		]
-	},
-	{
-		element: <Auth />,
-		children: [
-			{
-				path: "/login",
-				element: <Login />,
-			},
-			{
-				path: "/signup",
-				element: <Signup />,
-			},
-		],
-	},
+      {
+        path: "/commune",
+        element: <ForumPage></ForumPage>,
+      },
+      {
+        path: "/commune/post/:id",
+        element: <SinglePost />,
+      },
+      {
+        path: "/about",
+        element: <div>About us</div>,
+      },
+      { path: "/store", element: <Store /> },
+      { path: "prodDetail/:id", element: <ProductDetail /> },
+      { path: "cart", element: <Cart /> },
+      { path: "success", element: <Success /> },
+    ],
+  },
+  {
+    element: <Auth />,
+    children: [
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/signup",
+        element: <Signup />,
+      },
+    ],
+  },
 
-	{
-		element: <DashboardLayout />,
-		children: [
-			{
-				path: "/dashboard",
-				element: <ConsumerDashboard />,
-			},
-			{
-				path: "/appointments",
-				element: <Appointments />,
-			},
-			{
-				path: "/appointments/:id",
-				element: <AppointmentDetails />,
-			},
-			{
-				path: "/routines",
-				element: <RoutineDashboard />,
-			},
-			{
-				path: "/routines/create",
-				element: <CreateRoutine />,
-			},
-			{
-				path: "/medical-records",
-				element: <MedicalRecords />,
-			},
-			{
-				path: "/payments",
-				element: <Payments />,
-			},
-			{
-				path: "/chats",
-				element: <Chats />,
-			},
-			{
-				path: "/call-recordings",
-				element: <CallRecordings />,
-			},
-			{
-				path: "/routines/create/weekly-benefits",
-				element: <WeeklyBenefits />,
-			},
-			{
-				path: "/routines/create/add-reminder",
-				element: <AddReminder />,
-			},
-			{
-				path: "/routines/create/add-reminder/product-details",
-				element: <ProductDetails />,
-			},
-			{
-				path: "/routines/create/add-reminder-channels",
-				element: <ReminderChannel />,
-			},
-			{
-				path: "/routines/create/assign-caregiver",
-				element: <AssignCaregiver />,
-			},
-			{
-				path: "/profile",
-				element: <PatientProfile />,
-			},
-			{
-				path: "/profile/edit",
-				element: <PatientProfileEdit />,
-			},
-		],
-	},
+  {
+    element: <DashboardLayout />,
+    children: [
+      {
+        path: "/dashboard",
+        element: <ConsumerDashboard />,
+      },
+      {
+        path: "/appointments",
+        element: <Appointments />,
+      },
+      {
+        path: "/appointments/:id",
+        element: <AppointmentDetails />,
+      },
+      {
+        path: "/routines",
+        element: <RoutineDashboard />,
+      },
+      {
+        path: "/routines/create",
+        element: <CreateRoutine />,
+      },
+      {
+        path: "/medical-records",
+        element: <MedicalRecords />,
+      },
+      {
+        path: "/payments",
+        element: <Payments />,
+      },
+      {
+        path: "/chats",
+        element: <Chats />,
+      },
+      {
+        path: "/call-recordings",
+        element: <CallRecordings />,
+      },
+      {
+        path: "/routines/create/weekly-benefits",
+        element: <WeeklyBenefits />,
+      },
+      {
+        path: "/routines/create/add-reminder",
+        element: <AddReminder />,
+      },
+      {
+        path: "/routines/create/add-reminder/product-details",
+        element: <ProductDetails />,
+      },
+      {
+        path: "/routines/create/add-reminder-channels",
+        element: <ReminderChannel />,
+      },
+      {
+        path: "/routines/create/assign-caregiver",
+        element: <AssignCaregiver />,
+      },
+      {
+        path: "/profile",
+        element: <PatientProfile />,
+      },
+      {
+        path: "/profile/edit",
+        element: <PatientProfileEdit />,
+      },
+    ],
+  },
 ]);
 
 // Create a client
 const queryClient = new QueryClient();
 
 function App() {
-	return (
-		<UserProvider>
-			<QueryClientProvider client={queryClient}>
-				<RouterProvider router={router} />
-				<ToastContainer
-					position="top-right"
-					autoClose={5000}
-					hideProgressBar={false}
-					newestOnTop={true}
-					closeOnClick
-					rtl={false}
-					pauseOnFocusLoss
-					draggable
-					pauseOnHover
-					theme="light"
-					transition={Bounce}
-				/>
-				<ReactQueryDevtools initialIsOpen={false} />
-			</QueryClientProvider>
-		</UserProvider>
-	);
+  return (
+    <UserProvider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          transition={Bounce}
+        />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </UserProvider>
+  );
 }
 
 export default App;
