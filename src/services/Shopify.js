@@ -121,3 +121,36 @@ export async function searchWizzy(query) {
     console.error(error);
   }
 }
+
+export async function getInternalProductID(id) {
+  try {
+    const response = await axios.get(
+      `https://judge.me/api/v1/products/888?shop_domain=amrutam3.myshopify.com&api_token=XsfSYKV1toU1cHKtcQnBG7q2FCA&external_id=${id}`,
+      {
+        maxBodyLength: Infinity,
+      },
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function mostReviewedDoctors() {
+  try {
+    const response = await axios.get(
+      "/api/v1/patient/doctors/most-reviewed-or-booked",
+      {
+        baseURL: "https://amrutam-dev-backend.azurewebsites.net",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MDUyMzg0ZjZjYmNmYjMwNWNhYmYxZiIsImlhdCI6MTcxNDM3OTY1NywiZXhwIjoxNzE0NDY2MDU3fQ.BaA4TJTU0c6XvHFpesG-V0TJg32lOBrJTWgXqKV2eEE`,
+        },
+        maxBodyLength: Infinity,
+      },
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}

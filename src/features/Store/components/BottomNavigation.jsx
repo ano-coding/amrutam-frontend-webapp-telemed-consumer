@@ -9,7 +9,9 @@ import { useLocation } from "react-router-dom";
 const BottomNavigation = () => {
   const location = useLocation();
   const hideBottomNavigationBar =
-    location.pathname === "/cart" || location.pathname === "/prodDetail";
+    location.pathname === "/cart" ||
+    location.pathname.startsWith("/prodDetail");
+  console.log(hideBottomNavigationBar);
 
   const [screen, setScreen] = useState(1);
   const screenHandler = (id) => {
