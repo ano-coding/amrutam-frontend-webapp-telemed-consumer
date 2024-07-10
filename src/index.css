@@ -152,3 +152,6 @@ html {
   scrollbar-width: thin;
   scrollbar-color: #cccccc #ffffff;
 }
+.custom-scrollbar {
+  scrollbar-width: thin;
+}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Breadcrumb from "../../../components/Breadcrumb";
 import ContentBoxLayout from "../../../components/ContentBoxLayout";
 import RoutineCard from "./RoutineCard";
@@ -7,6 +7,10 @@ import SkinCareCard from "./SkinCareCard";
 import ClockSvg from "../../../assets/clock.svg?react";
 import ChevronRightSvg from "../../../assets/chevron-right.svg?react";
 import CreateRoutinePopup from "./CreateRoutinePopup";
+import { UserContext } from "../../../context/UserContext";
+import useGetReminderTemplates from "../../../hooks/routines/useFetchReminderTemplates";
+import useGetTodayReminders from "../../../hooks/routines/useGetTodayReminders";
+import useGetReminderList from "../../../hooks/routines/useGetReminderList";
 
 const breadCrumbList = [
   {
@@ -130,6 +134,32 @@ const filters = [
 const RoutineDashboard = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(filters[0].name);
+
+  const { token } = useContext(UserContext);
+  const {
+    data: rtData,
+    error: rtError,
+    isLoading: rtLoading,
+  } = useGetReminderTemplates(token);
+
+  const {
+    data: gtrData,
+    error: gtrError,
+    gtrLoading,
+  } = useGetTodayReminders(token);
+
+  const {
+    data: grlData,
+    error: grlError,
+    isLoading: grlLoading,
+  } = useGetReminderList(token);
+
+  const isLoading = rtLoading || gtrLoading || grlLoading;
+  const error = rtError || gtrError || grlError;
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
   return (
     <div className="flex w-full flex-col gap-[37px]">
       <CreateRoutinePopup open={isPopupOpen} setOpen={setIsPopupOpen} />
@@ -159,7 +189,7 @@ const RoutineDashboard = () => {
         <div className="w-full border-b-2 border-slate-200 py-6">
           <h2 className="px-5 text-[18px] font-medium tracking-[-0.02em] xl:px-9">{`Today's Routines`}</h2>
           <p className="mt-1 px-5 font-nunito text-base font-medium tracking-[-0.02em] text-[#A0A0A0] xl:px-9">
-            You have 4 Routines remaining for the day
+            {`You have ${gtrData?.data?.length} Routines remaining for the day`}
           </p>
           {todayRoutines.map((routine, index) => (
             <div
@@ -209,7 +239,7 @@ const RoutineDashboard = () => {
             My Routine
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-            {myRoutines.map((routine, index) => (
+            {grlData?.data?.map((routine, index) => (
               <RoutineCard key={index} {...routine} />
             ))}
           </div>
@@ -248,8 +278,8 @@ const RoutineDashboard = () => {
           </div>
 
           <div className="mb-10 grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
-            {skinCare.map((card, index) => (
-              <SkinCareCard key={index} {...card} />
+            {rtData?.data?.map((card) => (
+              <SkinCareCard key={card._id} {...card} />
             ))}
           </div>
         </div>

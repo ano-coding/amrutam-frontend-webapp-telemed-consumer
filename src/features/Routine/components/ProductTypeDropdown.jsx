@@ -12,12 +12,12 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const extractWeekNumber = (weekString) => {
-  const match = weekString.match(/\d+/);
-  return match ? parseInt(match[0], 10) : null;
+const getLabelById = (id, items) => {
+  const item = items.find((item) => item.id === id);
+  return item ? item.label : null;
 };
 
-export default function HookFormDropDown({
+export default function ProductTypeDropDown({
   label,
   list,
   mdWidth,
@@ -47,7 +47,7 @@ export default function HookFormDropDown({
             className="relative w-full rounded-[16px] border-[1.5px] border-[#ced8e0] px-3 py-2 shadow-sm"
           >
             <label
-              htmlFor="concerns"
+              htmlFor="search"
               className="absolute -top-2 left-2 -mt-px inline-block bg-white px-1 text-[12px] leading-[16px] text-neutral-400"
             >
               {label}
@@ -58,8 +58,12 @@ export default function HookFormDropDown({
                 type="text"
                 name={field.name}
                 id={field.name}
-                value={selected || field.value || ""}
-                className="block w-full select-none border-0 p-0 py-1.5 pl-1 text-[16px] leading-[24px] text-black placeholder-neutral-400 caret-transparent placeholder:text-sm focus:ring-0"
+                value={
+                  getLabelById(selected, list) ||
+                  getLabelById(field.value, list) ||
+                  ""
+                }
+                className="block w-full select-none border-0 p-0 py-1.5 pl-1 text-[16px] capitalize leading-[24px] text-black placeholder-neutral-400 caret-transparent placeholder:text-sm focus:ring-0"
                 placeholder={placeholder}
                 readOnly
               />
@@ -68,9 +72,9 @@ export default function HookFormDropDown({
                 src="/dropdown-icon.svg"
                 alt="DropDown Icon"
               />
-              {errors?.weekInterval && (
-                <span className="absolute -bottom-2 right-1 text-[12px] text-red-600">
-                  *Please Select a Week Interval
+              {errors?.productType && (
+                <span className="absolute -bottom-2 right-1 text-[12px] font-medium text-red-500">
+                  *Please Select a Product Type
                 </span>
               )}
             </div>
@@ -88,22 +92,22 @@ export default function HookFormDropDown({
             <MenuItems className="absolute right-0 z-30 mr-2 mt-2 w-3/5 origin-top-right rounded-md bg-white shadow-lg shadow-[#ced8e0] ring-1 ring-[#ced8e0] ring-opacity-5 focus:outline-none">
               <div className="py-1">
                 {list.map((item) => (
-                  <MenuItem key={item}>
+                  <MenuItem key={item?.id}>
                     {({ focus }) => {
                       return (
                         <span
                           onClick={() => {
-                            setSelected(item);
-                            field.onChange(extractWeekNumber(item));
+                            setSelected(item?.id);
+                            field.onChange(item?.id);
                           }}
                           className={classNames(
                             focus
                               ? "bg-gray-100 text-gray-900"
                               : "text-gray-700",
-                            "block px-4 py-2 text-sm",
+                            "block px-4 py-2 text-sm capitalize",
                           )}
                         >
-                          {item}
+                          {getLabelById(item?.id, list)}
                         </span>
                       );
                     }}

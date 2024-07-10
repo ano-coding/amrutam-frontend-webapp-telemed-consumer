@@ -25,3 +25,27 @@ const uploadFileToS3 = async (file, token) => {
 };
 
 export default uploadFileToS3;
+
+export const uploadRoutineFileToAzure = async (file, token) => {
+  try {
+    const data = new FormData();
+    data.append("file", file);
+
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "https://amrutam-routine-nodejs-dev.azurewebsites.net/api/v1/patient/upload",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: data,
+    };
+
+    const response = await axios.request(config);
+
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
