@@ -287,6 +287,27 @@ export const getSingleUnit = async (token, unitId) => {
   }
 };
 
+export const createUnit = async (unitData, token) => {
+  const config = {
+    method: "post",
+    maxBodyLength: Infinity,
+    url: `${API_BASE_URL}/patient/units`,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    data: JSON.stringify(unitData),
+  };
+
+  try {
+    const response = await axios.request(config);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 export const createProductReminder = async (reminderData, token) => {
   console.log(token);
   const config = {
