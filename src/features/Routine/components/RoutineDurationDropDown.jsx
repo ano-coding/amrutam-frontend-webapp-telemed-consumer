@@ -19,6 +19,7 @@ export default function RoutineDurationDropDown({
   mdWidth,
   placeholder,
   className,
+  error,
 }) {
   return (
     <div
@@ -48,6 +49,11 @@ export default function RoutineDurationDropDown({
               alt="DropDown Icon"
             />
           </div>
+          {error && (
+            <p className="absolute bottom-0 right-2 text-[12px] font-medium text-red-500">
+              {error?.message}
+            </p>
+          )}
         </MenuButton>
 
         <Transition

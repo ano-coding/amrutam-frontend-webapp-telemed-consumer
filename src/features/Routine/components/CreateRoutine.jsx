@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useMemo, useRef, useState } from "react";
 import Breadcrumb from "../../../components/Breadcrumb";
 import ContentBoxLayout from "../../../components/ContentBoxLayout";
 import AddConvenience from "./AddConvenience";
@@ -27,14 +27,6 @@ const breadCrumbList = [
     link: "routines/create",
     isActive: true,
   },
-];
-
-const THUMBNAILS = [
-  "hair-care-1.jpg",
-  "hair-care-2.jpg",
-  "hair-care-3.jpg",
-  "hair-care-4.jpg",
-  "hair-care-5.jpg",
 ];
 
 const REMINDER_CHANNELS = ["SMS", "WhatsApp", "Email"];
@@ -84,6 +76,7 @@ const CreateRoutine = () => {
     getValues,
     handleSubmit,
     setValue,
+    watch,
 
     control,
     formState: { errors },
@@ -108,6 +101,7 @@ const CreateRoutine = () => {
         setPreviewUrl(reader.result);
       };
       reader.readAsDataURL(file);
+      setSelectedThumbnail(null);
     }
   };
 
@@ -133,7 +127,7 @@ const CreateRoutine = () => {
       const routineData = {
         name: formData.name,
         visibility: "Private",
-        image: photoData,
+        image: selectedThumbnail || photoData,
         category: formData.category,
         duration: {
           number: formData.durationNumber,
@@ -151,6 +145,16 @@ const CreateRoutine = () => {
       console.log(error);
     }
   };
+
+  const category = gcData?.data?.find(
+    (category) => category._id === watch("category"),
+  );
+
+  const aiThumbnails = useMemo(() => {
+    if (!category) return [];
+
+    return category.aiImages?.sort(() => 0.5 - Math.random())?.slice(0, 5);
+  }, [category]);
 
   return (
     <div className="flex w-full flex-col gap-[37px]">
@@ -190,12 +194,118 @@ const CreateRoutine = () => {
                   id="name"
                   className="block w-full border-0 p-0 py-1.5 text-[16px] leading-[24px] text-black placeholder-neutral-400 placeholder:text-sm focus:ring-0"
                   placeholder={"Hair Care Routine"}
-                  {...register("name", { required: true })}
+                  {...register("name", {
+                    required: "*Please Add a Routine Name",
+                  })}
                 />
+                {errors?.name && (
+                  <p className="absolute bottom-0 right-2 text-[12px] font-medium text-red-500">
+                    {errors?.name?.message}
+                  </p>
+                )}
               </div>
 
               <div className="w-full pl-3 text-[12px] leading-[16px] text-neutral-400">
                 {`This will be displayed as your Routine name.`}
+              </div>
+            </div>
+            {/* Category, Duration, Descriptions */}
+            <div className="flex flex-col items-center justify-between gap-5 sm:flex-row">
+              <div className="flex w-full flex-col gap-8 md:w-[300px] lg:w-[400px]">
+                <div className="flex flex-col gap-1">
+                  <Controller
+                    name="category"
+                    control={control}
+                    rules={{ required: "*Please Choose a Category" }}
+                    render={({ field }) => (
+                      <RoutineCategoriesDropDown
+                        list={gcData?.data || []}
+                        label="Category"
+                        mdWidth="w-[400px]"
+                        placeholder="Example: Lifestyle, Fitness, etc."
+                        value={
+                          gcData?.data?.find(
+                            (category) => category._id === field.value,
+                          )?.name || ""
+                        }
+                        onChange={field.onChange}
+                        error={errors?.category}
+                      />
+                    )}
+                  />
+                  <div className="w-full pl-3 text-[12px] leading-[16px] text-neutral-400">
+                    Please select the category of your Routine.
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-5">
+                  <Controller
+                    name="durationNumber"
+                    control={control}
+                    rules={{ required: "*This field is required" }}
+                    render={({ field }) => (
+                      <RoutineDurationDropDown
+                        list={Array.from({ length: 7 }, (_, i) => i + 1)}
+                        label="Duration"
+                        placeholder="1"
+                        value={field.value}
+                        onChange={field.onChange}
+                        error={errors?.durationNumber}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="durationUnit"
+                    control={control}
+                    rules={{ required: "*This field is required" }}
+                    render={({ field }) => (
+                      <RoutineDurationDropDown
+                        list={["Week(s)"]}
+                        label={`Unit`}
+                        placeholder="Weeks"
+                        value={field.value}
+                        onChange={field.onChange}
+                        error={errors?.durationUnit}
+                      />
+                    )}
+                  />
+                </div>
+              </div>
+              <div className="mt-4 flex flex-col gap-1 sm:mt-0">
+                <div className="relative w-full rounded-[16px] border-[1.5px] border-[#ced8e0] px-3 py-2 shadow-sm md:w-[300px] lg:w-[400px]">
+                  <label
+                    htmlFor="description"
+                    className="absolute -top-2 left-2 -mt-px inline-block bg-white px-1 text-[12px] leading-[16px] text-neutral-400"
+                  >
+                    Description
+                  </label>
+
+                  <textarea
+                    onKeyDown={handleKeyDown}
+                    onBeforeInput={() => {
+                      if (getValues("description") === "")
+                        setValue("description", "•   ");
+                    }}
+                    rows={6}
+                    type="text"
+                    name="description"
+                    id="description"
+                    className="custom-scrollbar block w-full border-0 p-0 py-1.5 pl-1 text-[14px] leading-[24px] text-black placeholder-neutral-400 placeholder:text-sm focus:ring-0"
+                    {...register("description", {
+                      required: "*Please Add Routine Description",
+                      validate: (value) =>
+                        (value.match(/•/g) || []).length >= 3 ||
+                        "Please add at least 3 pointers about the Routine.",
+                    })}
+                  />
+                  {errors?.description && (
+                    <p className="absolute bottom-1 right-8 text-[12px] font-medium text-red-500">
+                      {errors?.description?.message}
+                    </p>
+                  )}
+                </div>
+                <div className="w-full pl-3 text-[12px] leading-[16px] text-neutral-400">
+                  Please add at least 3 pointers about the Routine.
+                </div>
               </div>
             </div>
             <div className="flex flex-col gap-1">
@@ -207,6 +317,7 @@ const CreateRoutine = () => {
                       onClick={() => {
                         setPreviewUrl(null);
                         setSelectedFile(null);
+                        setSelectedThumbnail(null);
                       }}
                       className="absolute right-0.5 top-0.5 z-50 block h-6 w-6 -translate-y-1/2 translate-x-1/2 transform bg-[url('/red-cross.svg')]"
                     />
@@ -248,127 +359,51 @@ const CreateRoutine = () => {
                   <div className="h-[0.8px] w-[71px] bg-[#b0c1b1] sm:h-[71px] sm:w-[0.8px]" />
                 </div>
                 <div className="flex flex-col gap-[14px]">
-                  <div className="whitespace-nowrap text-[14px] leading-[12px] text-neutral-700">
-                    Select from our picks
+                  <div className="whitespace-nowrap text-[14px] capitalize leading-[12px] text-neutral-700">
+                    Select from our Random picks
                   </div>
-                  <div className="flex flex-wrap gap-3 sm:gap-[15px]">
-                    {THUMBNAILS.map((thumbnail) => (
-                      <span
-                        key={thumbnail}
-                        onClick={() => {
-                          if (selectedThumbnail === thumbnail) {
-                            setSelectedThumbnail(null);
-                          } else {
-                            setSelectedThumbnail(thumbnail);
-                          }
-                        }}
-                        className={`relative z-10 box-border shrink-0 cursor-pointer rounded-lg border-[0.14rem] border-solid hover:border-[#3a643b] ${selectedThumbnail === thumbnail ? `border-[#3a643b]` : "border-transparent"}`}
-                      >
-                        <img
-                          className="h-14 w-14 shrink-0 rounded-lg object-cover"
-                          alt=""
-                          src={`/${thumbnail}`}
-                        />
-                        {selectedThumbnail === thumbnail && (
-                          <span className="absolute right-0 top-0 z-50 block h-[14px] w-[14px] -translate-y-1/2 translate-x-1/2 transform bg-[url(/checked.svg)]" />
-                        )}
-                      </span>
-                    ))}
-                  </div>
+                  {aiThumbnails.length === 0 && (
+                    <div className="py-5 text-[14px] font-medium capitalize leading-[12px] text-red-500">
+                      *Please select Routine Category to view our Picks
+                    </div>
+                  )}
+                  {!!aiThumbnails.length && (
+                    <div className="flex flex-wrap gap-3 sm:gap-[15px]">
+                      {aiThumbnails.map((thumbnail) => (
+                        <span
+                          key={thumbnail}
+                          onClick={() => {
+                            if (selectedThumbnail === thumbnail) {
+                              setSelectedThumbnail(null);
+                            } else {
+                              setSelectedThumbnail(thumbnail);
+                              setPreviewUrl(thumbnail);
+                            }
+                          }}
+                          className={`relative z-10 box-border shrink-0 cursor-pointer rounded-lg border-[0.14rem] border-solid hover:border-[#3a643b] ${selectedThumbnail === thumbnail ? `border-[#3a643b]` : "border-transparent"}`}
+                        >
+                          <img
+                            className="h-14 w-14 shrink-0 rounded-lg border object-cover"
+                            alt=""
+                            src={thumbnail}
+                          />
+                          {selectedThumbnail === thumbnail && (
+                            <span className="absolute right-0 top-0 z-50 block h-[14px] w-[14px] -translate-y-1/2 translate-x-1/2 transform bg-[url(/checked.svg)]" />
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="mt-3 w-full pl-3 text-[12px] leading-[16px] text-neutral-400 sm:mt-0">
                 This will be displayed as your Routine thumbnail.
               </div>
-            </div>
-            {/* Section 3 */}
-            <div className="flex flex-col items-center justify-between gap-5 sm:flex-row">
-              <div className="flex w-full flex-col gap-8 md:w-[300px] lg:w-[400px]">
-                <div className="flex flex-col gap-1">
-                  <Controller
-                    name="category"
-                    control={control}
-                    rules={{ required: "This field is required" }}
-                    render={({ field }) => (
-                      <RoutineCategoriesDropDown
-                        list={gcData?.data || []}
-                        label="Category"
-                        mdWidth="w-[400px]"
-                        placeholder="Example: Lifestyle, Fitness, etc."
-                        value={
-                          gcData?.data?.find(
-                            (category) => category._id === field.value,
-                          )?.name || ""
-                        }
-                        onChange={field.onChange}
-                        className={errors.category ? "border-red-500" : ""}
-                      />
-                    )}
-                  />
-                  <div className="w-full pl-3 text-[12px] leading-[16px] text-neutral-400">
-                    Please select the category of your Routine.
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-5">
-                  <Controller
-                    name="durationNumber"
-                    control={control}
-                    rules={{ required: "This field is required" }}
-                    render={({ field }) => (
-                      <RoutineDurationDropDown
-                        list={Array.from({ length: 7 }, (_, i) => i + 1)}
-                        label="Duration"
-                        placeholder="1"
-                        value={field.value}
-                        onChange={field.onChange}
-                        className={errors.category ? "border-red-500" : ""}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="durationUnit"
-                    control={control}
-                    rules={{ required: "This field is required" }}
-                    render={({ field }) => (
-                      <RoutineDurationDropDown
-                        list={["Week(s)"]}
-                        label={`Unit`}
-                        placeholder="Weeks"
-                        value={field.value}
-                        onChange={field.onChange}
-                        className={errors.category ? "border-red-500" : ""}
-                      />
-                    )}
-                  />
-                </div>
-              </div>
-              <div className="mt-4 flex flex-col gap-1 sm:mt-0">
-                <div className="relative w-full rounded-[16px] border-[1.5px] border-[#ced8e0] px-3 py-2 shadow-sm md:w-[300px] lg:w-[400px]">
-                  <label
-                    htmlFor="description"
-                    className="absolute -top-2 left-2 -mt-px inline-block bg-white px-1 text-[12px] leading-[16px] text-neutral-400"
-                  >
-                    Description
-                  </label>
-
-                  <textarea
-                    onKeyDown={handleKeyDown}
-                    onBeforeInput={() => {
-                      if (getValues("description") === "")
-                        setValue("description", "•   ");
-                    }}
-                    rows={6}
-                    type="text"
-                    name="description"
-                    id="description"
-                    className="custom-scrollbar block w-full border-0 p-0 py-1.5 pl-1 text-[14px] leading-[24px] text-black placeholder-neutral-400 placeholder:text-sm focus:ring-0"
-                    {...register("description", { required: true })}
-                  />
-                </div>
-                <div className="w-full pl-3 text-[12px] leading-[16px] text-neutral-400">
-                  Please add at least 3 pointers about the Routine.
-                </div>
-              </div>
+              {!(photoData || selectedThumbnail) && (
+                <p className="self-end text-[12px] font-medium text-red-500">
+                  *Please Add a Routine Thumbnail
+                </p>
+              )}
             </div>
 
             {/* Form Part 2 */}
