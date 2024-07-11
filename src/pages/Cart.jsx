@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   fetchCartByUserId,
@@ -13,9 +12,10 @@ import HomeAppContainer from "../features/Store/components/HomeAppContainer";
 import Footer from "../features/Store/components/Footer";
 import SimilarProducts from "../features/Store/components/SimilarProducts";
 import { toast } from "react-toastify";
+import { ShopifyContext } from "../context/ShopifyContext";
 
 const Cart = () => {
-  // const navigate = useNavigate();
+  const { shopifyId, cartId, setCartId, _id } = useContext(ShopifyContext);
 
   //States
   const [cartProducts, setCartProducts] = useState();
@@ -28,8 +28,9 @@ const Cart = () => {
     isLoading: cartLoading,
     refetch: cartRefetch,
   } = useQuery({
-    queryFn: () => fetchCartByUserId(),
+    queryFn: () => fetchCartByUserId(Number(shopifyId)),
     queryKey: ["cart"],
+    gcTime: 100,
   });
 
   const {
@@ -43,6 +44,8 @@ const Cart = () => {
         productId: updatedItem.productId,
         variationId: updatedItem.variationId,
         quantity: updatedItem.quantity,
+        userId: Number(shopifyId),
+        cartId: cartId,
       }),
     queryKey: [`updateCart/${updatedItem?.variationId}`],
     enabled: false,
@@ -55,7 +58,7 @@ const Cart = () => {
     error: clearCartError,
     refetch: clearCartRefetch,
   } = useQuery({
-    queryFn: () => clearCart(),
+    queryFn: () => clearCart(shopifyId, cartId),
     queryKey: ["clearCart"],
     enabled: false,
     gcTime: 100,
@@ -67,9 +70,10 @@ const Cart = () => {
     error: shopflowCheckoutError,
     refetch: shopfloCheckoutRefetch,
   } = useQuery({
-    queryFn: () => shopfloCheckout(),
+    queryFn: () => shopfloCheckout(_id),
     queryKey: ["cart"],
     enabled: false,
+    gcTime: 100,
   });
 
   //Handlers
@@ -89,8 +93,7 @@ const Cart = () => {
     });
   };
 
-  const successHandler = () => {
-    // navigate("/success");
+  const checkoutHandler = () => {
     shopfloCheckoutRefetch();
   };
 
@@ -130,11 +133,12 @@ const Cart = () => {
   useEffect(() => {
     if (!clearCartLoading && clearCartData) {
       console.log(clearCartData);
+      setCartId(clearCartData?.data?.newCartID);
       toast.success("Cart emptied");
     } else if (clearCartError) {
       toast.error("Cannot empty cart");
     }
-  }, [clearCartError, clearCartLoading, clearCartData]);
+  }, [clearCartError, clearCartLoading, clearCartData, setCartId]);
 
   useEffect(() => {
     if (!shopfloCheckoutLoading && shopfloCheckoutResponse) {
@@ -144,15 +148,16 @@ const Cart = () => {
       );
     } else if (shopflowCheckoutError) {
       console.log(shopflowCheckoutError);
-      toast.error("Can't proceed at the moment");
+      // toast.error("Can't proceed at the moment");
     }
   }, [shopfloCheckoutLoading, shopfloCheckoutResponse, shopflowCheckoutError]);
 
   useEffect(() => {
     if (redirectURL) {
-      window.open(redirectURL, "_blank");
+      window.location.href = redirectURL;
     }
   }, [redirectURL]);
+
   return (
     <div>
       <Header name={"Cart"} show={false} padding={"72px 0"} />
@@ -331,7 +336,7 @@ const Cart = () => {
           </h4>
           <button
             className="ml-[73px] mt-[43px] w-[calc(100vw_-_146px)] cursor-pointer rounded-xl border-none bg-customgreen-800 px-0 py-[26.5px] text-[18px] font-medium leading-5 tracking-tight text-white outline-none max-sm:fixed max-sm:bottom-[20px] max-sm:left-[16px] max-sm:z-[1000] max-sm:m-0 max-sm:h-[52px] max-sm:w-[calc(100%_-_32px)] max-sm:p-0"
-            onClick={successHandler}
+            onClick={checkoutHandler}
           >
             Proceed to checkout
           </button>

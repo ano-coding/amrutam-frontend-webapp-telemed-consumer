@@ -1,12 +1,37 @@
 import axios from "axios";
+const token = localStorage.getItem("token");
+let shopifyToken;
+if (token) {
+  shopifyToken = localStorage.getItem("shopifyToken");
+}
+
 let config = {
   baseURL: "https://amrutam-shopify-nodejs-dev.azurewebsites.net",
   headers: {
     "X-Requested-With": "XMLHttpRequest",
-    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZGU0YTZjMWEzZTI1N2ExY2JmMmE1NCIsImlhdCI6MTcyMDA2NzQxMCwiZXhwIjoxNzI3ODQzNDEwfQ.tyMp4I-gninhfeteF23mJof17B3Bm_4kSrLo0IpvXPk`,
+    Authorization: `Bearer ${shopifyToken}`,
   },
   maxBodyLength: Infinity,
 };
+
+export async function getShopifyToken() {
+  try {
+    const response = await axios.post(
+      "/api/v1/Users/login",
+      {
+        email: "care@amrutam.global",
+        password: "Telemed@123$",
+      },
+      {
+        baseURL: "https://amrutam-shopify-nodejs-dev.azurewebsites.net",
+        maxBodyLength: Infinity,
+      },
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 export async function getTopProducts(location) {
   try {
@@ -47,7 +72,7 @@ export async function addToCart(data) {
   try {
     const response = await axios.post(
       "/api/v1/cart/add-to-cart",
-      { ...data, userId: 6773619261693, cartId: 4595 },
+      { ...data },
       config,
     );
     return response;
@@ -56,10 +81,10 @@ export async function addToCart(data) {
   }
 }
 
-export async function fetchCartByUserId() {
+export async function fetchCartByUserId(shopifyId) {
   try {
     const response = await axios.get(
-      `/api/v1/cart/cart-items/6773619261693`,
+      `/api/v1/cart/cart-items/${shopifyId}`,
       config,
     );
     return response;
@@ -72,7 +97,7 @@ export async function updateCart(data) {
   try {
     const response = await axios.post(
       "/api/v1/cart/update-cart",
-      { ...data, userId: 6773619261693, cartId: 4595 },
+      { ...data },
       config,
     );
     return response;
@@ -81,10 +106,10 @@ export async function updateCart(data) {
   }
 }
 
-export async function clearCart() {
+export async function clearCart(shopifyId, cartId) {
   try {
     const response = await axios.post(
-      "/api/v1/cart/empty-cart/6773619261693/4595",
+      `/api/v1/cart/empty-cart/${shopifyId}/${cartId}`,
       {},
       config,
     );
@@ -94,14 +119,31 @@ export async function clearCart() {
   }
 }
 
-export async function shopfloCheckout() {
+export async function shopfloCheckout(_id) {
   try {
     const response = await axios.post(
-      "/api/v1/cart/create-checkout",
+      "/api/v1/cart/create-checkout-to-web",
       {
-        cartId: "668773c74d83b3b4b89a9ef2",
-        backUrl: "www.amrutam.global",
+        cartId: _id,
+        backUrl:
+          "https://webhook.site/68c5c2fb-0e91-426b-becc-0e88d97fb0cf?backurl=here",
+        sf_session_id: "56478a4dc9750ae96f973a26576a05b8d17469ae",
+        success_url:
+          "https://webhook.site/68c5c2fb-0e91-426b-becc-0e88d97fb0cf?successurl=here",
       },
+      config,
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function markAsCheckedOutCart(shopifyId, cartId) {
+  try {
+    const response = await axios.post(
+      `/api/v1/cart/cart-checkout/${shopifyId}/${cartId}`,
+      {},
       config,
     );
     return response;
@@ -144,7 +186,7 @@ export async function mostReviewedDoctors() {
         baseURL: "https://amrutam-dev-backend.azurewebsites.net",
         headers: {
           "X-Requested-With": "XMLHttpRequest",
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MDUyMzg0ZjZjYmNmYjMwNWNhYmYxZiIsImlhdCI6MTcxNDM3OTY1NywiZXhwIjoxNzE0NDY2MDU3fQ.BaA4TJTU0c6XvHFpesG-V0TJg32lOBrJTWgXqKV2eEE`,
+          Authorization: `Bearer ${token}`,
         },
         maxBodyLength: Infinity,
       },

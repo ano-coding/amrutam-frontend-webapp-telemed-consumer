@@ -47,6 +47,8 @@ import Success from "./pages/Success";
 import AppointmentBookingForm from "./features/Appointments/components/AppointmentBookingForm";
 import CouponsPage from "./pages/CouponsPage";
 import AppointmentSuccessPage from "./pages/AppointmentSuccessPage";
+import CancelRedirect from "./pages/CancelRedirect";
+import { ShopifyProvider } from "./context/ShopifyContext";
 
 const router = createBrowserRouter([
   {
@@ -121,7 +123,11 @@ const router = createBrowserRouter([
       { path: "/store", element: <Store /> },
       { path: "prodDetail/:id", element: <ProductDetail /> },
       { path: "cart", element: <Cart /> },
-      { path: "success", element: <Success /> },
+      { path: "success-page", element: <Success /> },
+      {
+        path: "/cancel-page",
+        element: <CancelRedirect />,
+      },
     ],
   },
   {
@@ -215,23 +221,25 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <UserProvider>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={true}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-          transition={Bounce}
-        />
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
+      <ShopifyProvider>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={true}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            transition={Bounce}
+          />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </ShopifyProvider>
     </UserProvider>
   );
 }

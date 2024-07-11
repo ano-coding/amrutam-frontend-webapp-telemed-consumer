@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useContext, useEffect, useRef, useState } from "react";
+import { useNavigate, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   getProductsByCategory,
@@ -14,9 +14,11 @@ import FilterContainer from "../features/Store/components/FilterContainer";
 import MobileFilters from "../features/Store/components/MobileFilters";
 import Scroll from "../features/Store/components/Scroll";
 import Spinner from "../features/Store/components/Spinner";
+import { UserContext } from "../context/UserContext";
 
 const Store = () => {
   const navigate = useNavigate();
+  const { token } = useContext(UserContext);
 
   //States
   const [allProductsData, setAllProductsData] = useState();
@@ -103,6 +105,15 @@ const Store = () => {
   useEffect(() => {
     console.log("searctTerm=", searchTerm, "searchData=", searchData);
   }, [searchTerm, searchData]);
+
+  if (!token) {
+    return (
+      <Navigate
+        to={`/login?redirectTo=${encodeURIComponent(location.pathname)}`}
+        replace
+      />
+    );
+  }
 
   return (
     <div>

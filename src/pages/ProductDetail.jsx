@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -20,10 +20,12 @@ import UserReview from "../features/Store/components/UserReview";
 import SimilarProducts from "../features/Store/components/SimilarProducts";
 import Doctor from "../features/Store/components/Doctor";
 import Spinner from "../features/Store/components/Spinner";
+import { ShopifyContext } from "../context/ShopifyContext";
 
 const ProductDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { shopifyId, cartId } = useContext(ShopifyContext);
   const carouselRef = useRef(null);
   const quantityRef = useRef();
   const containerRef = useRef();
@@ -59,7 +61,7 @@ const ProductDetail = () => {
     isLoading: cartLoading,
     refetch: cartRefetch,
   } = useQuery({
-    queryFn: () => fetchCartByUserId(),
+    queryFn: () => fetchCartByUserId(Number(shopifyId)),
     queryKey: ["cart", id, activeVariantId, quantity],
   });
 
@@ -74,6 +76,8 @@ const ProductDetail = () => {
         productId: Number(id),
         variationId: activeVariantId,
         quantity: type === 1 ? quantityRef.current : quantity,
+        userId: Number(shopifyId),
+        cartId: cartId,
       }),
     queryKey: [`addToCart/${id}`],
     enabled: false,
@@ -91,6 +95,8 @@ const ProductDetail = () => {
         productId: Number(id),
         variationId: activeVariantId,
         quantity: type === 1 ? quantityRef.current : quantity,
+        userId: Number(shopifyId),
+        cartId: cartId,
       }),
     queryKey: [`updateCart/${id}`],
     enabled: false,
