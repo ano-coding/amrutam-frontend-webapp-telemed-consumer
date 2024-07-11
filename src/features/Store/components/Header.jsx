@@ -1,19 +1,25 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useLocation } from "react-router-dom";
 import { fetchCartByUserId } from "../../../services/Shopify";
+import { ShopifyContext } from "../../../context/ShopifyContext";
 
 const Header = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { shopifyId, setCartId, set_id, cartId } = useContext(ShopifyContext);
 
   //States
   const [size, setSize] = useState();
   const [cartItems, setCartItems] = useState();
 
   //APIs
-  const { data: cart, isLoading: cartLoading } = useQuery({
-    queryFn: () => fetchCartByUserId(),
+  const {
+    data: cart,
+    isLoading: cartLoading,
+    refetch: cartRefetch,
+  } = useQuery({
+    queryFn: () => fetchCartByUserId(Number(shopifyId)),
     queryKey: ["cart"],
   });
 
@@ -30,10 +36,16 @@ const Header = (props) => {
 
   //Effects
   useEffect(() => {
+    console.log("mansi");
     if (!cartLoading && cart) {
+      console.log(cart);
+      setCartId(cart?.data?.cart?.cartId || "");
+      localStorage.setItem("cartId", cart?.data?.cart?.cartId);
+      set_id(cart?.data?.cart?._id);
+      localStorage.setItem("_id", cart?.data?.cart?._id);
       setCartItems(cart?.data?.cart?.items?.length);
     }
-  }, [cart, cartLoading]);
+  }, [cart, cartLoading, setCartId, set_id]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -52,6 +64,9 @@ const Header = (props) => {
     };
   }, [location]);
 
+  useEffect(() => {
+    cartRefetch();
+  }, [cartRefetch, cartId]);
   return (
     <div
       className="max-md:bg-fill bg-customgreen-100 bg-header-leaves bg-cover bg-center bg-no-repeat max-md:bg-top max-sm:bg-transparent max-sm:bg-none"

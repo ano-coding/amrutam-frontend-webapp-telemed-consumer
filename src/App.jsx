@@ -45,10 +45,11 @@ import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Success from "./pages/Success";
 import AppointmentBookingFormPage from "./pages/AppointmentBookingFormPage";
-// import AppointmentBookingForm from "./features/Appointments/components/AppointmentBookingForm";
 import CouponsPage from "./pages/CouponsPage";
 import AppointmentSuccessPage from "./pages/AppointmentSuccessPage";
 import PageNotFound from "./pages/404";
+import CancelRedirect from "./pages/CancelRedirect";
+import { ShopifyProvider } from "./context/ShopifyContext";
 
 const router = createBrowserRouter([
 	{
@@ -108,6 +109,7 @@ const router = createBrowserRouter([
 				element: <TriviaResult />,
 			},
 
+<<<<<<< HEAD
 			{
 				path: "/commune",
 				element: <ForumPage></ForumPage>,
@@ -125,6 +127,43 @@ const router = createBrowserRouter([
 			{ path: "cart", element: <Cart /> },
 			{ path: "success", element: <Success /> },
 			{path: "*", element: <PageNotFound />}
+=======
+      {
+        path: "/commune",
+        element: <ForumPage></ForumPage>,
+      },
+      {
+        path: "/commune/post/:id",
+        element: <SinglePost />,
+      },
+      {
+        path: "/about",
+        element: <div>About us</div>,
+      },
+      { path: "/store", element: <Store /> },
+      { path: "prodDetail/:id", element: <ProductDetail /> },
+      { path: "cart", element: <Cart /> },
+      { path: "success-page", element: <Success /> },
+      {
+        path: "/cancel-page",
+        element: <CancelRedirect />,
+      },
+    ],
+  },
+  {
+    element: <Auth />,
+    children: [
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/signup",
+        element: <Signup />,
+      },
+    ],
+  },
+>>>>>>> c0951479cb2dfb5e71259cf706353804151938c5
 
 		],
 	},
@@ -219,6 +258,7 @@ const router = createBrowserRouter([
 const queryClient = new QueryClient();
 
 function App() {
+<<<<<<< HEAD
 	return (
 		<UserProvider>
 			<QueryClientProvider client={queryClient}>
@@ -240,6 +280,31 @@ function App() {
 			</QueryClientProvider>
 		</UserProvider>
 	);
+=======
+  return (
+    <UserProvider>
+      <ShopifyProvider>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={true}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            transition={Bounce}
+          />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </ShopifyProvider>
+    </UserProvider>
+  );
+>>>>>>> c0951479cb2dfb5e71259cf706353804151938c5
 }
 
 export default App;
