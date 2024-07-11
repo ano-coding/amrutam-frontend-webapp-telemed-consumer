@@ -1,9 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
+import axios from 'axios';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
+// import Razorpay from 'react-razorpay';
 import { useQuery } from '@tanstack/react-query';
 import Lottie from 'lottie-react';
-import useWindowSize from "react-use/lib/useWindowSize";
 import { useForm } from "react-hook-form";
 import { useLocation } from 'react-router-dom';
 import Confetti from '../../../assets/appointments/confetti.json';
@@ -12,9 +14,10 @@ import Confetti from '../../../assets/appointments/confetti.json';
 import AppointmentSection from './AppointmentSection';
 import AppointmentDetails from './SessionDetails.jsx';
 import { DAYS, fetchSingleDoctor, processNames, MONTHS } from '../../../services/Doctor';
-import { fetchSingleCouponStatus, uploadFile } from '../../../services/Appointments';
+import { fetchSingleCouponStatus, uploadFile, bookAppointment, markAppointmentAsPaid } from '../../../services/Appointments';
 import ProgressBar from './ProgressBar';
 import Modal from './Modal.jsx';
+import { SessionContext } from '../../../context/SessionDetailsContext.jsx';
 
 
 import arrowR from '../../../assets/appointments/arrow-r.svg';
@@ -24,11 +27,16 @@ import Coupons from './Coupons';
 
 
 function AppointmentBookingForm() {
-	const [appointmentDetails, setAppointmentDetails] = useState({});
-	const [currentStep, setCurrentStep] = useState(0);
-
 	const location = useLocation();
 	const from = location.state?.from;
+
+
+	const [appointmentDetails, setAppointmentDetails] = useState({});
+	const [currentStep, setCurrentStep] = useState(0);
+	const { setSessionDetails } = useContext(SessionContext);
+	const showConfetti = useRef(true);
+
+
 
 	useEffect(() => {
 		if (location.state?.data) {
@@ -39,10 +47,18 @@ function AppointmentBookingForm() {
 			});
 			setCurrentStep(1);
 		}
+
+		if (location.state?.details) {
+			setSessionDetails(location.state.details);
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-
+	useEffect(() => {
+		if (currentStep > 4) {
+			showConfetti.current = false;
+		}
+	}, [currentStep]);
 
 
 
@@ -89,7 +105,7 @@ function AppointmentBookingForm() {
 
 
 	return (
-		<div className='relative sm:grid grid-cols-2'>
+		<div className='relative sm:grid grid-cols-2 pb-10 sm:pb-0'>
 			<AppointmentDetails
 				from={from}
 				currentStep={currentStep}
@@ -107,9 +123,11 @@ function AppointmentBookingForm() {
 				</div>
 				
 			</div>
-			<div className='absolute z-10 top-0 left-[50%] translate-x-[-50%] sm:right-[200px] md:right-[400px] xl:right-[600px] w-[100%] max-w-[500px] sm:w-[300px] xl:w-[500px]'>
-				{currentStep === 4 && <Lottie loop={false} animationData={Confetti} />}
-			</div>
+			{(currentStep === 4 && showConfetti.current) && (
+				<div className='absolute z-10 top-0 left-[50%] translate-x-[-50%] sm:right-[200px] md:right-[400px] xl:right-[600px] w-[100%] max-w-[500px] sm:w-[300px] xl:w-[500px]'>
+					<Lottie loop={false} animationData={Confetti} />
+				</div>
+			)}
 		</div>
 
 	);
@@ -119,13 +137,95 @@ function AppointmentBookingForm() {
 
 function Symptoms({ setStep, appointmentDetails, setAppointmentDetails }) {
 	const { register, handleSubmit, formState: { errors } } = useForm();
-	const onSubmit = data => {
+	const { sleepPattern, symptoms } = appointmentDetails;
+
+	const concern = symptoms?.concern || '';
+	const description = symptoms?.description || '';
+	const severity = symptoms?.severity || '';	
+	// let duration = '';
+	// let timeUnit = ''
+
+	// if (symptoms?.duration) {
+	// 	duration = symptoms.duration?.[0];
+	// 	// timeUnit = (symptoms.duration?.[1] ?? '')
+	// }
+
+
+
+	console.log('appointment Details ', appointmentDetails);
+
+	function handleChange(e) {
+		if (e.target.id === 'sleep-pattern') {
+			setAppointmentDetails({
+				...appointmentDetails,
+				sleepPattern: e.target.value
+			});
+
+			return;
+		} 
+
+		if (e.target.id === 'duration') {
+			const duration = appointmentDetails.symptoms?.duration;
+			let newDuration = e.target.value;
+
+			console.log('duration ', duration);
+
+			if (duration) {
+				newDuration = duration.split(' ')[0] + e.target.value + ' ' + (duration.split(' ')[1] ?? '')
+			}
+			// const newDuration = e.target.value + ' ' + duration.split(' ')[1];
+
+			setAppointmentDetails({
+				...appointmentDetails,
+				symptoms: {
+					...appointmentDetails.symptoms,
+					duration: newDuration
+				}
+			})
+
+			return;
+		}
+
+
+		if (e.target.id === 'time-unit') {
+			const duration = appointmentDetails.symptoms.duration;
+			let newDuration;
+
+			if (duration) {
+				newDuration = duration.split(' ')[0] + ' ' + e.target.value;
+			}
+			// const newDuration = duration.split(' ')[0] + ' ' + e.target.value;
+
+			setAppointmentDetails({
+				...appointmentDetails,
+				symptoms: {
+					...appointmentDetails.symptoms,
+					duration: newDuration
+				}
+			})
+
+			return;
+		}
+
+		setAppointmentDetails({
+			...appointmentDetails,
+			symptoms: {
+				...appointmentDetails.symptoms,
+				[e.target.id]: e.target.value
+			}
+		})
+	}
+
+	const onSubmit = (data) => {
 		if (Object.keys(errors).length === 0) {
+
+			
 
 			setAppointmentDetails({
 				...appointmentDetails,
 				sleepPattern: data.sleepPattern,
 				symptoms: {
+					...appointmentDetails.symptoms,
 					concern: data.concern,
 					description: data.description,
 					severity: data.severity,
@@ -141,7 +241,7 @@ function Symptoms({ setStep, appointmentDetails, setAppointmentDetails }) {
 	// console.log('errors ', errors);
 
 	return (
-		<div className='border-[1.5px] border-[#3A643B] rounded-[25px] px-8 py-6'>
+		<div className='border-[1.5px] border-[#3A643B] rounded-[25px] px-4 py-6'>
 			<h2 className='font-inter font-semibold mb-6 text-lg'>Symptoms</h2>
 			<form
 				onSubmit={handleSubmit(onSubmit)}
@@ -150,21 +250,42 @@ function Symptoms({ setStep, appointmentDetails, setAppointmentDetails }) {
 				<div>
 					<label className='flex-1 block px-4 py-2 text-xs text-[#646665] border border-[#CED8E0] rounded-2xl'>
 						Concern
-						<input {...register('concern', { required: 'Concern is required' })} type='text' className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none' />
+						<input
+							{...register('concern', { required: 'Concern is required' })}
+							id='concern'
+							value={concern}
+							onChange={handleChange}
+							type='text'
+							className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none'
+						/>
 					</label>
 					<p className='px-2 mt-1 text-red-400 text-sm my-0 font-medium'>{errors.concern?.message}</p>
 				</div>
 				<div>
 					<label className='flex-1 block px-4 py-2 text-xs text-[#646665] border border-[#CED8E0] rounded-2xl'>
 						Description
-						<input {...register('description', { required: 'Description is required' })} type='text' className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none' />
+						<input
+							{...register('description', { required: 'Description is required' })}
+							type='text'
+							value={description}
+							onChange={handleChange}
+							id='description'
+							className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none'
+						/>
 					</label>
 					<p className='px-2 mt-1 text-red-400 text-sm font-medium'>{errors.description?.message}</p>
 				</div>
 				<div>
 					<label className='flex-1 block px-4 py-2 text-xs text-[#646665] border border-[#CED8E0] rounded-2xl'>
 						Severity
-						<input {...register('severity', { required: 'Severity is required' })} type='text' className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none' />
+						<input
+							{...register('severity', { required: 'Severity is required' })}
+							type='text'
+							value={severity}
+							onChange={handleChange}
+							id='severity'
+							className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none'
+						/>
 					</label>
 					<p className='px-2 mt-1 text-red-400 text-sm font-medium'>{errors.severity?.message}</p>
 				</div>
@@ -172,14 +293,28 @@ function Symptoms({ setStep, appointmentDetails, setAppointmentDetails }) {
 					<div className='flex-1'>
 						<label className='block px-4 py-2 text-xs text-[#646665] border border-[#CED8E0] rounded-2xl'>
 							Duration
-							<input {...register('duration', { required: 'Duration is required' })} type='number' className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none' />
+							<input
+								{...register('duration', { required: 'Duration is required' })}
+								type='number'
+								id='duration'
+								// value={duration}
+								onChange={handleChange}
+								className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none'
+							/>
 						</label>
 						<p className='px-2 mt-1 text-red-400 text-sm font-medium'>{errors.duration?.message}</p>
 					</div>
 					<div className='flex-1'>
 						<label className='block px-4 py-2 text-xs text-[#646665] border border-[#CED8E0] rounded-2xl'>
 							Time Unit
-							<input {...register('timeUnit', { required: 'Time unit is required' })} type='text' className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none' />
+							<input
+								{...register('timeUnit', { required: 'Time unit is required' })}
+								type='text'
+								id='time-unit'
+								// value={timeUnit}
+								// onChange={handleChange}
+								className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none'
+							/>
 						</label>
 						<p className='px-2 mt-1 text-red-400 text-sm font-medium'>{errors.timeUnit?.message}</p>
 					</div>
@@ -187,7 +322,13 @@ function Symptoms({ setStep, appointmentDetails, setAppointmentDetails }) {
 				<div>
 					<label className='flex-1 block px-4 py-2 text-xs text-[#646665] border border-[#CED8E0] rounded-2xl'>
 						Sleep Pattern
-						<input {...register('sleepPattern', { required: 'Sleep Pattern is required' })} type='text' className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none' />
+						<input
+							{...register('sleepPattern', { required: 'Sleep Pattern is required' })}
+							id='sleep-pattern'
+							value={sleepPattern}
+							onChange={handleChange}
+							type='text' className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none'
+						/>
 					</label>
 					<p className='px-2 mt-1 text-red-400 text-sm font-medium'>{errors.sleepPattern?.message}</p>
 				</div>
@@ -259,7 +400,7 @@ function Confirmation({ setStep, appointmentDetails }) {
 					</div>
 					<div className='flex justify-between'>
 						<p className='text-[#646665]'>Consultation Type</p>
-						<p className='font-medium text-[#0C0C0C]'>{appointmentDetails.appointmentType} Consultation</p>
+						<p className='font-medium text-[#0C0C0C]'>{appointmentDetails.appointmentType[0].toUpperCase() + appointmentDetails.appointmentType.slice(1)} Consultation</p>
 					</div>
 				</div>
 			</div>
@@ -278,10 +419,135 @@ function Confirmation({ setStep, appointmentDetails }) {
 function Payment({ setStep, appointmentDetails }) {
 	const [show, setShow] = useState(true);
 	const { doctorId } = useParams();
-	// const { appointmentDetails } = useAppointment();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const couponId = searchParams.get('couponId') || '';
 	let couponStatus = 'Not Applied';
+
+
+	// console.log('appointment Details ', appointmentDetails);
+
+
+	async function handleClick() {
+		console.log('Button clicked!');
+
+		const record = await bookAppointment(doctorId, appointmentDetails);
+
+		try {
+			const { data: res } = await createRazorPayOrder(record);
+
+			console.log('Data after razorpay order ', res);
+
+			if (res) {
+				const options = {
+					key: 'rzp_test_D207uk5d0UfCfa',
+					amount: record.slotBooked.amount,
+					currency: "INR",
+					name: "Amrutam Telemedicine",
+					description: "Payment for consultation",
+					order_id: res.data.id,
+					image:
+						"https://amstorage2024.blob.core.windows.net/amrutam-main-storage/1716861497754-310498919_424195159843924_6622146755335909308_n.jpg",
+					handler: async function (response) {
+						console.log('Data in razorpay handler ', response);
+						try {
+							const { data: markedAppointmentPaidRes } = await markAppointmentAsPaid(record._id);
+
+							if (markedAppointmentPaidRes?.success) {
+
+								console.log('markedPaidRes ', markedAppointmentPaidRes);
+
+								setStep(4)
+
+								// setBookingId(record?._id);
+
+								// toast({ title: "Payment Successful 🎉" });
+
+								// setNavigators(navigators.map((item) => {
+								// 	if (item.id === 3) {
+								// 		return { ...item, isCompleted: true };
+								// 	}
+								// 	return item;
+								// }));
+
+							} else {
+								// handlePaymentFailure(res.id, record, "Payment not marked Paid. Please contact with internal team with the screenshot", "Marking_paid_step", "Marked_Unpaid");
+								console.log("Payment not marked Paid. Please contact with internal team with the screenshot", "Marking_paid_step", "Marked_Unpaid");
+							}
+						} catch (error) {
+							console.log('An error occurred ', error)
+							// handlePaymentFailure(res.id, record, "An error occurred during payment marking", "Marking_paid_step", "Error");
+						}
+					},
+					// prefill: {
+					// 	name: patientProfile?.data?.first_name + " " + patientProfile?.data?.last_name,
+					// 	email: patientProfile?.data?.email,
+					// 	contact: patientProfile?.data?.phone,
+					// },
+					prefill: {
+						name: 'John Doe',
+						email: 'sample@gmail.com',
+						contact: '9233451802',
+					},
+					notes: {
+						address: "Razorpay Corporate Office",
+					},
+					theme: {
+						color: "#F37254",
+					},
+				};
+
+				const rzp = new window.Razorpay(options);
+				rzp.open();
+
+				rzp.on("payment.failed", function (response) {
+					// toast({
+					// 	title: "Payment Failed 😔",
+					// 	description: "Please try again",
+					// 	variant: "destructive",
+					// });
+					console.log('payment failed ', response);
+
+					// handlePaymentFailure(res.id, record, response.error.description, response.error.step, response.error.reason, response.error.metadata.payment_id);
+				});
+			}
+		} catch (e) {
+			console.error("Error creating RazorPay order:", e);
+		}
+
+		async function createRazorPayOrder(record) {
+			let data = JSON.stringify({
+				"amount": record.slotBooked.amount,
+				"notes": {
+					"note": "Payment for consultation"
+				},
+				"id": record._id
+			});
+
+			let config = {
+				method: 'post',
+				maxBodyLength: Infinity,
+				url: 'https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/create-razorpay-order',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzQ2NTE5NDUyMDgyOSwiaWF0IjoxNzIwMTY1Nzk5LCJleHAiOjE3Mjc5NDE3OTl9.MfO4C3Jwwgdmg4SimpZLhfityZBdZVzqJG0OPnJgEFQ'
+				},
+				data: data
+			};
+
+			try {
+				const res = await axios.request(config);
+
+				console.log('data in createRazorpayOrder ', res);
+
+				return res;
+			} catch (e) {
+				console.log(e);
+
+				return e;
+			}
+		}
+
+	} 
 
 	const { data: doctor, isDoctorLoading } = useQuery({
 		queryFn: () => fetchSingleDoctor(doctorId),
@@ -339,6 +605,9 @@ function Payment({ setStep, appointmentDetails }) {
 
 	return (
 		<div className='border border-[#3A643B] space-y-4 rounded-3xl px-4 md:px-6 py-8'>
+			<Helmet>
+				<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+			</Helmet>
 			<div className='bg-[#EAF2EA] rounded-[14px] py-6'>
 				<div className='flex justify-center'>
 					<h2
@@ -362,7 +631,7 @@ function Payment({ setStep, appointmentDetails }) {
 					</div>
 					<div className='flex justify-between'>
 						<p className='text-[#646665]'>Consultation Type - </p>
-						<p className='font-medium text-[#0C0C0C]'>{appointmentDetails.appointmentType} Consultation</p>
+						<p className='font-medium text-[#0C0C0C]'>{appointmentDetails.appointmentType[0].toUpperCase() + appointmentDetails.appointmentType.slice(1)} Consultation</p>
 					</div>
 					<div className='flex justify-between'>
 						<p className='text-[#646665]'>Consultation Fee - </p>
@@ -399,7 +668,7 @@ function Payment({ setStep, appointmentDetails }) {
 
 			<button
 				type='submit'
-				onClick={() => setStep(4)}
+				onClick={handleClick}
 				className='block w-[100%] py-3 mt-6 font-medium md:text-[20px] font-inter bg-[#3A643B] hover:bg-[#305030] rounded-lg text-white'
 			>
 				Proceed To Pay
@@ -496,20 +765,42 @@ function BasicInfo({ appointmentDetails, setAppointmentDetails }) {
 	const { register, handleSubmit, formState: { errors } } = useForm();
 	const navigate = useNavigate();
 	const { doctorId } = useParams();
-	console.log('doctorId', doctorId)
+	// console.log('doctorId', doctorId)
+
+	const patientDetails = appointmentDetails.patientDetails;
+
+	let height = '';
+	let weight = '';
+	let age = '';
+
+	if (patientDetails) {
+		height = patientDetails.height;
+		weight = patientDetails.weight;
+		age = patientDetails.age;
+	}
+
+	function handleChange(e) {
+		setAppointmentDetails({
+			...appointmentDetails,
+			patientDetails: {
+				...appointmentDetails.patientDetails,
+				[e.target.id]: e.target.value
+			}
+		})
+	}
 
 	const onSubmit = data => {
 		if (Object.keys(errors).length === 0) {
 
-			setAppointmentDetails({
-				...appointmentDetails,
-				...data
-			})
+			// setAppointmentDetails({
+			// 	...appointmentDetails,
+			// 	...data
+			// })
 
-			console.log('appointment Data', {
-				...appointmentDetails,
-				...data
-			})
+			// console.log('appointment Data', {
+			// 	...appointmentDetails,
+			// 	...data
+			// })
 
 			navigate('/appointment-success', {
 				state: {
@@ -535,8 +826,13 @@ function BasicInfo({ appointmentDetails, setAppointmentDetails }) {
 						<label className='flex-1 block px-4 py-2 text-xs text-[#646665] border border-[#CED8E0] rounded-2xl'>
 							Height
 							<input
-								{...register('height')}
-								type='text'
+								{...register('height', { required: 'Height is required!'})}
+								type='number'
+								min='0'
+								max='300'
+								id='height'
+								value={height}
+								onChange={handleChange}
 								className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none'
 							/>
 						</label>
@@ -547,8 +843,13 @@ function BasicInfo({ appointmentDetails, setAppointmentDetails }) {
 						<label className='flex-1 block px-4 py-2 text-xs text-[#646665] border border-[#CED8E0] rounded-2xl'>
 							Weight
 							<input
-								{...register('weight')}
-								type='text'
+								{...register('weight', { required: 'Weight is required!' })}
+								type='number'
+								min='0'
+								max='200'
+								id='weight'
+								value={weight}
+								onChange={handleChange}
 								className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none'
 							/>
 						</label>
@@ -559,8 +860,13 @@ function BasicInfo({ appointmentDetails, setAppointmentDetails }) {
 						<label className='flex-1 block px-4 py-2 text-xs text-[#646665] border border-[#CED8E0] rounded-2xl'>
 							Age
 							<input
-								{...register('age')}
-								type='num'
+								{...register('age', { required: 'Height is required!'})}
+								type='number'
+								min='0'
+								max='100'
+								id='age'
+								value={age}
+								onChange={handleChange}
 								className='mt-1 block w-[100%] text-base text-[#2E2F2E] font-medium focus:outline-none'
 							/>
 						</label>
@@ -600,9 +906,11 @@ function BasicInfo({ appointmentDetails, setAppointmentDetails }) {
 }
 
 function PhotoUploader({ appointmentDetails, setAppointmentDetails }) {
+	const url = appointmentDetails.attachments?.[0];
+
 	const [selectedFile, setSelectedFile] = useState('');
-	const [attachmentUrl, setAttachmentUrl] = useState('');
-	const [previewUrl, setPreviewUrl] = useState(null);
+	const [attachmentUrl, setAttachmentUrl] = useState(url ?? '');
+	const [previewUrl, setPreviewUrl] = useState(url ?? '');
 	const fileInputRef = useRef(null);
 	
 
@@ -673,6 +981,10 @@ function PhotoUploader({ appointmentDetails, setAppointmentDetails }) {
 					alt='cross icon'
 					onClick={() => {
 						setPreviewUrl(null);
+						setAppointmentDetails({
+							...appointmentDetails,
+							attachments: ['']
+						})
 						setSelectedFile(null);
 					}}
 					className="absolute right-0.5 top-0.5 z-50 block h-6 w-6 -translate-y-1/2 translate-x-1/2 transform]"
@@ -706,9 +1018,9 @@ function PhotoUploader({ appointmentDetails, setAppointmentDetails }) {
 
 
 function AttachReports({ setStep, appointmentDetails, setAppointmentDetails }) {
-	const { width, height } = useWindowSize();
-
 	console.log('appointment Details ', appointmentDetails)
+
+	const disabled = !appointmentDetails.attachments?.[0];
 
 	return (
 		<div className='relative'>
@@ -733,8 +1045,9 @@ function AttachReports({ setStep, appointmentDetails, setAppointmentDetails }) {
 				</div>
 				<button
 					type='submit'
+					disabled={disabled}
 					onClick={() => setStep(5)}
-					className='block w-[90%] md:w-[80%] mx-auto py-3 font-medium text-[20px] font-inter bg-[#3A643B] hover:bg-[#305030] rounded-lg text-white'
+					className={`block w-[90%] md:w-[80%] mx-auto py-3 font-medium text-[20px] font-inter ${disabled? 'bg-slate-200 text-black cursor-not-allowed': 'bg-[#3A643B] hover:bg-[#305030] text-white'} rounded-lg `}
 				>
 					Proceed
 				</button>

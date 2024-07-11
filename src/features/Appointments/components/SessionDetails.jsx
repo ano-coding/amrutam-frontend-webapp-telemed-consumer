@@ -133,7 +133,7 @@ function AppointmentDetails({ from, currentStep, setCurrentStep, appointmentDeta
 						<div className='flex items-center gap-4'>
 							<div className='w-[179px] sm:w-[150px] lg:w-[179px] lg:h-[117px] bg-[#F5F8ED] rounded-md px-[17px] py-[15px] border border-[#D6E5D6]'>
 								<h4 className='text-[#2B2E2B] mb-2 text-xs md:text-sm lg:text-[18px] font-semibold'>Session Mode</h4>
-								<p className='text-[#3A643B] text-[10px] md:text-xs lg:text-base font-medium'>{appointmentDetails.appointmentType || 'Not Selected'}</p>
+								<p className='text-[#3A643B] text-[10px] md:text-xs lg:text-base font-medium'>{appointmentDetails.appointmentType ? appointmentDetails.appointmentType[0].toUpperCase() + appointmentDetails.appointmentType.slice(1) :'Not Selected'}</p>
 								<p className='text-[#3A643B] text-[10px] md:text-xs lg:text-base font-medium'>{appointmentDetails.appointmentDuration && appointmentDetails.appointmentDuration + ' Mins'}  </p>
 							</div>
 							<div className='w-[179px] sm:w-[150px] lg:w-[179px] lg:h-[117px] bg-[#F5F8ED] rounded-md px-[17px] py-[15px] border border-[#D6E5D6]'>

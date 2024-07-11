@@ -1,29 +1,54 @@
-import { useEffect, useState } from "react";
-import { useParams } from 'react-router-dom';
+import { useEffect, useState, useContext, useRef } from "react";
+import { UserContext } from '../../../context/UserContext';
+import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import Modal from './AuthModal';
 import { fetchSingleDoctor, extractSessions } from '../../../services/Doctor';
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
-import {  fetchDateByAppointmentType, DAYS, MONTHS } from '../../../services/Doctor';
+import { fetchDateByAppointmentType, DAYS, MONTHS } from '../../../services/Doctor';
+import { SessionContext } from "../../../context/SessionDetailsContext";
 
 
 
-export default function AppointmentSection({ setStep, appointmentDetails, setAppointmentDetails }) {
+export default function AppointmentSection({ setStep, appointmentDetails, setAppointmentDetails, sessionData }) {
+	const { userId } = useContext(UserContext);
+	const { sessionDetails, setSessionDetails } = useContext(SessionContext);
 	const { doctorId } = useParams();
+	const [show, setShow] = useState(false);
+
+	console.log('sessionDetails ', sessionDetails);
+
+
+
 	const { data: doctor, isLoading: isDoctorLoading } = useQuery({
 		queryFn: () => fetchSingleDoctor(doctorId),
 		queryKey: ['doctor']
 	});
 
-	const [sessionModeIndex, setSessionModeIndex] = useState(-1);
-	const [slotIndex, setSlotIndex] = useState(0);
-	const [slotDateIndex, setSlotDateIndex] = useState(-1);
-	const [slotTime, setSlotTime] = useState("");
+	const [sessionModeIndex, setSessionModeIndex] = useState(sessionDetails?.sessionModeIndex ?? -1);
+	const [slotIndex, setSlotIndex] = useState(sessionDetails?.slotIndex ?? 0);
+	const [slotDateIndex, setSlotDateIndex] = useState(sessionDetails?.slotDateIndex ?? -1);
+	const [slotTime, setSlotTime] = useState(sessionDetails?.slotTime ?? "");
 	const [appointmentFee, setAppointmentFee] = useState(0);
+	
+
+	console.log('sessionModeIndex ', sessionModeIndex);
+	console.log('slotIndex', slotIndex);
+	console.log('slotDateIndex ', slotDateIndex);
+	console.log('slotTime ', slotTime);
 
 
 	const charges = doctor?.charges;
 	const sessions = extractSessions(charges);
 	const appointmentType = sessions[sessionModeIndex]?.type;
+
+	function handleClick() {
+		if (userId) {
+			setStep(1);
+		} else {
+			setShow(true);
+		}
+	}
 
 
 	useEffect(() => {
@@ -62,11 +87,53 @@ export default function AppointmentSection({ setStep, appointmentDetails, setApp
 					appointmentDate: data[slotDateIndex]?.date
 				})
 			}
+
+
+		}
+
+		function handleSession() {
+			if (sessionModeIndex !== -1 && sessionModeIndex !== sessionDetails.sessionModeIndex) {
+				setSessionDetails({
+					...sessionDetails,
+					sessionModeIndex
+				});
+			}
+
+			if (sessionModeIndex !== -1 && slotIndex !== sessionDetails.slotIndex) {
+				setSessionDetails({
+					...sessionDetails, // todo
+					slotIndex
+				})
+			}
+
+			if (slotTime !== '' && slotTime !== sessionDetails.slotTime) {
+				setSessionDetails({
+					...sessionDetails,
+					slotTime
+				})
+			}
+
+			if (slotDateIndex !== -1 && slotDateIndex !== sessionDetails.slotDateIndex) {
+				setSessionDetails({
+					...sessionDetails,
+					slotDateIndex
+				})
+			}
 		}
 
 		handleAppointment();
+		handleSession();
 
 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	})
+
+	useEffect(() => {
+		if (userId && userId !== appointmentDetails.patientId) {
+			setAppointmentDetails({
+				...appointmentDetails,
+				patientId: userId
+			})
+		}
 	})
 
 
@@ -76,24 +143,6 @@ export default function AppointmentSection({ setStep, appointmentDetails, setApp
 	})
 
 	const dates = data?.map(date => new Date(Date.parse(date.date)));
-
-
-	// console.log('appointments ', data);
-
-
-
-	// Selecting the first available date because slots need date to fetch them from api
-	// if (slotDateIndex === -1 && dates?.length > 0) {
-	// 	setSlotDateIndex(0);
-	// }
-
-
-	// const { data: slots, isLoading: isSlotsLoading } = useQuery({
-	// 	queryFn: () => fetchAppointmentsByDate(doctorId, dates[slotDateIndex]),
-	// 	queryKey: ['slots', slotDateIndex, doctorId]
-	// });
-
-
 
 	const morningSlots = [];
 	const afternoonSlots = [];
@@ -133,13 +182,7 @@ export default function AppointmentSection({ setStep, appointmentDetails, setApp
 
 
 	return (
-		<div className=" flex w-full flex-col gap-4  rounded-2xl  border-[2px] border-solid border-neutral-300 px-2 sm:px-5  pb-[31px]  pt-[40px] lg:gap-[27px]">
-			{/* <div className=" flex w-full justify-between  rounded-[15px] border-[1px] border-solid border-neutral-200 px-3 py-3.5 font-nunito   text-xl text-black lg:px-7">
-				<span className="  font-semibold ">Appointment Fee</span>
-				<span className=" font-inter font-semibold  text-darkolivegreen-200">
-					{appointmentFee > 0 && appointmentFee} {appointmentFee > 0 ? sessions[sessionModeIndex].slots[slotIndex]?.currency : 'N/A'}
-				</span>
-			</div> */}
+		<div className=" flex w-full flex-col gap-4  rounded-2xl  border-[2px] border-solid border-neutral-300 px-2 sm:px-5  py-6  lg:gap-[27px]">
 			<div className="mx-1 mt-5 flex items-center gap-5">
 				<span className="inline-block whitespace-nowrap font-nunito text-[20px] font-bold  tracking-[0.5px] text-black">
 					Select your mode of session
@@ -206,16 +249,23 @@ export default function AppointmentSection({ setStep, appointmentDetails, setApp
 							<img className="w-5 sm:w-10 flex-shrink-0" alt="Calendar Icon" src="/calendar.svg" />
 						</div>
 					</div>
-					<div className="mx-2 flex items-center justify-around gap-2 rounded-[21px] border-[1px] border-neutral-300 px-3 py-6 xl:px-8">
-						<img
+					<div
+						
+						className="mx-2 flex items-center justify-around gap-2 rounded-[21px] border-[1px] border-neutral-300 px-3 py-6 xl:px-8"
+					>
+						{/* {dates.length > 0 && <img
 							className="relative h-5 w-5 object-contain"
+							onClick={handleLeftClick}
 							loading="lazy"
 							alt=""
 							src="/chevronleft.png"
-						/>
+						/>} */}
 
-						<div className="no-scrollbar flex  gap-2  overflow-y-auto">
-							{dates.map((date, index) => {
+						<div
+							id="dates-container"
+							className="no-scrollbar flex  gap-2  overflow-y-auto"
+						>
+							{dates.length > 0 && dates.map((date, index) => {
 								return (
 									<div
 										key={index}
@@ -231,13 +281,16 @@ export default function AppointmentSection({ setStep, appointmentDetails, setApp
 									</div>
 								)
 							})}
+							{dates.length === 0 && <p className='text-[#3A643B] text-lg font-medium'>No Slots available!</p>}
+
 						</div>
-						<img
+						{/* {dates.length > 0 && <img
 							className="relative h-5 w-5"
+							onClick={handleRightClick}
 							loading="lazy"
 							alt=""
 							src="/chevronright.svg"
-						/>
+						/>} */}
 					</div>
 				</>
 			)}
@@ -305,11 +358,32 @@ export default function AppointmentSection({ setStep, appointmentDetails, setApp
 			<button
 				type='button'
 				disabled={slotTime === ''}
-				onClick={() => setStep(1)}
+				onClick={handleClick}
 				className={`block text-center p-4 rounded-xl  ${slotTime ? 'bg-[#3A643B] text-white cursor-pointer' :'bg-slate-200 text-[#333333] cursor-not-allowed'} font-inter text-[16px] sm:text-[20px] font-medium capitalize`}>
 				Make an appointment
 			</button>
+
+			<Modal show={show} setShow={setShow}>
+				<AuthPopUp />
+			</Modal>
 		</div>
 
+	)
+}
+
+
+
+function AuthPopUp() {
+	return (
+		<div className="min-h-[400px] p-6 pt-10 font-sans bg-white rounded-xl">
+			<img src='/amrutam.png' alt='Amrutam' />
+			<p className="text-[20px] mt-10 font-medium">Please sign up to secure your appointment</p>
+			<Link
+				to='/login'
+				className='w-[90%] sm:w-[80%] mt-6 flex justify-center py-4 rounded-xl bg-[#3A643B] text-white font-medium '
+			>
+				Sign In
+			</Link>
+		</div>
 	)
 }
