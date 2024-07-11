@@ -109,7 +109,6 @@ const router = createBrowserRouter([
 				element: <TriviaResult />,
 			},
 
-<<<<<<< HEAD
 			{
 				path: "/commune",
 				element: <ForumPage></ForumPage>,
@@ -125,48 +124,19 @@ const router = createBrowserRouter([
 			{ path: "/store", element: <Store /> },
 			{ path: "prodDetail/:id", element: <ProductDetail /> },
 			{ path: "cart", element: <Cart /> },
-			{ path: "success", element: <Success /> },
-			{path: "*", element: <PageNotFound />}
-=======
-      {
-        path: "/commune",
-        element: <ForumPage></ForumPage>,
-      },
-      {
-        path: "/commune/post/:id",
-        element: <SinglePost />,
-      },
-      {
-        path: "/about",
-        element: <div>About us</div>,
-      },
-      { path: "/store", element: <Store /> },
-      { path: "prodDetail/:id", element: <ProductDetail /> },
-      { path: "cart", element: <Cart /> },
-      { path: "success-page", element: <Success /> },
-      {
-        path: "/cancel-page",
-        element: <CancelRedirect />,
-      },
-    ],
-  },
-  {
-    element: <Auth />,
-    children: [
-      {
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        path: "/signup",
-        element: <Signup />,
-      },
-    ],
-  },
->>>>>>> c0951479cb2dfb5e71259cf706353804151938c5
+
+			{ path: "success-page", element: <Success /> },
+			{
+				path: "/cancel-page",
+				element: <CancelRedirect />,
+			},
+			{ path: "*", element: <PageNotFound /> }
 
 		],
 	},
+
+
+
 	{
 		element: <Auth />,
 		children: [
@@ -258,7 +228,6 @@ const router = createBrowserRouter([
 const queryClient = new QueryClient();
 
 function App() {
-<<<<<<< HEAD
 	return (
 		<UserProvider>
 			<QueryClientProvider client={queryClient}>
@@ -280,31 +249,7 @@ function App() {
 			</QueryClientProvider>
 		</UserProvider>
 	);
-=======
-  return (
-    <UserProvider>
-      <ShopifyProvider>
-        <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
-          <ToastContainer
-            position="top-right"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={true}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-            transition={Bounce}
-          />
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
-      </ShopifyProvider>
-    </UserProvider>
-  );
->>>>>>> c0951479cb2dfb5e71259cf706353804151938c5
+ 
 }
 
 export default App;
