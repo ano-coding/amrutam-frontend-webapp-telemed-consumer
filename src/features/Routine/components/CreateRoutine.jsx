@@ -15,6 +15,8 @@ import useDeleteProductReminder from "../../../hooks/routines/useDeleteProductRe
 import useGetSingleRoutine from "../../../hooks/routines/useGetSingleRoutine";
 import DisplayCardSmallReminder from "./DisplayCardSmallReminder";
 import useGetReminderChannel from "../../../hooks/routines/useGetReminderChannel";
+import DisplayCardSmallReminderActivity from "./DisplayCardSmallReminderActivity";
+import useDeleteActivityReminder from "../../../hooks/routines/useDeleteActivityReminder";
 
 const breadCrumbList = [
   {
@@ -72,6 +74,8 @@ const CreateRoutine = () => {
 
   const { deleteProductReminderMutate, deleteProductReminderStatus } =
     useDeleteProductReminder();
+  const { deleteActivityReminderMutate, deleteActivityReminderStatus } =
+    useDeleteActivityReminder();
 
   const {
     register,
@@ -419,27 +423,41 @@ const CreateRoutine = () => {
                     state={dataCurrent}
                   />
                   <div className="flex flex-col flex-wrap gap-4 sm:flex-row sm:gap-10 md:gap-8">
-                    {dataCurrent?.productReminders?.map((reminder) => (
-                      <DisplayCardSmallReminder
-                        key={reminder.id}
-                        reminder={reminder}
-                        title={reminder.name}
-                        shopifyId={reminder.productId}
-                        tag={
-                          reminder.productType === "consumable"
-                            ? "Consumable"
-                            : "Application Based"
-                        }
-                        onClick={(e) => {
-                          e.preventDefault();
-                          deleteProductReminderMutate([
-                            token,
-                            reminder.id,
-                            routineId,
-                          ]);
-                        }}
-                      />
-                    ))}
+                    <>
+                      {dataCurrent?.productReminders?.map((reminder) => (
+                        <DisplayCardSmallReminder
+                          key={reminder.id}
+                          reminder={reminder}
+                          title={reminder.name}
+                          shopifyId={reminder.productId}
+                          tag={
+                            reminder.productType === "consumable"
+                              ? "Consumable"
+                              : "Application Based"
+                          }
+                          onClick={(e) => {
+                            e.preventDefault();
+                            deleteProductReminderMutate([token, reminder.id]);
+                          }}
+                        />
+                      ))}
+                      {dataCurrent?.activityReminders?.map((reminder) => (
+                        <DisplayCardSmallReminderActivity
+                          key={reminder.id}
+                          reminder={reminder}
+                          title={reminder.name}
+                          tag={
+                            reminder.activityType === "physical"
+                              ? "Physical"
+                              : reminder.activityType
+                          }
+                          onClick={(e) => {
+                            e.preventDefault();
+                            deleteActivityReminderMutate([token, reminder._id]);
+                          }}
+                        />
+                      ))}
+                    </>
                   </div>
                 </div>
                 <div className="flex flex-col gap-4">

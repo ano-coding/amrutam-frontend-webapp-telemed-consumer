@@ -23,6 +23,11 @@ import TimePickerDropdown from "./TimePickerDropdown";
 import useCreateProductReminder from "../../../hooks/routines/useCreateProductReminder";
 import { UserContext } from "../../../context/UserContext";
 import useUpdateProductReminder from "../../../hooks/routines/useUpdateProductReminder";
+import ActivityNameInput from "./ActivityNameInput";
+import ActivityTypeDropdown from "./ActivityTypeDropdown";
+import ChooseGoalInput from "./ChooseGoalInput";
+import ChooseActivityUnitDropDown from "./ChooseActivityUnitDropDown";
+import useCreateActivityReminder from "../../../hooks/routines/useCreateActivityReminder";
 
 const breadCrumbList = [
   {
@@ -73,7 +78,6 @@ const NavigationButtons = ({ step, setStep }) => {
           onClick={(e) => {
             e.preventDefault();
             setStep((step) => {
-              console.log("Hello " + step);
               if (step > 1) return step - 1;
             });
           }}
@@ -157,6 +161,43 @@ function convertTimeSlotsToApiFormat(timeSlots) {
   });
 }
 
+function ConvertDataToActivityApiFormat(data, id) {
+  const {
+    reminderType,
+    goalUnitId,
+    goalUnit,
+    goal,
+    activityType,
+    activityName,
+    customActivityDays,
+    activityStartDate,
+    activityEndDate,
+    activityTimeSlots,
+    activityFrequency,
+  } = data;
+  return {
+    name: activityName,
+    activityType,
+    goal,
+    unit: goalUnitId,
+    reminderListId: id,
+    timeslotActivityBased: convertTimeSlotsToApiFormat(activityTimeSlots),
+    frequency:
+      activityFrequency === "daily"
+        ? [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ]
+        : convertFrequency(customActivityDays),
+    endDate: activityEndDate,
+    startDate: activityStartDate,
+  };
+}
 function ConvertDataToApiFormat(data, id) {
   const {
     reminderType,
@@ -213,35 +254,61 @@ const AddReminder = () => {
   const { token } = useContext(UserContext);
   const { state } = useLocation();
 
+  console.log(state);
+
   let defaultValues = {};
   if (state?.isEdit) {
-    defaultValues = {
-      reminderType: state.reminderType,
-      searchedProductId: state.productId,
-      searchProducts: state.name,
-      productType: state.productType,
-      dosageQty: state.dosageQty,
-      dosageUnitId: state.dosageUnit,
-      dosageUnit: state?.dosageUnitObject?.data?.at(0)?.name,
-      productFrequency: state.frequency.length === 7 ? "daily" : "customDays",
-      customDays: convertToAbbreviatedDays(state.frequency),
-      startDate: state.startDate,
-      endDate: state.endDate,
-      timeSlots: convertTimeSlotsFromApiFormat(
-        state.productType === "consumable"
-          ? state.timeSlotsConsumable
-          : state.timeSlotsAppBased,
-      ),
-    };
+    if (state.reminderType === "product") {
+      defaultValues = {
+        reminderType: state.reminderType,
+        searchedProductId: state.productId,
+        searchProducts: state.name,
+        productType: state.productType,
+        dosageQty: state.dosageQty,
+        dosageUnitId: state.dosageUnit,
+        dosageUnit: state?.dosageUnitObject?.data?.at(0)?.name,
+        productFrequency: state.frequency.length === 7 ? "daily" : "customDays",
+        customDays: convertToAbbreviatedDays(state.frequency),
+        startDate: state.startDate,
+        endDate: state.endDate,
+        timeSlots: convertTimeSlotsFromApiFormat(
+          state.productType === "consumable"
+            ? state.timeSlotsConsumable
+            : state.timeSlotsAppBased,
+        ),
+      };
+    }
+    if (state.reminderType === "activity") {
+      defaultValues = {
+        reminderType: state.reminderType,
+        goalUnitId: state.unit,
+        goalUnit: state?.goalUnitObject?.data?.at(0)?.name,
+        goal: state.goal,
+        activityType: state.activityType,
+        activityName: state.name,
+        customActivityDays: convertToAbbreviatedDays(state.frequency),
+        activityStartDate: state.startDate,
+        activityEndDate: state.endDate,
+        activityTimeSlots: convertTimeSlotsFromApiFormat(
+          state.timeslotActivityBased,
+        ),
+        activityFrequency:
+          state.frequency.length === 7 ? "daily" : "customDays",
+      };
+    }
   }
   const methods = useForm({ defaultValues });
   const { createProductReminderMutate, createProductReminderStatus } =
     useCreateProductReminder();
 
+  const { createActivityReminderMutate, createActivityReminderStatus } =
+    useCreateActivityReminder();
+
   const { updateProductReminderMutate, updateProductReminderStatus } =
     useUpdateProductReminder();
 
   const onSubmit = (data) => {
+    console.log(data);
     if (step < 3) return setStep((step) => step + 1);
     if (step < 3) {
       return;
@@ -250,8 +317,13 @@ const AddReminder = () => {
       const apiData = ConvertDataToApiFormat(data, state.reminderListId);
       updateProductReminderMutate([apiData, token, state.id]);
     } else {
-      const apiData = ConvertDataToApiFormat(data, state.id);
-      createProductReminderMutate([apiData, token]);
+      if (data.reminderType === "product") {
+        const apiData = ConvertDataToApiFormat(data, state.id);
+        createProductReminderMutate([apiData, token]);
+      } else if (data.reminderType === "activity") {
+        const apiData = ConvertDataToActivityApiFormat(data, state.id);
+        createActivityReminderMutate([apiData, token]);
+      }
     }
   };
 
@@ -282,7 +354,7 @@ const AddReminder = () => {
                 <ActivityDetails />
               )}
               {step === 3 && methods.watch("reminderType") === "activity" && (
-                <TimeSlot />
+                <ActivityTimeSlot />
               )}
               {step === 2 && methods.watch("reminderType") === "product" && (
                 <ProductDetails />
@@ -364,7 +436,10 @@ const FirstStage = () => {
 };
 
 const ActivityDetails = () => {
-  const { watch } = useFormContext();
+  const {
+    watch,
+    formState: { errors },
+  } = useFormContext();
   return (
     <div className="flex flex-col gap-6">
       <div className="text-[18px] font-medium leading-[16px] text-neutral-800">
@@ -372,52 +447,64 @@ const ActivityDetails = () => {
       </div>
       <div className="flex max-w-5xl flex-col items-center justify-between gap-5 md:w-full lg:flex-row lg:items-start">
         <div className="flex w-full flex-col gap-1 md:w-fit">
-          <SimpleDropDownComponent
+          <ActivityNameInput
             label="Activity Name"
-            list={[
-              "Drinking Water",
-              "Walking",
-              "Running",
-              "Exercise",
-              "Medication",
-              "Yoga",
-            ]}
-            mdWidth="w-[400px]"
+            mdWidth={400}
             placeholder="Select Activity"
           />
           <div className="ml-5 text-[12px] font-medium leading-[16px] text-[#3A643B]">
             Unable to find activity? Add your Activity
           </div>
         </div>
-        <SimpleDropDownComponent
+        <ActivityTypeDropdown
           label="Activity Type"
-          list={["Physical", "Spiritual"]}
+          list={[
+            { label: "Physical", id: "physical" },
+            { label: "Spiritual", id: "spiritual" },
+          ]}
           mdWidth="w-[400px]"
           placeholder="Select Activity Type"
           className={`w-full`}
+          name="activityType"
+          requiredMessage="*Please Select an Activity Type"
         />
       </div>
       <div className="flex w-full max-w-5xl flex-col items-center justify-between gap-5 lg:flex-row lg:items-start">
         <div className="grid w-full grid-cols-2 gap-10 md:w-[400px]">
-          <SingleLineInput label="Quantity" />
-          <SingleLineInput label="Unit" />
+          <ChooseGoalInput name="goal" label="Goal" placeholder={"10"} />
+          <ChooseActivityUnitDropDown
+            label="Unit"
+            placeholder="Start Typing..."
+          />
         </div>
         <div className="flex w-full flex-col gap-[30px] md:w-[400px] lg:items-end">
           <div className="flex gap-12 pl-3 sm:w-[400px]">
             <CustomRadioButton
-              name="activity-frequency"
+              name="activityFrequency"
               id="daily"
               label="Daily"
             />
             <CustomRadioButton
-              name="activity-frequency"
+              name="activityFrequency"
               id="customDays"
               label="Custom Days"
             />
           </div>
+          {errors?.activityFrequency && (
+            <p className="text-[12px] font-medium text-red-500">
+              {errors?.activityFrequency?.message}
+            </p>
+          )}
           <div className="w-full">
-            {watch("activity-frequency") === "customDays" && <SelectDays />}
+            {watch("activityFrequency") === "customDays" && (
+              <SelectDays name="customActivityDays" />
+            )}
           </div>
+          {errors?.customActivityDays && (
+            <p className="self-end text-[12px] font-medium text-red-500">
+              {errors?.customActivityDays?.message}
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -484,7 +571,9 @@ const ProductDetails = () => {
           )}
 
           <div className="w-full">
-            {watch("productFrequency") === "customDays" && <SelectDays />}
+            {watch("productFrequency") === "customDays" && (
+              <SelectDays name="customDays" />
+            )}
           </div>
           {errors?.customDays && (
             <p className="self-end text-[12px] font-medium text-red-500">
@@ -518,7 +607,7 @@ const CustomRadioButton = ({ id, label, name }) => {
   );
 };
 
-const SelectDays = () => {
+const SelectDays = ({ name }) => {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const { control } = useFormContext();
 
@@ -528,7 +617,7 @@ const SelectDays = () => {
         <Fragment key={day}>
           <Controller
             control={control}
-            name={`customDays`}
+            name={name}
             rules={{ required: "*Please Select a Day" }}
             render={({ field }) => {
               const { onChange, value = [] } = field;
@@ -569,68 +658,193 @@ const SelectDays = () => {
   );
 };
 
-const TimeSlot = () => {
-  return (
-    <div className="flex w-full flex-col gap-6">
-      <div className="text-[18px] font-medium leading-[16px] text-neutral-800">
-        Add Time Slot
-      </div>
-      <div className="flex w-fit max-w-5xl items-center gap-2 sm:gap-5 lg:items-start">
-        <SimpleDropDownComponent
-          label="Hours"
-          list={[
-            "01",
-            "02",
-            "03",
-            "04",
-            "05",
-            "06",
-            "07",
-            "08",
-            "09",
-            "10",
-            "11",
-            "12",
-          ]}
-          className="w-[105px] sm:w-[150px]"
-          placeholder="Hours"
-        />
-
-        <SingleLineInput
-          label="Minutes"
-          className={`w-[105px] sm:w-[150px]`}
-          placeholder="Minutes"
-        />
-        <SimpleDropDownComponent
-          label="Unit"
-          list={["AM", "PM"]}
-          className="w-[105px] sm:w-[150px]"
-          placeholder="Unit"
-        />
-      </div>
-      <div className="flex flex-col gap-[30px] md:w-[400px] lg:items-end">
-        <div className="flex gap-12 sm:w-[400px]">
-          <CustomRadioButton
-            name="moment"
-            id="before-meal"
-            label="Before Meal"
-          />
-          <CustomRadioButton name="moment" id="after-meal" label="After Meal" />
-        </div>
-      </div>
-      <div className="mt-5">
-        <AddMoreButton label="Add More Slots" />
-      </div>
-    </div>
-  );
-};
-
 const hoursArray = Array.from({ length: 12 }, (_, i) =>
   (i + 1).toString().padStart(2, "0"),
 );
 const minutesArray = Array.from({ length: 60 }, (_, i) =>
   i.toString().padStart(2, "0"),
 );
+
+const ActivityTimeSlot = () => {
+  const {
+    control,
+    watch,
+    register,
+    clearErrors,
+    formState: { errors },
+  } = useFormContext();
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: `activityTimeSlots`,
+    rules: { required: "*Please add at least one Time Slot" },
+  });
+
+  useEffect(() => {
+    if (fields.length === 0) {
+      append({
+        hour: "",
+        minutes: "",
+        "am/pm": "",
+        timing: "",
+      });
+    }
+  }, [append, fields.length]);
+
+  return (
+    <div className="flex w-full flex-col gap-6">
+      <div className="text-[18px] font-medium leading-[16px] text-neutral-800">
+        Add Date Range
+      </div>
+      <div className="my-2 grid w-full grid-cols-2 gap-3">
+        <div className="flex flex-col gap-1">
+          <div
+            className={`relative rounded-[16px] border-[1.5px] border-[#ced8e0] px-1.5 py-1 shadow-sm lg:w-60`}
+          >
+            <label
+              htmlFor="activityStartDate"
+              className="absolute -top-2 left-2 -mt-px inline-block bg-white px-1 text-[12px] leading-[16px] text-neutral-400"
+            >
+              {"Start Date"}
+            </label>
+            <div className="flex w-full flex-col gap-1">
+              <DatePicker hookId={"activityStartDate"} minDate={new Date()} />
+            </div>
+            {errors?.activityStartDate && (
+              <p className="absolute bottom-0 right-2 text-[12px] font-medium text-red-500">
+                {errors?.activityStartDate?.message}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="flex flex-col gap-1">
+          <div
+            className={`relative rounded-[16px] border-[1.5px] border-[#ced8e0] px-1.5 py-1 shadow-sm lg:w-60`}
+          >
+            <label
+              htmlFor="activityEndDate"
+              className="absolute -top-2 left-2 -mt-px inline-block bg-white px-1 text-[12px] leading-[16px] text-neutral-400"
+            >
+              {"End Date"}
+            </label>
+            <div className="flex w-full flex-col gap-1">
+              <DatePicker
+                hookId={"activityEndDate"}
+                minDate={getNextDate(watch("activityStartDate"))}
+              />
+            </div>
+            {errors?.activityEndDate &&
+              errors?.activityEndDate?.message !== "SPECIAL_ERROR_MESSAGE" && (
+                <p className="absolute bottom-0 right-2 text-[12px] font-medium text-red-500">
+                  {errors?.activityEndDate?.message}
+                </p>
+              )}
+          </div>
+        </div>
+      </div>
+      {errors?.activityEndDate &&
+        errors?.activityEndDate?.message === "SPECIAL_ERROR_MESSAGE" && (
+          <p className="-mt-5 self-end text-[12px] font-medium text-red-500">
+            *End date must be after start date
+          </p>
+        )}
+      <div className="text-[18px] font-medium leading-[16px] text-neutral-800">
+        Add Time Slot
+      </div>
+      {fields.map((item, index) => (
+        <div
+          className="relative flex w-full flex-col items-end sm:flex-row sm:items-center sm:gap-5"
+          key={item.id}
+        >
+          <div className="my-4 flex flex-col gap-4">
+            <div className="flex w-fit max-w-5xl items-center gap-2 lg:items-start">
+              <TimePickerDropdown
+                label="hour"
+                index={index}
+                list={hoursArray}
+                name="activityTimeSlots"
+              />
+              <div className="text-3xl text-neutral-500">:</div>
+              <TimePickerDropdown
+                index={index}
+                label="minutes"
+                list={minutesArray}
+                name="activityTimeSlots"
+              />
+              <div className="mr-2"></div>
+              <TimePickerDropdown
+                index={index}
+                label="am/pm"
+                list={["AM", "PM"]}
+                name="activityTimeSlots"
+              />
+            </div>
+
+            <div className="ml-3 flex w-full flex-col gap-[10px] md:w-[400px] lg:items-end">
+              <div className="flex gap-12 sm:w-[400px]">
+                <div className="flex items-center">
+                  <input
+                    {...register(`activityTimeSlots.${index}.timing`, {
+                      required: "*Please Select Timing",
+                    })}
+                    onClick={() => {
+                      clearErrors(`activityTimeSlots.${index}.timing`);
+                    }}
+                    id={`activityTimeSlots.${index}.beforeMeal`}
+                    type="radio"
+                    value="beforeMeal"
+                    className="h-[20px] w-[20px] border-2 border-neutral-500 text-[#3A643B] ring-0 checked:border-[#3A643B] checked:ring-0 hover:ring-0 hover:ring-[#3A643B] focus:outline-none focus:ring-[#3a643b] focus-visible:bg-red-500 active:ring-0"
+                  />
+                  <label
+                    htmlFor={`activityTimeSlots.${index}.beforeMeal`}
+                    className="ml-3 text-[14px] leading-[16px]"
+                  >
+                    Before Meal
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    {...register(`activityTimeSlots.${index}.timing`, {
+                      required: "*Please Select Timing",
+                    })}
+                    onClick={() => {
+                      clearErrors(`activityTimeSlots.${index}.timing`);
+                    }}
+                    id={`activityTimeSlots.${index}.afterMeal`}
+                    type="radio"
+                    value="afterMeal"
+                    className="h-[20px] w-[20px] border-2 border-neutral-500 text-[#3A643B] ring-0 checked:border-[#3A643B] checked:ring-0 hover:ring-0 hover:ring-[#3A643B] focus:outline-none focus:ring-[#3a643b] focus-visible:bg-red-500 active:ring-0"
+                  />
+                  <label
+                    htmlFor={`activityTimeSlots.${index}.afterMeal`}
+                    className="ml-3 text-[14px] leading-[16px]"
+                  >
+                    After Meal
+                  </label>
+                </div>
+              </div>
+              {errors?.activityTimeSlots?.[index]?.timing && (
+                <p className="mr-2 self-end text-[12px] font-medium text-red-500">
+                  {errors?.activityTimeSlots?.[index]?.timing?.message}
+                </p>
+              )}
+            </div>
+          </div>
+          <TrashSvg
+            onClick={() => remove(index)}
+            className={`absolute bottom-4 right-0 size-4 cursor-pointer sm:static sm:mb-9 ${fields.length > 1 ? "" : "hidden"}`}
+          />
+        </div>
+      ))}
+      <div className="mt-5">
+        <AddMoreButton
+          onClick={() => append({ hour: "", minutes: "", "am/pm": "" })}
+          label="Add More Slots"
+        />
+      </div>
+    </div>
+  );
+};
 
 const ProductTimeSlot = () => {
   const {
@@ -640,8 +854,6 @@ const ProductTimeSlot = () => {
     clearErrors,
     formState: { errors },
   } = useFormContext();
-
-  console.log(watch("startDate"));
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -731,18 +943,21 @@ const ProductTimeSlot = () => {
                 label="hour"
                 index={index}
                 list={hoursArray}
+                name="timeSlots"
               />
               <div className="text-3xl text-neutral-500">:</div>
               <TimePickerDropdown
                 index={index}
                 label="minutes"
                 list={minutesArray}
+                name="timeSlots"
               />
               <div className="mr-2"></div>
               <TimePickerDropdown
                 index={index}
                 label="am/pm"
                 list={["AM", "PM"]}
+                name="timeSlots"
               />
             </div>
 

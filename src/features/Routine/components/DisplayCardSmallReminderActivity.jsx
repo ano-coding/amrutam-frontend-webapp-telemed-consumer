@@ -1,36 +1,30 @@
 import { useContext } from "react";
 import { UserContext } from "../../../context/UserContext";
-import useGetSingleProductFromStore from "../../../hooks/routines/useGetSingleProductFromStore";
 import { Link } from "react-router-dom";
 import useGetSingleUnit from "../../../hooks/routines/useGetSingleUnit";
 
-const DisplayCardSmallReminder = ({
+const DisplayCardSmallReminderActivity = ({
   title,
-  shopifyId,
   tag,
   onClick,
   reminder,
 }) => {
   const { token } = useContext(UserContext);
-  const { data: productData } = useGetSingleProductFromStore([
-    token,
-    shopifyId,
-  ]);
 
-  const { data: singleUnit } = useGetSingleUnit([token, reminder?.dosageUnit]);
+  const { data: singleUnit } = useGetSingleUnit([token, reminder?.unit]);
 
   return (
     <div className="flex gap-3 rounded-2xl border-[1px] border-solid border-neutral-200 px-[10px] py-[10px] hover:shadow-lg hover:shadow-neutral-100 md:w-[380px]">
       <img
         className="h-[100px] w-[100px] rounded-lg object-cover"
-        src={productData?.data?.ProductData?.at(0)?.image?.src}
+        src={`/activity-reminder-default-thumbnail.png`}
       />
       <div className="flex flex-1 flex-col justify-between">
         <span className="line-clamp-1 text-[16px] font-medium leading-[24px] tracking-[0.15px]">
           {title}
         </span>
         <div>
-          <span className="rounded-[64px] bg-[#E9F1E0] p-[10px] py-2 text-[14px] tracking-[-0.02em] text-[#A0A0A0]">
+          <span className="rounded-[64px] bg-[#E9F1E0] p-[10px] py-2 text-[14px] capitalize tracking-[-0.02em] text-[#A0A0A0]">
             {tag}
           </span>
         </div>
@@ -38,8 +32,8 @@ const DisplayCardSmallReminder = ({
           to="add-reminder"
           state={{
             isEdit: true,
-            dosageUnitObject: singleUnit,
-            reminderType: "product",
+            goalUnitObject: singleUnit,
+            reminderType: "activity",
             ...reminder,
           }}
           className="cursor-pointer font-nunito text-[14px] font-bold text-[#3A643B]"
@@ -67,4 +61,4 @@ const DisplayCardSmallReminder = ({
   );
 };
 
-export default DisplayCardSmallReminder;
+export default DisplayCardSmallReminderActivity;

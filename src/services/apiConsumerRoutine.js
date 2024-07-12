@@ -355,6 +355,46 @@ export const updateProductReminder = async (
   }
 };
 
+export const createActivityReminder = async (reminderData, token) => {
+  const config = {
+    method: "post",
+    maxBodyLength: Infinity,
+    url: `${API_BASE_URL}/patient/reminder-activity`,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    data: JSON.stringify(reminderData),
+  };
+
+  try {
+    const response = await axios.request(config);
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const deleteActivityReminder = async (token, reminderId) => {
+  const config = {
+    method: "delete",
+    maxBodyLength: Infinity,
+    url: `${API_BASE_URL}/patient/reminder-activity/${reminderId}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  try {
+    const response = await axios.request(config);
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 export const createReminderChannel = async (channelData, token) => {
   const config = {
     method: "post",

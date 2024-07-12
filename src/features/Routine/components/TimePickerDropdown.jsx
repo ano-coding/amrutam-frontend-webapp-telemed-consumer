@@ -13,7 +13,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function TimePickerDropdown({ label, list, index }) {
+export default function TimePickerDropdown({ name, label, list, index }) {
   const {
     register,
     setValue,
@@ -38,15 +38,15 @@ export default function TimePickerDropdown({ label, list, index }) {
             type="text"
             id={label}
             className="font-poppins block w-full select-none border-0 p-0 py-1.5 pl-1 text-[16px] leading-[24px] text-black placeholder-neutral-400 caret-transparent placeholder:text-sm focus:ring-0"
-            {...register(`timeSlots.${index}.${label}`, {
+            {...register(`${name}.${index}.${label}`, {
               required: `*Select ${label}`,
             })}
           />
           <DropdownSvg className="mr-2 size-5" />
         </div>
-        {errors?.timeSlots?.[index]?.[label] && (
+        {errors?.[name]?.[index]?.[label] && (
           <span className="absolute bottom-0 right-1 text-[12px] font-medium text-red-500 sm:right-3">
-            {errors?.timeSlots?.[index]?.[label]?.message}
+            {errors?.[name]?.[index]?.[label]?.message}
           </span>
         )}
       </MenuButton>
@@ -71,8 +71,8 @@ export default function TimePickerDropdown({ label, list, index }) {
                       "font-poppins block px-4 py-2 text-sm",
                     )}
                     onClick={() => {
-                      setValue(`timeSlots.${index}.${label}`, item);
-                      clearErrors(`timeSlots.${index}.${label}`);
+                      setValue(`${name}.${index}.${label}`, item);
+                      clearErrors(`${name}.${index}.${label}`);
                     }}
                   >
                     {item}

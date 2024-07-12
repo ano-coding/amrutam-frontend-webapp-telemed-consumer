@@ -17,7 +17,7 @@ function filterByQuery(units, query) {
   );
 }
 
-export default function ChooseUnitDropDown({
+export default function ChooseActivityUnitDropDown({
   label,
   mdWidth,
   placeholder,
@@ -35,8 +35,8 @@ export default function ChooseUnitDropDown({
   } = useFormContext();
   const [createNewUnitModal, setCreateNewUnitModal] = useState(false);
   const { data: units } = useGetUnits(token);
-  const dosageUnit = watch("dosageUnit");
-  const [debouncedValue] = useDebounce(dosageUnit, 500);
+  const goalUnit = watch("goalUnit");
+  const [debouncedValue] = useDebounce(goalUnit, 500);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -67,7 +67,7 @@ export default function ChooseUnitDropDown({
           </label>
           <div className="flex items-center justify-between gap-3">
             <Controller
-              name="dosageUnit"
+              name="goalUnit"
               control={control}
               rules={{ required: "*Please Select a Unit" }}
               defaultValue=""
@@ -82,25 +82,25 @@ export default function ChooseUnitDropDown({
                   onBlur={() => setTimeout(() => setOpen(false), 100)}
                   onChange={(e) => {
                     field.onChange(e);
-                    setValue("dosageUnitId", null);
+                    setValue("goalUnitId", null);
                   }}
                 />
               )}
             />
           </div>
-          {errors?.dosageUnit && (
+          {errors?.goalUnit && (
             <p className="absolute bottom-0 right-2 text-[12px] font-medium text-red-500">
-              {errors?.dosageUnit?.message}
+              {errors?.goalUnit?.message}
             </p>
           )}
-          {!errors?.dosageUnit &&
-            errors?.dosageUnitId &&
+          {!errors?.goalUnit &&
+            errors?.goalUnitId &&
             filteredUnits?.length !== 0 && (
               <p className="absolute bottom-0 right-2 text-[12px] font-medium text-red-500">
-                {errors?.dosageUnitId?.message}
+                {errors?.goalUnitId?.message}
               </p>
             )}
-          {filteredUnits?.length === 0 && dosageUnit && (
+          {filteredUnits?.length === 0 && goalUnit && (
             <p className="absolute bottom-0 right-2 text-[12px] font-medium text-red-500">
               *No Units Found
             </p>
@@ -108,12 +108,12 @@ export default function ChooseUnitDropDown({
 
           <input
             type="hidden"
-            {...register("dosageUnitId", {
+            {...register("goalUnitId", {
               required: "Choose from Dropdown",
             })}
           />
         </div>
-        {filteredUnits?.length === 0 && dosageUnit && (
+        {filteredUnits?.length === 0 && goalUnit && (
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -131,7 +131,7 @@ export default function ChooseUnitDropDown({
             open &&
             filteredUnits?.length !== 0 &&
             !filteredUnits?.some(
-              (item) => item?.name?.toLowerCase() === dosageUnit?.toLowerCase(),
+              (item) => item?.name?.toLowerCase() === goalUnit?.toLowerCase(),
             )
               ? true
               : false
@@ -154,10 +154,10 @@ export default function ChooseUnitDropDown({
                 <div key={item.name}>
                   <span
                     onClick={() => {
-                      setValue("dosageUnit", item.name);
-                      setValue("dosageUnitId", item._id);
-                      clearErrors("dosageUnitId");
-                      clearErrors("dosageUnit");
+                      setValue("goalUnit", item.name);
+                      setValue("goalUnitId", item._id);
+                      clearErrors("goalUnitId");
+                      clearErrors("goalUnit");
                     }}
                     className={classNames(
                       "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
@@ -184,7 +184,7 @@ export default function ChooseUnitDropDown({
               <p className="text-start text-sm font-medium">
                 Are you sure you want to create{" "}
                 <span className="font-bold tracking-wide">
-                  {`"${dosageUnit}"`}
+                  {`"${goalUnit}"`}
                 </span>{" "}
                 as a new Unit?
               </p>
@@ -207,7 +207,7 @@ export default function ChooseUnitDropDown({
                   createUnitMutate(
                     [
                       {
-                        name: dosageUnit,
+                        name: goalUnit,
                         makePublic: false,
                       },
                       token,
@@ -215,7 +215,7 @@ export default function ChooseUnitDropDown({
                     {
                       onSuccess: () => {
                         setCreateNewUnitModal(false);
-                        setValue("dosageUnit", "");
+                        setValue("goalUnit", "");
                       },
                     },
                   );
