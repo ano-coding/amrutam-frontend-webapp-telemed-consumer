@@ -44,9 +44,10 @@ import Store from "./pages/Store";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Success from "./pages/Success";
-import AppointmentBookingForm from "./features/Appointments/components/AppointmentBookingForm";
+import AppointmentBookingFormPage from "./pages/AppointmentBookingFormPage";
 import CouponsPage from "./pages/CouponsPage";
 import AppointmentSuccessPage from "./pages/AppointmentSuccessPage";
+import PageNotFound from "./pages/404";
 import CancelRedirect from "./pages/CancelRedirect";
 import { ShopifyProvider } from "./context/ShopifyContext";
 
@@ -73,7 +74,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/appointment/:doctorId",
-        element: <AppointmentBookingForm></AppointmentBookingForm>,
+        element: <AppointmentBookingFormPage></AppointmentBookingFormPage>,
       },
       {
         path: "/coupons",
@@ -123,13 +124,16 @@ const router = createBrowserRouter([
       { path: "/store", element: <Store /> },
       { path: "prodDetail/:id", element: <ProductDetail /> },
       { path: "cart", element: <Cart /> },
+
       { path: "success-page", element: <Success /> },
       {
         path: "/cancel-page",
         element: <CancelRedirect />,
       },
+      { path: "*", element: <PageNotFound /> },
     ],
   },
+
   {
     element: <Auth />,
     children: [
@@ -141,6 +145,7 @@ const router = createBrowserRouter([
         path: "/signup",
         element: <Signup />,
       },
+      { path: "*", element: <PageNotFound /> },
     ],
   },
 
@@ -211,6 +216,7 @@ const router = createBrowserRouter([
         path: "/profile/edit",
         element: <PatientProfileEdit />,
       },
+      { path: "*", element: <PageNotFound /> },
     ],
   },
 ]);

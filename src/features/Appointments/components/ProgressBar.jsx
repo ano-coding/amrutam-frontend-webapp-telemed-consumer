@@ -28,7 +28,7 @@ export function ProgressBar({ currentStep }) {
 									index < 9 ? '0' + (index + 1) : index + 1
 								)}
 							</div>
-							<p className={`min-w-[120px] block text-center text-[10px] xl:text-[13px] absolute top-10 font-sans ${index < currentStep ? 'font-semibold text-[#3A643B]' : 'font-medium text-[#797979]'} `}>{step}</p>
+							<p className={`min-w-[120px] block text-center text-[10px] xl:text-[12px] absolute top-10 font-sans ${index < currentStep ? 'font-semibold text-[#3A643B]' : 'font-medium text-[#797979]'} `}>{step}</p>
 						</div>
 
 						{index !== lastIndex && (

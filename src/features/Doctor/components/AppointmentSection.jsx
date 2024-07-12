@@ -3,16 +3,11 @@ import { useState } from 'react';
 import { extractSessions } from '../../../services/Doctor';
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { fetchDateByAppointmentType, DAYS, MONTHS } from '../../../services/Doctor';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 // import { useAppointment } from '../../Appointments/AppointmentContext';
 
 function AppointmentSection({ doctorId, charges }) {
-	// const { appointmentDetails, setAppointmentDetails } = useAppointment();
-
 	const location = useLocation();
-
-	// console.log('location ', location.pathname);
-
 
 	const [sessionModeIndex, setSessionModeIndex] = useState(-1);
 	const [slotIndex, setSlotIndex] = useState(0);
@@ -34,21 +29,6 @@ function AppointmentSection({ doctorId, charges }) {
 	})
 
 	const dates = data?.map(date => new Date(Date.parse(date.date)));
-
-	// Selecting the first available date because slots need date to fetch them from api
-	// if (slotDateIndex === -1 && dates?.length > 0) {
-	// 	setSlotDateIndex(0);
-	// }
-
-
-	// const { data: slots, isLoading: isSlotsLoading } = useQuery({
-	// 	queryFn: () => fetchAppointmentsByDate(doctorId, dates[slotDateIndex]),
-	// 	queryKey: ['slots', slotDateIndex, doctorId]
-	// });
-
-	// console.log('slots ', slots);
-
-	console.log('data/slots ', data);
 
 
 
@@ -76,7 +56,6 @@ function AppointmentSection({ doctorId, charges }) {
 		}
 	}
 
-	console.log('slot date Index ', slotDateIndex);
 
 
 
@@ -87,56 +66,6 @@ function AppointmentSection({ doctorId, charges }) {
 			... Appointments & Slots are loading
 		</div>
 	}
-
-	// let slots = []
-
-	// console.log('Slot Time ', slotTime);
-
-	// console.log('appointmentDetails ', appointmentDetails);
-
-
-
-	// function handleAppointment() {
-	// 	if (sessionModeIndex !== -1 && sessions[sessionModeIndex]?.type !== appointmentDetails.sessionMode) {
-	// 		setAppointmentDetails({
-	// 			...appointmentDetails,
-	// 			sessionMode: sessions[sessionModeIndex]?.type
-	// 		});
-	// 	}
-
-	// 	if (sessionModeIndex !== -1 && sessions[sessionModeIndex]?.slots[slotIndex].timing !== appointmentDetails.sessionDuration) {
-	// 		setAppointmentDetails({
-	// 			...appointmentDetails,
-	// 			sessionDuration: sessions[sessionModeIndex]?.slots[slotIndex].timing
-	// 		})
-	// 	}
-
-	// 	if (appointmentFee !== 0 && appointmentDetails.appointmentFee !== appointmentFee) {
-	// 		setAppointmentDetails({
-	// 			...appointmentDetails,
-	// 			appointmentFee
-	// 		})
-	// 	}
-
-	// 	if (slotTime !== '' && slotTime !== appointmentDetails.sessionTime) {
-	// 		setAppointmentDetails({
-	// 			...appointmentDetails,
-	// 			sessionTime: slotTime
-	// 		})
-	// 	}
-
-	// 	if (slots[slotDateIndex] !== -1 && slots[slotDateIndex] !== appointmentDetails.sessionDate) {
-	// 		setAppointmentDetails({
-	// 			...appointmentDetails,
-	// 			sessionDate: dates[slotDateIndex]
-	// 		})
-	// 	}
-	// }
-
-
-	// handleAppointment();
-
-
 
 
 
@@ -215,15 +144,15 @@ function AppointmentSection({ doctorId, charges }) {
 						</div>
 					</div>
 					<div className="mx-2 flex items-center justify-around gap-2 rounded-[21px] border-[1px] border-neutral-300 px-3 py-6 xl:px-8">
-						<img
+						{/* <img
 							className="relative h-5 w-5 object-contain"
 							loading="lazy"
 							alt=""
 							src="/chevronleft.png"
-						/>
+						/> */}
 
 						<div className="no-scrollbar flex  gap-2  overflow-y-auto">
-							{dates.map((date, index) => {
+							{data.length > 0 && dates.map((date, index) => {
 								return (
 									<div
 										key={index}
@@ -239,13 +168,14 @@ function AppointmentSection({ doctorId, charges }) {
 									</div>
 								)
 							})}
+							{dates.length === 0 && <p className='text-[#3A643B] text-lg font-medium'>No Slots available!</p>}
 						</div>
-						<img
+						{/* <img
 							className="relative h-5 w-5"
 							loading="lazy"
 							alt=""
 							src="/chevronright.svg"
-						/>
+						/> */}
 					</div>
 				</>
 			)}
@@ -270,7 +200,7 @@ function AppointmentSection({ doctorId, charges }) {
 					</div>
 				)}
 
-				{afternoonSlots.length > 0 && (
+				{afternoonSlots.length > 0&& (
 					<div className="my-5">
 						<h3 className="mb-2 ml-4 flex text-center font-nunito text-[18px] font-bold capitalize tracking-[0.2px] text-black">
 							Afternoon
@@ -320,6 +250,12 @@ function AppointmentSection({ doctorId, charges }) {
 							appointmentDate: data[slotDateIndex]?.date,
 							appointmentTime: slotTime
 						},
+						details: {
+							sessionModeIndex,
+							slotIndex,
+							slotDateIndex,
+							slotTime
+						},
 						from: location.pathname
 					}}
 					className="block text-center p-4 rounded-xl bg-darkolivegreen-200 font-inter text-[16px] sm:text-[20px] font-medium capitalize text-white duration-100 hover:bg-darkolivegreen-300 active:scale-95">
@@ -334,24 +270,6 @@ function AppointmentSection({ doctorId, charges }) {
 					Make an appointment
 				</button>
 			)}
-
-			{/* <NavLink
-				
-				to={`/appointment/${doctorId}`}
-				state={{
-					data: {
-						appointmentType: sessions[sessionModeIndex]?.type,
-						appointmentDuration: sessions[sessionModeIndex]?.slots[slotIndex].timing,
-						appointmentFee: sessions[sessionModeIndex]?.slots[slotIndex].amount,
-						appointmentDate: data[slotDateIndex]?.date,
-						appointmentTime: slotTime
-					},
-					from: location.pathname
-				}}
-				className="block  text-center p-4 rounded-xl bg-slate-200 font-inter text-[16px] sm:text-[20px] font-medium capitalize text-[#333333]">
-				Make an appointment
-			</NavLink> */}
-
 		</div>
 
 	)

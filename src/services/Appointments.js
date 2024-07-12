@@ -34,10 +34,10 @@ export async function fetchDoctorCoupons(appointmentType, amount, doctorId) {
 export async function fetchSingleCouponStatus(couponCode, amount, appointmentType, doctorId ) {
 	// If no coupon is selected
 
-	console.log('coupon code ', couponCode);
+	// console.log('coupon code ', couponCode);
 
 	if (!couponCode) {
-		console.log('No coupon code returned!')
+		console.log('No coupon code entered!')
 		return {
 			noCouponCode: true
 		}
@@ -148,4 +148,120 @@ export async function uploadFile(file) {
 	}
 
 }
+
+
+export async function bookAppointment(doctorId, appointmentDetails) {	
+	let data = JSON.stringify({
+		"sleepPattern": "Once a day",
+		"attachments": [
+			"https://www.google.com"
+		],
+		"symptoms": {
+			"concern": "Headache",
+			"description": "Pains at night",
+			"severity": "Very bad",
+			"duration": "2 weeks"
+		},
+		"patientId": "666a8ad38b46507633759035",
+		"source": "app-android",
+		"fromTiming": "03:20 PM",
+		"requestedDate": "2024-07-29",
+		"appointmentType": "chat",
+		"bookedBy": "admin"
+	});
+
+	// let data = JSON.stringify(appointmentDetails);
+
+	// console.log('appointmentDetails ', appointmentDetails);
+
+	let config = {
+		method: 'post',
+		maxBodyLength: Infinity,
+		url: `https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/664c9cdb82f45439bf5e4ff5/book-appointment`,
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzQ2NTE5NDUyMDgyOSwiaWF0IjoxNzIwMTY1Nzk5LCJleHAiOjE3Mjc5NDE3OTl9.MfO4C3Jwwgdmg4SimpZLhfityZBdZVzqJG0OPnJgEFQ'
+		},
+		data: data
+	};
+
+	try {
+		const res = await axios.request(config);
+
+		const data = res.data.data.data;
+
+		console.log('Data in bookAppointment ', data);
+
+		return data;
+	} catch (e) {
+		console.log(e);
+		return e;
+	}
+}
+
+
+// async function createRazorPayOrder(record) {
+// 	let data = JSON.stringify({
+// 		"amount": record.slotBooked.amount,
+// 		"notes": {
+// 			"note": "Payment for consultation"
+// 		},
+// 		"id": record._id
+// 	});
+
+// 	let config = {
+// 		method: 'post',
+// 		maxBodyLength: Infinity,
+// 		url: 'https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/create-razorpay-order',
+// 		headers: {
+// 			'Content-Type': 'application/json',
+// 			'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzQ2NTE5NDUyMDgyOSwiaWF0IjoxNzIwMTY1Nzk5LCJleHAiOjE3Mjc5NDE3OTl9.MfO4C3Jwwgdmg4SimpZLhfityZBdZVzqJG0OPnJgEFQ'
+// 		},
+// 		data: data
+// 	};
+
+// 	try {
+// 		const res = await axios.request(config);
+
+// 		console.log('data in createRazorpayOrder ', res);
+
+// 		return res;
+// 	} catch (e) {
+// 		console.log(e);
+
+// 		return e;
+// 	}
+// }
+
+
+export async function markAppointmentAsPaid(appointmentId) {
+	let data = '';
+
+	let config = {
+		method: 'post',
+		maxBodyLength: Infinity,
+		// url: 'https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/659146c48417a0c563b4718d/markPaid',
+		url: `https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/${appointmentId}/markPaid`,
+		headers: {
+			'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzIwNTkwODQxNDcxNywiaWF0IjoxNzE4MTkyOTEyLCJleHAiOjE3MjU5Njg5MTJ9.tRK8eAF2AOh_GHNNzvMHR_6vqoa_Pf8kc7ylbg6b3C8'
+		},
+		data: data
+	};
+
+	try {
+		const res = await axios.request(config);
+
+		console.log('result in mark apppointment paid ', res);
+		return res;
+	} catch (e) {
+		console.log(e);
+		return e;
+	}
+}
+
+
+
+
+
+
 
