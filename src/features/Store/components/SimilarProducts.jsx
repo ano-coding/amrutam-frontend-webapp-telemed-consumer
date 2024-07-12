@@ -1,23 +1,44 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { getTopProducts } from "../../../services/Shopify";
+import { getTopProducts, fetchCartByUserId } from "../../../services/Shopify";
+import { ShopifyContext } from "../../../context/ShopifyContext";
 import Product from "./Product";
 import Spinner from "./Spinner";
 
 const SimilarProducts = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { shopifyId } = useContext(ShopifyContext);
 
   //States
   const [size, setSize] = useState();
   const [similarProductsData, setSimilarProductsData] = useState();
+  const [commonIds, setCommonIds] = useState([]);
 
+  //Handlers
+  const prodDetailHandler = (id) => {
+    console.log(id);
+    navigate(`/prodDetail/${id}`);
+    window.location.reload();
+  };
+
+  //APIs
   const { data: similarProducts, isLoading: similarProductsLoading } = useQuery(
     {
       queryFn: () => getTopProducts("Checkout"),
       queryKey: ["similarProducts"],
     },
   );
+  const {
+    data: cart,
+    isLoading: cartLoading,
+    error: cartError,
+  } = useQuery({
+    queryFn: () => fetchCartByUserId(Number(shopifyId)),
+    queryKey: ["cart"],
+  });
+
   //Effects
   useEffect(() => {
     const handleResize = () => {
@@ -34,10 +55,27 @@ const SimilarProducts = () => {
   }, [location]);
 
   useEffect(() => {
+    let cartIds = new Set();
+    let topProductIds = new Set();
+    if (!cartLoading && cart) {
+      cart?.data?.cart?.items?.map((item) => cartIds.add(item.variationId));
+      console.log(cartIds);
+    }
     if (!similarProductsLoading && similarProducts) {
+      console.log("similar=", similarProducts);
+      similarProducts?.data?.data.map((section) => {
+        return section?.ProductList?.map((product) =>
+          topProductIds.add(product?.variants?.[0].id),
+        );
+      });
       setSimilarProductsData(similarProducts?.data?.data);
     }
-  }, [similarProductsLoading, similarProducts]);
+    if (cartIds.size > 0 && topProductIds.size > 0) {
+      setCommonIds([...cartIds.intersection(topProductIds)]);
+    } else if (cartError) {
+      console.log(cartError);
+    }
+  }, [similarProductsLoading, similarProducts, cartLoading, cart, cartError]);
 
   return (
     <div
@@ -53,7 +91,9 @@ const SimilarProducts = () => {
             return section?.ProductList?.map((product) => {
               return (
                 <Product
-                  key={product.id}
+                  key={product.shopify_product_id}
+                  id={product.shopify_product_id}
+                  variantId={product?.variants?.[0].id}
                   src={product?.image?.src}
                   name={product?.title}
                   cost={
@@ -67,8 +107,13 @@ const SimilarProducts = () => {
                       " " +
                       product?.variants[0]?.weight_unit
                   }
-                  rating={"52"}
-                  add={true}
+                  // rating={"52"}
+                  add={
+                    commonIds.includes(product?.variants?.[0].id)
+                      ? "minus"
+                      : "plus"
+                  }
+                  onClick={() => prodDetailHandler(product?.shopify_product_id)}
                 />
               );
             });

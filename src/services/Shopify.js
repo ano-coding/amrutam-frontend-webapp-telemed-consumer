@@ -167,10 +167,41 @@ export async function searchWizzy(query) {
 export async function getInternalProductID(id) {
   try {
     const response = await axios.get(
-      `https://judge.me/api/v1/products/888?shop_domain=amrutam3.myshopify.com&api_token=XsfSYKV1toU1cHKtcQnBG7q2FCA&external_id=${id}`,
-      {
-        maxBodyLength: Infinity,
-      },
+      `/api/v1/products/judgeMe?id=${id}`,
+      config,
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getProductReviews(id) {
+  try {
+    const response = await axios.get(
+      `/api/v1/products/judgeMe/productReview?id=${id}&perpage=10&page=1`,
+      config,
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function createReview(
+  id,
+  name,
+  email,
+  rating,
+  body,
+  title,
+  picture_urls,
+) {
+  try {
+    const response = await axios.post(
+      `/api/v1/products/judgeMe/createReview?id=${id}&name=${name}&email=${email}&rating=${rating}&body=${body}&title=${title}&picture_urls=${picture_urls}`,
+      {},
+      config,
     );
     return response;
   } catch (error) {

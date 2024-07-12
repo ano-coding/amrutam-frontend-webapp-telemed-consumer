@@ -19,7 +19,7 @@ const Login = () => {
     formState: { errors },
   } = useForm();
 
-  const { setToken, setUserId, setPhoneNumber, setName } =
+  const { setToken, setUserId, setPhoneNumber, setName, setEmail } =
     useContext(UserContext);
   const { setShopifyId, setShopifyToken } = useContext(ShopifyContext);
 
@@ -77,6 +77,8 @@ const Login = () => {
           );
           setShopifyId(res?.data?.info?.id);
           localStorage.setItem("shopifyId", res?.data?.info?.id);
+          setEmail(res?.data?.info?.email);
+          localStorage.setItem("email", res?.data?.info?.email);
           toast.success("Logged in successfully!");
         },
         onError: (error) => {

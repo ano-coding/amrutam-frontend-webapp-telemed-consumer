@@ -9,6 +9,7 @@ const UserProvider = ({ children }) => {
     localStorage.getItem("phoneNumber") || null,
   );
   const [name, setName] = useState(localStorage.getItem("name") || null);
+  const [email, setEmail] = useState(localStorage.getItem("email") || null);
 
   return (
     <UserContext.Provider
@@ -21,6 +22,8 @@ const UserProvider = ({ children }) => {
         setPhoneNumber,
         name,
         setName,
+        email,
+        setEmail,
       }}
     >
       {children}

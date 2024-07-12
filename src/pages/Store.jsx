@@ -185,7 +185,7 @@ const Store = () => {
                         " " +
                         product?.variants[0]?.weight_unit
                     }
-                    rating={"52"}
+                    // rating={"52"}
                   />
                   <div className="mb-0 mt-5 h-[1px] w-[calc(100vw_-_40px)] bg-offWhite-100 md:hidden" />
                 </div>
@@ -247,7 +247,7 @@ const ProductRow = ({ section }) => {
                       " " +
                       product?.variants[0]?.weight_unit
                   }
-                  rating={"52"}
+                  // rating={"52"}
                 />
                 <div className="mb-0 mt-5 h-[1px] w-[calc(100vw_-_40px)] bg-offWhite-100 md:hidden" />
               </div>

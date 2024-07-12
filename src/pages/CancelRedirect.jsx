@@ -10,6 +10,7 @@ function CancelRedirect() {
     const orderStatus = searchParams.get("orderStatus");
     const token = searchParams.get("token");
     console.log("Order cancelled:", orderStatus, token);
+    sessionStorage.setItem("showCancelToast", "true");
   }, [location]);
 
   // Redirect to cart

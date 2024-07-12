@@ -1,9 +1,96 @@
+import { useEffect } from "react";
 import { formatNumber } from "../../../helper/formatNumber";
+import { useQuery } from "@tanstack/react-query";
+import {
+  addToCart,
+  updateCart,
+  fetchCartByUserId,
+} from "../../../services/Shopify";
+import { useContext } from "react";
+import { ShopifyContext } from "../../../context/ShopifyContext";
+import { toast } from "react-toastify";
 
 const Product = (props) => {
+  const { shopifyId, cartId } = useContext(ShopifyContext);
+
+  //APIs
+  const { refetch: cartRefetch } = useQuery({
+    queryFn: () => fetchCartByUserId(Number(shopifyId)),
+    queryKey: ["cart"],
+  });
+
+  const {
+    data: addToCartResponse,
+    isLoading: addToCartLoading,
+    error: addToCartError,
+    refetch: addToCartRefetch,
+  } = useQuery({
+    queryFn: () =>
+      addToCart({
+        productId: Number(props.id),
+        variationId: props.variantId,
+        quantity: 1,
+        userId: Number(shopifyId),
+        cartId: cartId,
+      }),
+    queryKey: [`addToCart/${props.id}`],
+    enabled: false,
+    gcTime: 100,
+  });
+
+  const {
+    data: updateCartResponse,
+    isLoading: updateCartLoading,
+    error: updateCartError,
+    refetch: updateCartRefetch,
+  } = useQuery({
+    queryFn: () =>
+      updateCart({
+        productId: Number(props.id),
+        variationId: props.variantId,
+        quantity: 0,
+        userId: Number(shopifyId),
+        cartId: cartId,
+      }),
+    queryKey: [`updateCart/${props.id}`],
+    enabled: false,
+    gcTime: 100,
+  });
+
+  //Handlers
+  const addToCartHandler = (e) => {
+    e.stopPropagation();
+    addToCartRefetch();
+  };
+
+  const updateCartHandler = (e) => {
+    e.stopPropagation();
+    updateCartRefetch();
+  };
+
+  //Effects
+  useEffect(() => {
+    if (!addToCartLoading && addToCartResponse) {
+      toast.success("Item added to cart");
+      cartRefetch();
+    } else if (addToCartError) {
+      toast.error("Item cannot be added");
+    }
+  }, [addToCartLoading, addToCartResponse, addToCartError]);
+
+  useEffect(() => {
+    if (!updateCartLoading && updateCartResponse) {
+      toast.success("Cart updated successfully");
+      cartRefetch();
+    } else if (updateCartError) {
+      console.log(updateCartError);
+      toast.error("Cannot update cart");
+    }
+  }, [updateCartResponse, updateCartError, updateCartLoading]);
+
   return (
     <div
-      className="flex w-[365px] flex-col items-center justify-center hover:cursor-pointer max-xl:w-[250px] max-lg:w-[200px] max-md:w-full max-md:flex-row max-md:items-start max-md:justify-start max-md:gap-5 max-sm:gap-2.5"
+      className="relative flex w-[365px] flex-col items-center justify-center hover:cursor-pointer max-xl:w-[250px] max-lg:w-[200px] max-md:w-full max-md:flex-row max-md:items-start max-md:justify-start max-md:gap-5 max-sm:gap-2.5"
       onClick={props.onClick}
     >
       <img
@@ -12,7 +99,7 @@ const Product = (props) => {
         style={{ width: props.imageWidth, height: props.imageHeight }}
         className="h-[410px] w-[365px] max-w-[365px] rounded-2xl max-xl:h-[281px] max-xl:w-[250px] max-lg:h-[200px] max-lg:w-[200px] max-sm:h-[140px] max-sm:w-[140px]"
       />
-      <div className="relative flex flex-col items-center justify-center text-center max-md:w-[60%] max-md:items-start max-md:text-left max-sm:mr-4">
+      <div className="relative flex w-full flex-col items-center justify-center text-center max-md:w-[60%] max-md:items-start max-md:text-left max-sm:mr-4">
         <h5
           style={{ fontSize: props.nameSize }}
           className="mx-0 mb-[8px] mt-[18px] text-lg font-medium leading-[29px] tracking-tight text-darkslategray-300 max-lg:text-sm max-lg:leading-5"
@@ -116,11 +203,25 @@ const Product = (props) => {
         ) : (
           ""
         )}
-        {props.add ? (
-          <div className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-customgreen-800 max-md:left-[120px] max-md:h-6 max-md:w-6">
+        {props.add === "plus" ? (
+          <div
+            onClick={addToCartHandler}
+            className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-customgreen-800 max-md:left-[120px] max-md:h-6 max-md:w-6"
+          >
             <img
               src="/add.png"
               alt="add"
+              className="h-6 w-6 max-md:h-[18px] max-md:w-[18px]"
+            />
+          </div>
+        ) : props.add === "minus" ? (
+          <div
+            onClick={updateCartHandler}
+            className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-customgreen-800 max-md:left-[120px] max-md:h-6 max-md:w-6"
+          >
+            <img
+              src="/remove.svg"
+              alt="remove"
               className="h-6 w-6 max-md:h-[18px] max-md:w-[18px]"
             />
           </div>

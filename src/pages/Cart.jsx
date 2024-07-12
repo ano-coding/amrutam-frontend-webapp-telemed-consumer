@@ -158,6 +158,14 @@ const Cart = () => {
     }
   }, [redirectURL]);
 
+  useEffect(() => {
+    const showCancelToast = sessionStorage.getItem("showCancelToast");
+    if (showCancelToast === "true") {
+      toast.info("Payment was cancelled. No transaction was made.");
+      sessionStorage.removeItem("showCancelToast");
+    }
+  }, []);
+
   return (
     <div>
       <Header name={"Cart"} show={false} padding={"72px 0"} />
