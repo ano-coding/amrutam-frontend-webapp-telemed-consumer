@@ -376,6 +376,31 @@ export const createActivityReminder = async (reminderData, token) => {
   }
 };
 
+export const updateActivityReminder = async (
+  reminderData,
+  token,
+  reminderId,
+) => {
+  const config = {
+    method: "put",
+    maxBodyLength: Infinity,
+    url: `${API_BASE_URL}/patient/reminder-activity/${reminderId}`,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    data: JSON.stringify(reminderData),
+  };
+
+  try {
+    const response = await axios.request(config);
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 export const deleteActivityReminder = async (token, reminderId) => {
   const config = {
     method: "delete",

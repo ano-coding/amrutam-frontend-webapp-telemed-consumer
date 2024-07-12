@@ -28,6 +28,7 @@ import ActivityTypeDropdown from "./ActivityTypeDropdown";
 import ChooseGoalInput from "./ChooseGoalInput";
 import ChooseActivityUnitDropDown from "./ChooseActivityUnitDropDown";
 import useCreateActivityReminder from "../../../hooks/routines/useCreateActivityReminder";
+import useUpdateActivityReminder from "../../../hooks/routines/useUpdateActivityReminder";
 
 const breadCrumbList = [
   {
@@ -54,9 +55,10 @@ function getNextDate(date) {
 }
 
 const CustomCheckbox = ({ field, id }) => {
+  const { getValues } = useFormContext();
   return (
     <Checkbox
-      disabled={field.value === id ? true : false}
+      disabled={field.value === id || getValues("isEdit") ? true : false}
       checked={field.value === id || false}
       onChange={(checked) => field.onChange(checked ? id : undefined)}
       className={`group absolute left-4 top-[41px] size-6 rounded-full border border-solid border-neutral-500 bg-white p-1 ${field.value === id ? "data-[checked]:bg-[#3A643B]" : ""}`}
@@ -160,6 +162,18 @@ function convertTimeSlotsToApiFormat(timeSlots) {
     };
   });
 }
+function convertActivityTimeSlotsToApiFormat(timeSlots) {
+  return timeSlots.map((slot) => {
+    const hoursNum = parseInt(slot.hour, 10);
+    const hours = hoursNum.toString().padStart(2, "0");
+    const minutes = slot.minutes.padStart(2, "0");
+    const ampm = slot["am/pm"];
+    const time = `${hours}:${minutes} ${ampm}`;
+    return {
+      time: time,
+    };
+  });
+}
 
 function ConvertDataToActivityApiFormat(data, id) {
   const {
@@ -181,7 +195,8 @@ function ConvertDataToActivityApiFormat(data, id) {
     goal,
     unit: goalUnitId,
     reminderListId: id,
-    timeslotActivityBased: convertTimeSlotsToApiFormat(activityTimeSlots),
+    timeslotActivityBased:
+      convertActivityTimeSlotsToApiFormat(activityTimeSlots),
     frequency:
       activityFrequency === "daily"
         ? [
@@ -260,6 +275,7 @@ const AddReminder = () => {
   if (state?.isEdit) {
     if (state.reminderType === "product") {
       defaultValues = {
+        isEdit: true,
         reminderType: state.reminderType,
         searchedProductId: state.productId,
         searchProducts: state.name,
@@ -280,6 +296,7 @@ const AddReminder = () => {
     }
     if (state.reminderType === "activity") {
       defaultValues = {
+        isEdit: true,
         reminderType: state.reminderType,
         goalUnitId: state.unit,
         goalUnit: state?.goalUnitObject?.data?.at(0)?.name,
@@ -307,15 +324,26 @@ const AddReminder = () => {
   const { updateProductReminderMutate, updateProductReminderStatus } =
     useUpdateProductReminder();
 
+  const { updateActivityReminderMutate, updateActivityReminderStatus } =
+    useUpdateActivityReminder();
+
   const onSubmit = (data) => {
-    console.log(data);
     if (step < 3) return setStep((step) => step + 1);
     if (step < 3) {
       return;
     }
     if (state?.isEdit) {
-      const apiData = ConvertDataToApiFormat(data, state.reminderListId);
-      updateProductReminderMutate([apiData, token, state.id]);
+      if (state.reminderType === "product") {
+        const apiData = ConvertDataToApiFormat(data, state.reminderListId);
+        updateProductReminderMutate([apiData, token, state.id]);
+      } else if (state.reminderType === "activity") {
+        const apiData = ConvertDataToActivityApiFormat(
+          data,
+          state.reminderListId,
+        );
+
+        updateActivityReminderMutate([apiData, token, state._id]);
+      }
     } else {
       if (data.reminderType === "product") {
         const apiData = ConvertDataToApiFormat(data, state.id);
@@ -343,7 +371,9 @@ const AddReminder = () => {
           </p>
         </div>
       </div>
-      <ContentBoxLayout title="Add Reminder Items">
+      <ContentBoxLayout
+        title={`${state?.isEdit ? "Edit" : "Add"} Reminder Items`}
+      >
         <FormProvider {...methods}>
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             <div className="flex max-w-5xl flex-col gap-10 px-5 py-10">
@@ -669,8 +699,6 @@ const ActivityTimeSlot = () => {
   const {
     control,
     watch,
-    register,
-    clearErrors,
     formState: { errors },
   } = useFormContext();
 
@@ -779,60 +807,10 @@ const ActivityTimeSlot = () => {
                 name="activityTimeSlots"
               />
             </div>
-
-            <div className="ml-3 flex w-full flex-col gap-[10px] md:w-[400px] lg:items-end">
-              <div className="flex gap-12 sm:w-[400px]">
-                <div className="flex items-center">
-                  <input
-                    {...register(`activityTimeSlots.${index}.timing`, {
-                      required: "*Please Select Timing",
-                    })}
-                    onClick={() => {
-                      clearErrors(`activityTimeSlots.${index}.timing`);
-                    }}
-                    id={`activityTimeSlots.${index}.beforeMeal`}
-                    type="radio"
-                    value="beforeMeal"
-                    className="h-[20px] w-[20px] border-2 border-neutral-500 text-[#3A643B] ring-0 checked:border-[#3A643B] checked:ring-0 hover:ring-0 hover:ring-[#3A643B] focus:outline-none focus:ring-[#3a643b] focus-visible:bg-red-500 active:ring-0"
-                  />
-                  <label
-                    htmlFor={`activityTimeSlots.${index}.beforeMeal`}
-                    className="ml-3 text-[14px] leading-[16px]"
-                  >
-                    Before Meal
-                  </label>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    {...register(`activityTimeSlots.${index}.timing`, {
-                      required: "*Please Select Timing",
-                    })}
-                    onClick={() => {
-                      clearErrors(`activityTimeSlots.${index}.timing`);
-                    }}
-                    id={`activityTimeSlots.${index}.afterMeal`}
-                    type="radio"
-                    value="afterMeal"
-                    className="h-[20px] w-[20px] border-2 border-neutral-500 text-[#3A643B] ring-0 checked:border-[#3A643B] checked:ring-0 hover:ring-0 hover:ring-[#3A643B] focus:outline-none focus:ring-[#3a643b] focus-visible:bg-red-500 active:ring-0"
-                  />
-                  <label
-                    htmlFor={`activityTimeSlots.${index}.afterMeal`}
-                    className="ml-3 text-[14px] leading-[16px]"
-                  >
-                    After Meal
-                  </label>
-                </div>
-              </div>
-              {errors?.activityTimeSlots?.[index]?.timing && (
-                <p className="mr-2 self-end text-[12px] font-medium text-red-500">
-                  {errors?.activityTimeSlots?.[index]?.timing?.message}
-                </p>
-              )}
-            </div>
           </div>
           <TrashSvg
             onClick={() => remove(index)}
-            className={`absolute bottom-4 right-0 size-4 cursor-pointer sm:static sm:mb-9 ${fields.length > 1 ? "" : "hidden"}`}
+            className={`absolute bottom-4 right-0 size-4 cursor-pointer sm:static ${fields.length > 1 ? "" : "hidden"}`}
           />
         </div>
       ))}
