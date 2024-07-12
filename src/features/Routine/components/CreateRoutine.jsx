@@ -2,7 +2,6 @@ import { useContext, useMemo, useRef, useState } from "react";
 import Breadcrumb from "../../../components/Breadcrumb";
 import ContentBoxLayout from "../../../components/ContentBoxLayout";
 import AddConvenience from "./AddConvenience";
-import DisplayCardSmall from "./DisplayCardSmall";
 import { Controller, useForm } from "react-hook-form";
 import { uploadRoutineFileToAzure } from "../../../services/apiUpload";
 import { UserContext } from "../../../context/UserContext";
@@ -15,6 +14,7 @@ import useUpdateRoutine from "../../../hooks/routines/useUpdateRoutine";
 import useDeleteProductReminder from "../../../hooks/routines/useDeleteProductReminder";
 import useGetSingleRoutine from "../../../hooks/routines/useGetSingleRoutine";
 import DisplayCardSmallReminder from "./DisplayCardSmallReminder";
+import useGetReminderChannel from "../../../hooks/routines/useGetReminderChannel";
 
 const breadCrumbList = [
   {
@@ -33,6 +33,8 @@ const REMINDER_CHANNELS = ["SMS", "WhatsApp", "Email"];
 
 const CreateRoutine = () => {
   const { token } = useContext(UserContext);
+  const { data: reminderChannelData } = useGetReminderChannel(token);
+
   const [selectedThumbnail, setSelectedThumbnail] = useState(null);
   const { state } = useLocation();
 
@@ -319,7 +321,7 @@ const CreateRoutine = () => {
                         setSelectedFile(null);
                         setSelectedThumbnail(null);
                       }}
-                      className="absolute right-0.5 top-0.5 z-50 block h-6 w-6 -translate-y-1/2 translate-x-1/2 transform bg-[url('/red-cross.svg')]"
+                      className="absolute right-0.5 top-0.5 z-20 block h-6 w-6 -translate-y-1/2 translate-x-1/2 transform bg-[url('/red-cross.svg')]"
                     />
                   )}
                   <div
@@ -330,7 +332,7 @@ const CreateRoutine = () => {
                       alt="Photo Frame"
                       className={
                         previewUrl || photoData
-                          ? `z-30 h-[210px] w-[210px] rounded-2xl object-cover`
+                          ? `z-10 h-[210px] w-[210px] rounded-2xl object-cover`
                           : ""
                       }
                       src={
@@ -388,7 +390,7 @@ const CreateRoutine = () => {
                             src={thumbnail}
                           />
                           {selectedThumbnail === thumbnail && (
-                            <span className="absolute right-0 top-0 z-50 block h-[14px] w-[14px] -translate-y-1/2 translate-x-1/2 transform bg-[url(/checked.svg)]" />
+                            <span className="absolute right-0 top-0 z-20 block h-[14px] w-[14px] -translate-y-1/2 translate-x-1/2 transform bg-[url(/checked.svg)]" />
                           )}
                         </span>
                       ))}
@@ -448,11 +450,12 @@ const CreateRoutine = () => {
                     state={dataCurrent}
                   />
                 </div>
-                {/* <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4">
                   <AddConvenience
                     link="add-reminder-channels"
                     title="Add Reminder Channels"
                     subtitle="We will notify you about your Routine using channels."
+                    state={reminderChannelData?.data}
                   />
                   <div className="ml-10 flex gap-3">
                     {REMINDER_CHANNELS.map((item) => (
@@ -468,6 +471,7 @@ const CreateRoutine = () => {
                     ))}
                   </div>
                 </div>
+                {/*
                 <div className="flex flex-col gap-4">
                   <AddConvenience
                     link="assign-caregiver"

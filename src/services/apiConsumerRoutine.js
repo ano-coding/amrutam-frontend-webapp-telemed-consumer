@@ -355,6 +355,46 @@ export const updateProductReminder = async (
   }
 };
 
+export const createReminderChannel = async (channelData, token) => {
+  const config = {
+    method: "post",
+    maxBodyLength: Infinity,
+    url: `${API_BASE_URL}/patient/channel`,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    data: JSON.stringify(channelData),
+  };
+
+  try {
+    const response = await axios.request(config);
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const getReminderChannel = async (token) => {
+  const config = {
+    method: "get",
+    maxBodyLength: Infinity,
+    url: `${API_BASE_URL}/patient/channel`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  try {
+    const response = await axios.request(config);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 export const getSearchedProductsFromStore = async (token, searchQuery) => {
   const config = {
     method: "get",

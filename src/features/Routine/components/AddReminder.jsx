@@ -97,7 +97,7 @@ const NavigationButtons = ({ step, setStep }) => {
         type="submit"
         className={`my-10 box-border rounded-xl bg-[#3A643B] px-16 py-[17px] text-center text-base font-semibold text-white shadow-[0px_4px_14px_rgba(58,_100,_59,_0.25)] duration-100 hover:bg-[#618a61] active:scale-95 sm:w-[15rem] lg:w-[20rem] xl:w-[23.4rem]`}
       >
-        {`Next (${step}/3)`}
+        {step === 3 ? `Submit (${step}/3)` : `Next (${step}/3)`}
       </button>
     </div>
   );
