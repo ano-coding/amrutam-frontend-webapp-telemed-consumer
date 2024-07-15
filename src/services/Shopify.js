@@ -209,6 +209,18 @@ export async function createReview(
   }
 }
 
+export async function getSingleProductMeta(id) {
+  try {
+    const response = await axios.get(
+      `/api/v1/products/getProductMeta/single/${id}`,
+      config,
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function mostReviewedDoctors() {
   try {
     const response = await axios.get(

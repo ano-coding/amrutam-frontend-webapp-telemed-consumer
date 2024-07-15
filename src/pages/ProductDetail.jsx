@@ -10,6 +10,7 @@ import {
   mostReviewedDoctors,
   getProductReviews,
   createReview,
+  getSingleProductMeta,
 } from "../services/Shopify";
 import { toast } from "react-toastify";
 import parse from "html-react-parser";
@@ -62,6 +63,10 @@ const ProductDetail = () => {
   const [titleError, setTitleError] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
   const [showMoreReviews, setShowMoreReviews] = useState(false);
+  const [rating, setRating] = useState();
+  const [ratingCount, setRatingCount] = useState();
+  const [howToUse, setHowToUse] = useState();
+  const [generalInstructions, setGeneralInstructions] = useState();
 
   //For Mobile
   const [type, setType] = useState(0);
@@ -153,6 +158,16 @@ const ProductDetail = () => {
     queryKey: ["createReview"],
     enabled: false,
   });
+
+  const {
+    data: productMetaResponse,
+    isLoading: productMetaLoading,
+    error: productMetaError,
+  } = useQuery({
+    queryFn: () => getSingleProductMeta(id),
+    queryKey: ["singleProductMeta"],
+  });
+
   const {
     data: mostReviewedDoctorsResponse,
     isLoading: mostReviewedDoctorsLoading,
@@ -451,6 +466,26 @@ const ProductDetail = () => {
     }
   }, [createReviewError, createReviewLoading, createReviewResponse]);
 
+  useEffect(() => {
+    if (!productMetaLoading && productMetaResponse) {
+      console.log("meta=", productMetaResponse);
+      const productMeta = productMetaResponse?.data?.data?.products;
+      for (let i = 0; i < productMeta.length; i++) {
+        if (productMeta[i].key === "rating") {
+          setRating(JSON.parse(productMeta[i].value).value);
+        } else if (productMeta[i].key === "rating_count") {
+          setRatingCount(productMeta[i].value);
+        } else if (productMeta[i].key === "how_to_use_") {
+          setHowToUse(productMeta[i].value);
+        } else if (productMeta[i].key === "general_instructions") {
+          setGeneralInstructions(productMeta[i].value);
+        }
+      }
+    } else if (productMetaError) {
+      console.log(productMetaError);
+    }
+  }, [productMetaLoading, productMetaError, productMetaResponse]);
+
   return (
     <div>
       <Header name={"Store"} show={true} />
@@ -492,17 +527,14 @@ const ProductDetail = () => {
               <h3 className="mx-0 mb-[7px] mt-[12px] w-[606px] text-[22px] font-medium leading-[30px] tracking-tight max-xl:mb-0 max-xl:mt-[53px] max-md:mx-[20px] max-md:w-[calc(100%_-_40px)] max-md:text-lg max-md:leading-[18px]">
                 {singleProductData?.[0]?.title}
               </h3>
-              {/* Reviews */}
-              {/* <div className="mb-[7px] mt-2.5 flex items-center justify-start gap-1 max-md:ml-5 [&_img]:h-[18px] [&_img]:w-[18px]">
-                <img src="/star.svg" alt="star" />
-                <img src="/star.svg" alt="star" />
-                <img src="/star.svg" alt="star" />
-                <img src="/star.svg" alt="star" />
-                <img src="/star.svg" alt="star" />
+              <div className="mb-[7px] mt-2.5 flex items-center justify-start gap-1 max-md:ml-5 [&_img]:h-[18px] [&_img]:w-[18px]">
+                {[...Array(Math.trunc(rating))].map((_, index) => {
+                  return <img src="/star.svg" alt="star" key={index} />;
+                })}
                 <span className="ml-1 text-[18px] font-medium leading-[18px] tracking-tight text-dimgray-100">
-                  (204 reviews)
+                  ({ratingCount} reviews)
                 </span>
-              </div> */}
+              </div>
               <div className="mb-9 mt-2 flex items-center justify-start max-md:mb-2.5 max-md:ml-5">
                 <img src="/ruppee.png" alt="ruppee" className="h-5 w-5" />
                 <span className="text-xl font-medium leading-[26px] tracking-tight text-customblack-100">
@@ -605,33 +637,41 @@ const ProductDetail = () => {
                 </div>
               </div> */}
               {/* <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" /> */}
-              {/* <div className="mb-12">
-                <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
-                  How to use
-                </h4>
-                <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight [&_p]:text-dimgray-100">
-                  <p className="py-5 pl-3 pr-[18px] text-[18px] leading-[30px]">
-                    Mix one or tow tablespoons of Herbal Child Care Malt with
-                    milk or 100-200ml warm water and then consume twice a day or
-                    consult our Ayurvedic Expert to find the right Ayurvedic
-                    recipe for you.
-                  </p>
-                </div>
-              </div> */}
-              {/* <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" /> */}
-              {/* <div className="mb-12">
-                <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
-                  General Instructions
-                </h4>
-                <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight [&_p]:text-dimgray-100">
-                  <p className="py-5 pl-3 pr-0 text-base leading-[30px]">
-                    Store in a cool and dry palce away from direct sunlight. Not
-                    advisable for diabetic patients
-                  </p>
-                </div>
-              </div>
-              <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
-              <div className="mb-[38px] [&_h5]:m-0 [&_h5]:pb-[14px] [&_h5]:pl-3 [&_h5]:pr-[15px] [&_h5]:pt-5 [&_h5]:text-base [&_h5]:font-bold [&_h5]:tracking-tight [&_h5]:text-darkslategray-300">
+              {howToUse ? (
+                <>
+                  <div className="mb-12">
+                    <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
+                      How to use
+                    </h4>
+                    <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight [&_p]:text-dimgray-100">
+                      <p className="py-5 pl-3 pr-[18px] text-[18px] leading-[30px]">
+                        {howToUse}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
+                </>
+              ) : (
+                ""
+              )}
+              {generalInstructions ? (
+                <>
+                  <div className="mb-12">
+                    <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
+                      General Instructions
+                    </h4>
+                    <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight [&_p]:text-dimgray-100">
+                      <p className="py-5 pl-3 pr-0 text-base leading-[30px]">
+                        {generalInstructions}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
+                </>
+              ) : (
+                ""
+              )}
+              {/* <div className="mb-[38px] [&_h5]:m-0 [&_h5]:pb-[14px] [&_h5]:pl-3 [&_h5]:pr-[15px] [&_h5]:pt-5 [&_h5]:text-base [&_h5]:font-bold [&_h5]:tracking-tight [&_h5]:text-darkslategray-300">
                 <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
                   Commonly Asked Questions
                 </h4>
@@ -684,7 +724,7 @@ const ProductDetail = () => {
                   alt="play"
                   className="absolute right-[45%] top-[45%] h-[64px] w-[64px] cursor-pointer rounded-xl bg-none"
                 />
-              </div> */}
+              </div>*/}
             </div>
           </div>
           {/* <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" /> */}
@@ -695,7 +735,7 @@ const ProductDetail = () => {
             <div className="mb-[34px] flex items-start justify-between max-lg:flex-col max-lg:items-center">
               <div className="flex h-[124px] w-[308px] items-center justify-start gap-5 rounded-xl bg-offWhite-100 pl-5 max-lg:mb-5 max-lg:w-full max-sm:mx-5 max-sm:w-[calc(100%_-_64px)]">
                 <h2 className="font-nunito text-[32px] font-bold leading-[42px] tracking-tight text-customblack-100">
-                  5.0
+                  {rating}
                 </h2>
                 <div>
                   <div className="flex items-center gap-1">
@@ -706,7 +746,7 @@ const ProductDetail = () => {
                     <img src="/star.svg" alt="star" className="h-6 w-6" />
                   </div>
                   <span className="font-nunito text-sm tracking-tight text-darkslategray-300">
-                    Based on 20 reviews
+                    Based on {ratingCount} reviews
                   </span>
                 </div>
               </div>
