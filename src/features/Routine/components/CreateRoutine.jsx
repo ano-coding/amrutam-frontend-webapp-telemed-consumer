@@ -72,11 +72,6 @@ const CreateRoutine = () => {
     isLoading: gcLoading,
   } = useGetCategories(token);
 
-  const { deleteProductReminderMutate, deleteProductReminderStatus } =
-    useDeleteProductReminder();
-  const { deleteActivityReminderMutate, deleteActivityReminderStatus } =
-    useDeleteActivityReminder();
-
   const {
     register,
     getValues,
@@ -435,10 +430,6 @@ const CreateRoutine = () => {
                               ? "Consumable"
                               : "Application Based"
                           }
-                          onClick={(e) => {
-                            e.preventDefault();
-                            deleteProductReminderMutate([token, reminder.id]);
-                          }}
                         />
                       ))}
                       {dataCurrent?.activityReminders?.map((reminder) => (
@@ -451,10 +442,6 @@ const CreateRoutine = () => {
                               ? "Physical"
                               : reminder.activityType
                           }
-                          onClick={(e) => {
-                            e.preventDefault();
-                            deleteActivityReminderMutate([token, reminder._id]);
-                          }}
                         />
                       ))}
                     </>
