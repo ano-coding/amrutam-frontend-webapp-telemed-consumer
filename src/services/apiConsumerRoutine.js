@@ -43,6 +43,24 @@ export const getTodayReminders = async (token) => {
     throw error;
   }
 };
+export const getTodayActivityReminders = async (token) => {
+  const config = {
+    method: "get",
+    maxBodyLength: Infinity,
+    url: `${API_BASE_URL}/patient/reminder-activity/find/today`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  try {
+    const response = await axios.request(config);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
 
 export const getReminderList = async (token) => {
   const config = {

@@ -1,16 +1,18 @@
-import { useContext, useState } from "react";
+import { Fragment, useContext, useState } from "react";
 import Breadcrumb from "../../../components/Breadcrumb";
 import ContentBoxLayout from "../../../components/ContentBoxLayout";
 import RoutineCard from "./RoutineCard";
 import ExploreNowCard from "./ExploreNowCard";
 import SkinCareCard from "./SkinCareCard";
-import ClockSvg from "../../../assets/clock.svg?react";
 import ChevronRightSvg from "../../../assets/chevron-right.svg?react";
 import CreateRoutinePopup from "./CreateRoutinePopup";
 import { UserContext } from "../../../context/UserContext";
 import useGetReminderTemplates from "../../../hooks/routines/useFetchReminderTemplates";
 import useGetTodayReminders from "../../../hooks/routines/useGetTodayReminders";
 import useGetReminderList from "../../../hooks/routines/useGetReminderList";
+import TodayProductReminders from "./TodayProductReminders";
+import useGetTodayActivityReminders from "../../../hooks/routines/useGetTodayActivityReminders";
+import TodayActivityReminders from "./TodayActivityReminders";
 
 const breadCrumbList = [
   {
@@ -20,53 +22,6 @@ const breadCrumbList = [
   },
 ];
 
-const todayRoutines = [
-  {
-    image: "./drinking-water.png",
-    title: "Drinking Water",
-    type: "Consumable",
-    time: "09:30 AM",
-    progress: 8,
-  },
-  {
-    image: "./kuntal-care-hair-spa.png",
-    title: "Amrutam Kuntal Care Hair Spa",
-    type: "Application Based",
-    time: "09:30 AM",
-    progress: 14,
-  },
-];
-
-const myRoutines = [
-  {
-    image: "/mountain.jpg",
-    title: "Focus & Work",
-    reminders: 3,
-    progress: 80,
-    finished: true,
-  },
-  {
-    image: "/two-lady.jpg",
-    title: "Skin Care Routine",
-    reminders: 3,
-    progress: 40,
-    finished: false,
-  },
-  {
-    image: "/mountain.jpg",
-    title: "Focus & Work",
-    reminders: 3,
-    progress: 80,
-    finished: true,
-  },
-  {
-    image: "/two-lady.jpg",
-    title: "Skin Care Routine",
-    reminders: 3,
-    progress: 40,
-    finished: false,
-  },
-];
 const skinCare = [
   {
     image: "/acne-reduction.jpeg",
@@ -134,6 +89,9 @@ const filters = [
 const RoutineDashboard = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(filters[0].name);
+  const [viewMoreReminder, setViewMoreReminder] = useState(false);
+  const [viewMoreActivityReminder, setViewMoreActivityReminder] =
+    useState(false);
 
   const { token } = useContext(UserContext);
   const {
@@ -147,6 +105,11 @@ const RoutineDashboard = () => {
     error: gtrError,
     gtrLoading,
   } = useGetTodayReminders(token);
+  const {
+    data: gtarData,
+    error: gtarError,
+    gtarLoading,
+  } = useGetTodayActivityReminders(token);
 
   const {
     data: grlData,
@@ -154,8 +117,8 @@ const RoutineDashboard = () => {
     isLoading: grlLoading,
   } = useGetReminderList(token);
 
-  const isLoading = rtLoading || gtrLoading || grlLoading;
-  const error = rtError || gtrError || grlError;
+  const isLoading = rtLoading || gtrLoading || gtarLoading || grlLoading;
+  const error = rtError || gtrError || gtarError || grlError;
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -187,49 +150,74 @@ const RoutineDashboard = () => {
       </div>
       <ContentBoxLayout title={"Routines"}>
         <div className="w-full border-b-2 border-slate-200 py-6">
-          <h2 className="px-5 text-[18px] font-medium tracking-[-0.02em] xl:px-9">{`Today's Routines`}</h2>
+          <h2 className="px-5 text-[18px] font-medium tracking-[-0.02em] xl:px-9">{`Today's Product Reminders`}</h2>
           <p className="mt-1 px-5 font-nunito text-base font-medium tracking-[-0.02em] text-[#A0A0A0] xl:px-9">
-            {`You have ${gtrData?.data?.length} Routines remaining for the day`}
+            {`You have ${gtrData?.data?.length} Product Reminders remaining for the day`}
           </p>
-          {todayRoutines.map((routine, index) => (
-            <div
-              key={index}
-              className={`flex items-center justify-between gap-5 ${todayRoutines.length > index + 1 ? `border-b` : ""} px-5 py-7 xl:px-9`}
-            >
-              <div className="flex items-center gap-3">
-                <img
-                  src={routine.image}
-                  alt=""
-                  className="size-[50px] rounded-lg object-cover"
-                />
-
-                <div className="flex flex-col gap-[9px]">
-                  <h3 className="line-clamp-1 overflow-ellipsis text-sm font-medium tracking-[-0.02em] md:text-[16px]">
-                    {routine.title}
-                  </h3>
-                  <div className="flex flex-col text-[12px] font-medium tracking-[-0.02em] text-[#a0a0a0] sm:flex-row sm:items-center sm:gap-4">
-                    <div>{routine.type}</div>
-                    <div className="flex items-center gap-1">
-                      <ClockSvg />
-                      <span className="text-gray-900">{routine.time}</span>
-                    </div>
-                  </div>
+          {gtrData?.data?.map((reminder, index) => {
+            if (!viewMoreReminder && index > 1) return null;
+            const showingRoutinesNumber = viewMoreReminder
+              ? gtrData?.data?.length
+              : 2;
+            return (
+              <Fragment key={index}>
+                <div
+                  className={`flex items-center justify-between gap-5 ${showingRoutinesNumber > index + 1 ? `border-b` : ""} px-5 py-7 xl:px-9`}
+                >
+                  <TodayProductReminders reminder={reminder} />
                 </div>
-              </div>
-              <div className="flex flex-row items-center justify-center gap-2.5 sm:gap-5 md:gap-12">
-                <span className="whitespace-nowrap text-[15px] font-semibold">
-                  {routine.progress} 🌻
-                </span>
-                <span className="rounded-lg py-1 text-sm font-semibold">
-                  <ChevronRightSvg className="size-6" />
-                </span>
-              </div>
-            </div>
-          ))}
-          <p className="flex w-full cursor-pointer items-center justify-between px-5 text-[14px] font-medium tracking-[-0.02em] text-[#a0a0a0] xl:px-9">
-            <span>More Routines (2)</span>
+              </Fragment>
+            );
+          })}
+          <p
+            onClick={() => setViewMoreReminder((i) => !i)}
+            className="flex w-full cursor-pointer items-center justify-between px-5 text-[14px] font-medium tracking-[-0.02em] text-[#a0a0a0] xl:px-9"
+          >
             <span>
-              <ChevronRightSvg className="size-6 rotate-90 text-black" />
+              {viewMoreReminder
+                ? "Show Less Product Reminders"
+                : `Show More Product Reminders (${gtrData?.data?.length - 2})`}
+            </span>
+            <span>
+              <ChevronRightSvg
+                className={`size-6 ${viewMoreReminder ? "-rotate-90" : `rotate-90`} text-black`}
+              />
+            </span>
+          </p>
+        </div>
+        <div className="w-full border-b-2 border-slate-200 py-6">
+          <h2 className="px-5 text-[18px] font-medium tracking-[-0.02em] xl:px-9">{`Today's Activity Reminders`}</h2>
+          <p className="mt-1 px-5 font-nunito text-base font-medium tracking-[-0.02em] text-[#A0A0A0] xl:px-9">
+            {`You have ${gtarData?.data?.length} Activity Reminders remaining for the day`}
+          </p>
+          {gtarData?.data?.map((reminder, index) => {
+            if (!viewMoreActivityReminder && index > 1) return null;
+            const showingRoutinesNumber = viewMoreReminder
+              ? gtarData?.data?.length
+              : 2;
+            return (
+              <Fragment key={index}>
+                <div
+                  className={`flex items-center justify-between gap-5 ${showingRoutinesNumber > index + 1 ? `border-b` : ""} px-5 py-7 xl:px-9`}
+                >
+                  <TodayActivityReminders reminder={reminder} />
+                </div>
+              </Fragment>
+            );
+          })}
+          <p
+            onClick={() => setViewMoreActivityReminder((i) => !i)}
+            className="flex w-full cursor-pointer items-center justify-between px-5 text-[14px] font-medium tracking-[-0.02em] text-[#a0a0a0] xl:px-9"
+          >
+            <span>
+              {viewMoreActivityReminder
+                ? "Show Less Activity Reminders"
+                : `Show More Activity Reminders (${gtarData?.data?.length - 2})`}
+            </span>
+            <span>
+              <ChevronRightSvg
+                className={`size-6 ${viewMoreActivityReminder ? "-rotate-90" : `rotate-90`} text-black`}
+              />
             </span>
           </p>
         </div>
