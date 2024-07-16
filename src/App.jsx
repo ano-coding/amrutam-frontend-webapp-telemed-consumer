@@ -21,7 +21,7 @@ import RoutineDashboard from "./features/Routine/components/RoutineDashboard";
 import CreateRoutine from "./features/Routine/components/CreateRoutine";
 import ConsumerDashboard from "./pages/ConsumerDashboard";
 import PatientProfile from "./pages/PatientProfile";
-import { UserProvider } from "./context/UserContext";
+import { UserProvider } from "./context/UserContext.jsx";
 import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PatientProfileEdit from "./pages/PatientProfileEdit";
@@ -53,62 +53,63 @@ import CancelRedirect from "./pages/CancelRedirect";
 import { ShopifyProvider } from "./context/ShopifyContext";
 
 const router = createBrowserRouter([
-  {
-    element: <AppLayout />,
-    children: [
-      {
-        path: "/",
-        element: <HomePage></HomePage>,
-      },
+	{
+		element: <AppLayout />,
+		children: [
+			{
+				path: "/",
+				element: <HomePage></HomePage>,
+			},
+			{
+				path: "/find-doctors",
+				element: <FindDoctorsPage></FindDoctorsPage>,
+			},
+			{
+				path: "/profile/:id",
+				element: <DoctorProfilePage></DoctorProfilePage>,
+			},
+			{
+				path: "/appointment-booking",
+				element: <AppointmentBookingPage />,
+			},
+			{
+				path: "/appointment/:doctorId",
+				element: <AppointmentBookingFormPage></AppointmentBookingFormPage>,
+			},
+			{
+				path: "/coupons",
+				element: <CouponsPage></CouponsPage>,
+			},
+			{
+				path: "/appointment-success",
+				element: <AppointmentSuccessPage></AppointmentSuccessPage>,
+			},
+			{
+				path: "/questionnaire",
+				element: <QuestionnairePage></QuestionnairePage>,
+			},
+			{
+				path: "/questionnaireSingleCard/:id",
+				element: <QuestionnaireSingleCard></QuestionnaireSingleCard>,
+			},
+			{
+				path: "/selfAssessmentQuestions",
+				element: <SelfAssessmentQuestions />,
+			},
+			{
+				path: "/selfAssessmentResult",
+				element: <SelfAssessmentResult />,
+			},
+			{
+				path: "/triviaQuestions",
+				element: <TriviaQuestions />,
+			},
+			{
+				path: "/triviaResult",
+				element: <TriviaResult />,
+			},
 
-      {
-        path: "/find-doctors",
-        element: <FindDoctorsPage></FindDoctorsPage>,
-      },
-      {
-        path: "/profile/:id",
-        element: <DoctorProfilePage></DoctorProfilePage>,
-      },
-      {
-        path: "/appointment-booking",
-        element: <AppointmentBookingPage />,
-      },
-      {
-        path: "/appointment/:doctorId",
-        element: <AppointmentBookingFormPage></AppointmentBookingFormPage>,
-      },
-      {
-        path: "/coupons",
-        element: <CouponsPage></CouponsPage>,
-      },
-      {
-        path: "/appointment-success",
-        element: <AppointmentSuccessPage></AppointmentSuccessPage>,
-      },
-      {
-        path: "/questionnaire",
-        element: <QuestionnairePage></QuestionnairePage>,
-      },
-      {
-        path: "/questionnaireSingleCard/:id",
-        element: <QuestionnaireSingleCard></QuestionnaireSingleCard>,
-      },
-      {
-        path: "/selfAssessmentQuestions",
-        element: <SelfAssessmentQuestions />,
-      },
-      {
-        path: "/selfAssessmentResult",
-        element: <SelfAssessmentResult />,
-      },
-      {
-        path: "/triviaQuestions",
-        element: <TriviaQuestions />,
-      },
-      {
-        path: "/triviaResult",
-        element: <TriviaResult />,
-      },
+
 
       {
         path: "/commune",

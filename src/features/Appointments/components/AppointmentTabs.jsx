@@ -5,7 +5,7 @@ import VideoSvg from "../../../assets/video.svg?react";
 import MessageSvg from "../../../assets/message.svg?react";
 import EditSvg from "../../../assets/edit.svg?react";
 import useGetUpcomingAppointments from "../../../hooks/useGetUpcomingAppointments";
-import { UserContext } from "../../../context/UserContext";
+import { UserContext } from "../../../context/UserContext.jsx";
 import { calculateDuration, formatDateWithWeek } from "../../../helper/helper";
 
 const appointmentsStatic = [

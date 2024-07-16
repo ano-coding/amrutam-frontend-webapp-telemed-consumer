@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { PhoneNumberInput } from "../features/Auth/components/PhoneNumberInput";
 import { useContext, useState, useEffect } from "react";
 import { parsePhoneNumber } from "react-phone-number-input";
-import { UserContext } from "../context/UserContext";
+import { UserContext } from "../context/UserContext.jsx";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { ShopifyContext } from "../context/ShopifyContext";

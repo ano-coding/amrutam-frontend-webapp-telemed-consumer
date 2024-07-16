@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import { UserContext } from "../../context/UserContext";
+import { UserContext } from "../../context/UserContext.jsx";
 
 const NAV_LINKS = [
   {

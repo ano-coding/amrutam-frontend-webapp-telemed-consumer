@@ -159,7 +159,7 @@ export async function fetchDateByAppointmentType(appointmentType, doctorId) {
 		method: 'get',
 		maxBodyLength: Infinity,
 		// url: `https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/booking/getDatesByAppointmentType?appointmentType=${appointmentType}&doctorId=${doctorId}`,
-		url: `https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/booking/getDatesByAppointmentType?appointmentType=${appointmentType}&doctorId=664c9cdb82f45439bf5e4ff5`,
+		url: `https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/booking/getDatesByAppointmentType?appointmentType=${appointmentType}&doctorId=664c9cdb82f45439bf5e4ff5`, 
 		headers: {
 			'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzIwNTkwODQxNDcxNywiaWF0IjoxNzE4MTkyOTEyLCJleHAiOjE3MjU5Njg5MTJ9.tRK8eAF2AOh_GHNNzvMHR_6vqoa_Pf8kc7ylbg6b3C8'
 		},
@@ -243,13 +243,14 @@ export async function fetchAllSpecialities() {
 
 export async function fetchAppointmentsByDate(doctorId, date) {
 	// Return an empty array if impossible values are received
-	// if (!doctorId || !date) {
-	// 	console.log('Impossible date or doctorId');
-	// 	console.log('Date', date);
-	// 	console.log('Doctor Id ', doctorId);
+	
+	if (!doctorId || !date) {
+		console.log('Impossible date or doctorId');
+		console.log('Date', date);
+		console.log('Doctor Id ', doctorId);
 
-	// 	return [];
-	// }
+		return [];
+	}
 
 
 	let data = JSON.stringify({

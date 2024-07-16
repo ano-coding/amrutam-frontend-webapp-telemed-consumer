@@ -1,7 +1,8 @@
-import { useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from '@tanstack/react-query';
 import { fetchDoctorCoupons } from "../../../services/Appointments";
+import { DAYS, MONTHS } from "../../../services/Doctor";
+import { useParams } from "react-router-dom";
 
 const COUPONS = [
 	{
@@ -33,8 +34,8 @@ const couponImages = {
 	'60': '/appointments/tree.png'
 };
 
-export function Coupons({ setStep }) {
-	const [searchParams, setSearchParams] = useSearchParams();
+export function Coupons({ setStep, appointmentDetails, setAppointmentDetails }) {
+	// const [searchParams, setSearchParams] = useSearchParams();
 	const [couponCode, setCouponCode] = useState('');
 
 	return (
@@ -50,8 +51,10 @@ export function Coupons({ setStep }) {
 				/>
 				<button
 					onClick={() => {
-						searchParams.set('couponId', couponCode);
-						setSearchParams(searchParams);
+						setAppointmentDetails({
+							...appointmentDetails,
+							coupon: couponCode
+						})
 						setStep(3);
 					}}
 					className='absolute top-[20px] right-6 text-[#28643B] text-sm font-bold'>
@@ -59,19 +62,22 @@ export function Coupons({ setStep }) {
 				</button>
 			</div>
 			<BestCouponList
-				searchParams={searchParams}
-				setSearchParams={setSearchParams}
-				setStep={setStep}>				
-			</BestCouponList>
+				appointmentDetails={appointmentDetails}
+				setAppointmentDetails={setAppointmentDetails}
+				setStep={setStep}
+			/>				
+			
 			
 		</div>
 	)
 }
 
 
-function BestCouponList({searchParams, setSearchParams, setStep}) {
+function BestCouponList({ appointmentDetails, setAppointmentDetails, setStep }) {
+	const { doctorId } = useParams();
+	const { appointmentType, appointmentFee } = appointmentDetails;
 	const { data: coupons, isLoading } = useQuery({
-		queryFn: () => fetchDoctorCoupons(),
+		queryFn: () => fetchDoctorCoupons(appointmentType, doctorId, appointmentFee),
 		queryKey: ['coupons']
 	});
 
@@ -80,10 +86,16 @@ function BestCouponList({searchParams, setSearchParams, setStep}) {
 		return <div>... Coupons are loading</div>
 	}
 
+
 	return (
 		<div>
 			<h3 className='font-dmsans font-medium'>Best Coupons</h3>
-			{coupons.map((coupon, index) => {
+			{!coupons && <p className="font-sans font-medium text-[#28643B] my-4 text-center">
+				No coupons available! Come back later for exciting coupons
+			</p>}
+			{coupons?.map((coupon, index) => {
+				const expirationDate = new Date(Date.parse(coupon.couponDetails.validTill));
+
 				return (
 					<div key={index} className='flex'>
 						<div className='relative h-[110px]'>
@@ -106,13 +118,17 @@ function BestCouponList({searchParams, setSearchParams, setStep}) {
 							>
 								<h4 className='font-semibold lg:text-xl'>{coupon.couponDetails.couponCode}</h4>
 								<p className='text-[10px] font-medium'>{coupon.couponDetails.description}</p>
-								<p className='text-[10px] font-medium text-[#0000004D]'>Valid until </p>
+								<p className='text-[10px] font-medium text-[#0000004D]'>
+									Valid until {DAYS[expirationDate.getDay()]}, {expirationDate.getDate()} {MONTHS[expirationDate.getMonth()]} {expirationDate.getFullYear()}
+								</p>
 							</div>
 
 							<button
 								onClick={() => {
-									searchParams.set('couponId', coupon.couponDetails.couponCode);
-									setSearchParams(searchParams);
+									setAppointmentDetails({
+										...appointmentDetails,
+										coupon: coupon.couponDetails.couponCode
+									})
 									setStep(3);
 								}}
 								className='absolute top-[45px] lg:top-[42px] right-10 sm:right-6 md:right-10 lg:right-14 font-nunito font-bold text-[#28643B] text-xs lg:text-sm'

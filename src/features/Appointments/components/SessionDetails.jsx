@@ -16,7 +16,6 @@ function AppointmentDetails({ from, currentStep, setCurrentStep, appointmentDeta
 	const backNotAllowed = currentStep === 4;
 
 
-	// const { appointmentDetails } = useAppointment();
 	const { doctorId } = useParams();
 
 	const { data, isLoading } = useQuery({
@@ -62,6 +61,12 @@ function AppointmentDetails({ from, currentStep, setCurrentStep, appointmentDeta
 		}
 
 		if (backNotAllowed) {
+			return;
+		}
+         
+		// Clicking back on coupon step should take the user to payment step
+		if (currentStep === 6) {
+			setCurrentStep(3);
 			return;
 		}
 

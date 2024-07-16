@@ -2,7 +2,7 @@ import { Fragment, useContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import Banner from "./Banner";
 import DashboardSidebar from "./DashboardSidebar";
-import { UserContext } from "../context/UserContext";
+import { UserContext } from "../context/UserContext.jsx";
 import "react-phone-number-input/style.css";
 import useGetPatientProfile from "../hooks/useGetPatientProfile";
 

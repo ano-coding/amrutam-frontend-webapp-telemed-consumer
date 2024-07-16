@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 
 const Product = (props) => {
   const { shopifyId, cartId } = useContext(ShopifyContext);
-
+  const sm = props.sm === true ? true : false;
   //APIs
   const { refetch: cartRefetch } = useQuery({
     queryFn: () => fetchCartByUserId(Number(shopifyId)),
@@ -33,7 +33,7 @@ const Product = (props) => {
         userId: Number(shopifyId),
         cartId: cartId,
       }),
-    queryKey: [`addToCart/${props.id}`],
+    queryKey: [`addToCart/${props.from}/${props.id}`],
     enabled: false,
     gcTime: 100,
   });
@@ -52,7 +52,7 @@ const Product = (props) => {
         userId: Number(shopifyId),
         cartId: cartId,
       }),
-    queryKey: [`updateCart/${props.id}`],
+    queryKey: [`updateCart/${props.from}/${props.id}`],
     enabled: false,
     gcTime: 100,
   });
@@ -90,19 +90,21 @@ const Product = (props) => {
 
   return (
     <div
-      className="relative flex w-[365px] flex-col items-center justify-center hover:cursor-pointer max-xl:w-[250px] max-lg:w-[200px] max-md:w-full max-md:flex-row max-md:items-start max-md:justify-start max-md:gap-5 max-sm:gap-2.5"
+      className={`${sm ? "relative flex w-[519px] flex-row items-start justify-start gap-5 hover:cursor-pointer max-sm:gap-2.5" : "relative flex w-[365px] flex-col items-center justify-center hover:cursor-pointer max-xl:w-[250px] max-lg:w-[200px] max-md:w-full max-md:flex-row max-md:items-start max-md:justify-start max-md:gap-5 max-sm:gap-2.5"}`}
       onClick={props.onClick}
     >
       <img
         src={props.src}
         alt={props.src}
         style={{ width: props.imageWidth, height: props.imageHeight }}
-        className="h-[410px] w-[365px] max-w-[365px] rounded-2xl max-xl:h-[281px] max-xl:w-[250px] max-lg:h-[200px] max-lg:w-[200px] max-sm:h-[140px] max-sm:w-[140px]"
+        className={`${sm ? "h-[102px] w-[102px] rounded-2xl max-sm:w-[140px]" : "h-[410px] w-[365px] max-w-[365px] rounded-2xl max-xl:h-[281px] max-xl:w-[250px] max-lg:h-[200px] max-lg:w-[200px] max-sm:h-[140px] max-sm:w-[140px]"}`}
       />
-      <div className="relative flex w-full flex-col items-center justify-center text-center max-md:w-[60%] max-md:items-start max-md:text-left max-sm:mr-4">
+      <div
+        className={`${sm ? "flex w-[60%] flex-col items-start text-left max-sm:mr-4" : "relative flex w-full flex-col items-center justify-center text-center max-md:w-[60%] max-md:items-start max-md:text-left max-sm:mr-4"}`}
+      >
         <h5
           style={{ fontSize: props.nameSize }}
-          className="mx-0 mb-[8px] mt-[18px] text-lg font-medium leading-[29px] tracking-tight text-darkslategray-300 max-lg:text-sm max-lg:leading-5"
+          className={`${sm ? "m-0 mb-2 text-base font-medium text-[#0c0c0c] max-lg:text-sm max-lg:leading-5" : "mx-0 mb-2 mt-[18px] text-lg font-medium leading-[29px] tracking-tight text-darkslategray-300 max-lg:text-sm max-lg:leading-5"}`}
         >
           {props.name}
         </h5>
@@ -206,23 +208,23 @@ const Product = (props) => {
         {props.add === "plus" ? (
           <div
             onClick={addToCartHandler}
-            className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-customgreen-800 max-md:left-[120px] max-md:h-6 max-md:w-6"
+            className={`${sm ? "absolute bottom-0 left-[400px] right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded-lg bg-customgreen-800" : "absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-customgreen-800 max-md:left-[120px] max-md:h-6 max-md:w-6"}`}
           >
             <img
               src="/add.png"
               alt="add"
-              className="h-6 w-6 max-md:h-[18px] max-md:w-[18px]"
+              className={`${sm ? "h-[18px] w-[18px]" : "h-6 w-6 max-md:h-[18px] max-md:w-[18px]"}`}
             />
           </div>
         ) : props.add === "minus" ? (
           <div
             onClick={updateCartHandler}
-            className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-customgreen-800 max-md:left-[120px] max-md:h-6 max-md:w-6"
+            className={`${sm ? "absolute bottom-0 left-[400px] right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded-lg bg-customgreen-800" : "absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-customgreen-800 max-md:left-[120px] max-md:h-6 max-md:w-6"}`}
           >
             <img
               src="/remove.svg"
               alt="remove"
-              className="h-6 w-6 max-md:h-[18px] max-md:w-[18px]"
+              className={`${sm ? "h-[18px] w-[18px]" : "h-6 w-6 max-md:h-[18px] max-md:w-[18px]"}`}
             />
           </div>
         ) : (
