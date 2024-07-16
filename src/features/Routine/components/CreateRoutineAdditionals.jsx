@@ -187,7 +187,7 @@ const CreateRoutineAdditionals = () => {
             </button>
             <button
               onClick={() => navigate("/routines")}
-              className="my-10 box-border rounded-xl bg-[#3a643b] px-16 py-[17px] text-center text-base font-semibold text-white shadow-[0px_4px_14px_rgba(58,_100,_59,_0.25)] duration-100 hover:bg-[#618a61] active:scale-95 md:w-[23.4rem]"
+              className="my-10 box-border rounded-xl border-2 border-[#3A643B] bg-[#3a643b] px-16 py-[17px] text-center text-base font-semibold text-white shadow-[0px_4px_14px_rgba(58,_100,_59,_0.25)] duration-100 hover:bg-[#618a61] active:scale-95 md:w-[23.4rem]"
             >
               Proceed
             </button>

@@ -5,7 +5,7 @@ import ContentBoxLayout from "../../../components/ContentBoxLayout";
 import { FormProvider, useForm } from "react-hook-form";
 import HookFormDropDown from "./HookFormDropDown";
 import AddWeeklyBenefits from "./AddWeeklyBenefits";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useCreateWeeklyBenefits from "../../../hooks/routines/useCreateWeeklyBenefits";
 import { useContext } from "react";
 import { UserContext } from "../../../context/UserContext";
@@ -31,6 +31,7 @@ const breadCrumbList = [
 ];
 
 const WeeklyBenefits = () => {
+  const navigate = useNavigate();
   const { token } = useContext(UserContext);
   const { createWeeklyBenefitsMutate, createWeeklyBenefitsStatus } =
     useCreateWeeklyBenefits();
@@ -97,7 +98,11 @@ const WeeklyBenefits = () => {
                   <TrashSolidSvg
                     onClick={(e) => {
                       e.preventDefault();
-                      deleteWeeklyBenefitsMutate([token, benefits._id]);
+                      deleteWeeklyBenefitsMutate([token, benefits._id], {
+                        onSuccess: () => {
+                          navigate(-1);
+                        },
+                      });
                     }}
                     className="size-6 cursor-pointer fill-red-600"
                   />
@@ -136,10 +141,20 @@ const WeeklyBenefits = () => {
                 ))}
               </div>
               {/* ------------- */}
-
-              <button className="mx-auto my-10 mt-20 box-border rounded-xl bg-[#3A643B] px-16 py-[17px] text-center text-base text-white shadow-[0px_4px_14px_rgba(58,_100,_59,_0.25)] duration-100 hover:bg-[#618a61] active:scale-95 md:w-[23.4rem]">
-                Save Benefits
-              </button>
+              <div className="flex w-full items-center justify-center gap-3 sm:gap-6">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(-1);
+                  }}
+                  className={`my-10 box-border rounded-xl border-2 border-[#3A643B] px-5 py-[17px] text-center text-base font-semibold text-[#3A643B] shadow-sm duration-100 hover:bg-[#f4f4f4] active:scale-95 sm:w-[15rem] lg:w-[20rem] xl:w-[23.4rem]`}
+                >
+                  Cancel
+                </button>
+                <button className="my-10 box-border rounded-xl border-2 border-[#3A643B] bg-[#3A643B] px-16 py-[17px] text-center text-base text-white shadow-[0px_4px_14px_rgba(58,_100,_59,_0.25)] duration-100 hover:bg-[#618a61] active:scale-95 md:w-[23.4rem]">
+                  Save Benefits
+                </button>
+              </div>
             </div>
           </form>
         </FormProvider>
