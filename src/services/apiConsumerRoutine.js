@@ -478,6 +478,44 @@ export const getReminderChannel = async (token) => {
   }
 };
 
+export const addLikeReminderList = async (token, reminderListId) => {
+  const config = {
+    method: "post",
+    maxBodyLength: Infinity,
+    url: `${API_BASE_URL}/patient/reminderlist/${reminderListId}/like`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  try {
+    const response = await axios.request(config);
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const addUnLikeReminderList = async (token, reminderListId) => {
+  const config = {
+    method: "post",
+    maxBodyLength: Infinity,
+    url: `${API_BASE_URL}/patient/reminderlist/${reminderListId}/unlike`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  try {
+    const response = await axios.request(config);
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 export const getSearchedProductsFromStore = async (token, searchQuery) => {
   const config = {
     method: "get",
