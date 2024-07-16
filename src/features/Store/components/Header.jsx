@@ -36,7 +36,6 @@ const Header = (props) => {
 
   //Effects
   useEffect(() => {
-    console.log("mansi");
     if (!cartLoading && cart) {
       console.log(cart);
       setCartId(cart?.data?.cart?.cartId || "");

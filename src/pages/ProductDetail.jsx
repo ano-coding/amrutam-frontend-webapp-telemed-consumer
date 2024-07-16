@@ -8,27 +8,34 @@ import {
   updateCart,
   getInternalProductID,
   mostReviewedDoctors,
+  getProductReviews,
+  createReview,
+  getSingleProductMeta,
 } from "../services/Shopify";
 import { toast } from "react-toastify";
 import parse from "html-react-parser";
 import Footer from "../features/Store/components/Footer";
 import Header from "../features/Store/components/Header";
-import Highlight from "../features/Store/components/Highlight";
-import Ingredient from "../features/Store/components/Ingredient";
+// import Highlight from "../features/Store/components/Highlight";
+// import Ingredient from "../features/Store/components/Ingredient";
 import HomeAppContainer from "../features/Store/components/HomeAppContainer";
 import UserReview from "../features/Store/components/UserReview";
 import SimilarProducts from "../features/Store/components/SimilarProducts";
 import Doctor from "../features/Store/components/Doctor";
 import Spinner from "../features/Store/components/Spinner";
 import { ShopifyContext } from "../context/ShopifyContext";
+import { UserContext } from "../context/UserContext";
 
 const ProductDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { shopifyId, cartId } = useContext(ShopifyContext);
+  const { name, email } = useContext(UserContext);
   const carouselRef = useRef(null);
   const quantityRef = useRef();
   const containerRef = useRef();
+  const inputFileRef = useRef(null);
+  const totalStars = 5;
 
   //States
   const [singleProductData, setSingleProductData] = useState();
@@ -45,6 +52,22 @@ const ProductDetail = () => {
   const [doctors, setDoctors] = useState();
   const [scrollPosition, setScrollPosition] = useState(0);
   const [maxScroll, setMaxScroll] = useState(0);
+  const [internalId, setInternalId] = useState("");
+  const [showWriteReviewBtn, setShowWriteReviewBtn] = useState(true);
+  const [showCancelBtn, setShowCancelBtn] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [userRating, setUserRating] = useState(5);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedFile, setSelectedFile] = useState("");
+  const [titleError, setTitleError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
+  const [showMoreReviews, setShowMoreReviews] = useState(false);
+  const [rating, setRating] = useState();
+  const [ratingCount, setRatingCount] = useState();
+  const [howToUse, setHowToUse] = useState();
+  const [generalInstructions, setGeneralInstructions] = useState();
+
   //For Mobile
   const [type, setType] = useState(0);
   const [showAddBtn, setShowAddBtn] = useState(true);
@@ -62,7 +85,7 @@ const ProductDetail = () => {
     refetch: cartRefetch,
   } = useQuery({
     queryFn: () => fetchCartByUserId(Number(shopifyId)),
-    queryKey: ["cart", id, activeVariantId, quantity],
+    queryKey: ["cart"],
   });
 
   const {
@@ -110,6 +133,39 @@ const ProductDetail = () => {
   } = useQuery({
     queryFn: () => getInternalProductID(id),
     queryKey: ["internalProductId"],
+  });
+
+  const {
+    data: productReviews,
+    isLoading: productReviewsLoading,
+    error: productReviewsError,
+  } = useQuery({
+    queryFn: () => getProductReviews(internalId),
+    queryKey: ["productReviews", internalId],
+    enabled: internalId !== "",
+  });
+
+  const {
+    data: createReviewResponse,
+    isLoading: createReviewLoading,
+    error: createReviewError,
+    refetch: createReviewRefetch,
+  } = useQuery({
+    queryFn: () =>
+      createReview(id, name, email, userRating, description, title, [
+        selectedFile,
+      ]),
+    queryKey: ["createReview"],
+    enabled: false,
+  });
+
+  const {
+    data: productMetaResponse,
+    isLoading: productMetaLoading,
+    error: productMetaError,
+  } = useQuery({
+    queryFn: () => getSingleProductMeta(id),
+    queryKey: ["singleProductMeta"],
   });
 
   const {
@@ -196,6 +252,55 @@ const ProductDetail = () => {
     });
   };
 
+  const writeReviewHandler = () => {
+    setShowWriteReviewBtn(false);
+    setShowCancelBtn(true);
+    setShowReviewForm(true);
+  };
+
+  const cancelReviewHandler = () => {
+    setShowWriteReviewBtn(true);
+    setShowCancelBtn(false);
+    setShowReviewForm(false);
+  };
+
+  const handleStarClick = (starIndex) => {
+    setUserRating(starIndex + 1);
+  };
+
+  const removeFileHandler = () => {
+    setSelectedFile(null);
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setSelectedFile(file);
+    } else {
+      alert("Please select a valid image file.");
+    }
+  };
+
+  const reviewSubmitHandler = (e) => {
+    e.preventDefault();
+    if (title.trim() === "") {
+      setTitleError("Title cannot be empty");
+    } else {
+      setTitleError("");
+    }
+    if (description.trim() === "") {
+      setDescriptionError("Description cannot be empty");
+    } else {
+      setDescriptionError("");
+    }
+    if (title.trim() !== "" && description.trim() !== "") {
+      setShowReviewForm(false);
+      setShowCancelBtn(false);
+      setShowWriteReviewBtn(true);
+      createReviewRefetch();
+    }
+  };
+
   //Effects
   useEffect(() => {
     if (!singleProductLoading && singleProduct) {
@@ -249,7 +354,7 @@ const ProductDetail = () => {
     } else if (addToCartError) {
       toast.error("Item cannot be added");
     }
-  }, [addToCartLoading, addToCartResponse, addToCartError, cartRefetch, type]);
+  }, [addToCartLoading, addToCartResponse, addToCartError, type]);
 
   useEffect(() => {
     if (!cartLoading && cart) {
@@ -317,6 +422,7 @@ const ProductDetail = () => {
   useEffect(() => {
     if (!internalProductIdLoading && internalProductId) {
       console.log(internalProductId);
+      setInternalId(internalProductId?.data?.data?.product?.id);
     } else if (internalProductIdError) {
       console.log(internalProductIdError);
     }
@@ -342,6 +448,43 @@ const ProductDetail = () => {
       setMaxScroll(scrollWidth);
     }
   }, [containerRef]);
+
+  useEffect(() => {
+    if (!productReviewsLoading && productReviews) {
+      console.log("reviews=", productReviews);
+    } else if (productReviewsError) {
+      console.log(productReviewsError);
+    }
+  }, [productReviews, productReviewsError, productReviewsLoading]);
+
+  useEffect(() => {
+    if (!createReviewLoading && createReviewResponse) {
+      console.log("create review response=", createReviewResponse);
+      toast.success("Review added");
+    } else if (createReviewError) {
+      console.log(createReviewError);
+    }
+  }, [createReviewError, createReviewLoading, createReviewResponse]);
+
+  useEffect(() => {
+    if (!productMetaLoading && productMetaResponse) {
+      console.log("meta=", productMetaResponse);
+      const productMeta = productMetaResponse?.data?.data?.products;
+      for (let i = 0; i < productMeta.length; i++) {
+        if (productMeta[i].key === "rating") {
+          setRating(JSON.parse(productMeta[i].value).value);
+        } else if (productMeta[i].key === "rating_count") {
+          setRatingCount(productMeta[i].value);
+        } else if (productMeta[i].key === "how_to_use_") {
+          setHowToUse(productMeta[i].value);
+        } else if (productMeta[i].key === "general_instructions") {
+          setGeneralInstructions(productMeta[i].value);
+        }
+      }
+    } else if (productMetaError) {
+      console.log(productMetaError);
+    }
+  }, [productMetaLoading, productMetaError, productMetaResponse]);
 
   return (
     <div>
@@ -385,13 +528,11 @@ const ProductDetail = () => {
                 {singleProductData?.[0]?.title}
               </h3>
               <div className="mb-[7px] mt-2.5 flex items-center justify-start gap-1 max-md:ml-5 [&_img]:h-[18px] [&_img]:w-[18px]">
-                <img src="/star.svg" alt="star" />
-                <img src="/star.svg" alt="star" />
-                <img src="/star.svg" alt="star" />
-                <img src="/star.svg" alt="star" />
-                <img src="/star.svg" alt="star" />
+                {[...Array(Math.trunc(rating))].map((_, index) => {
+                  return <img src="/star.svg" alt="star" key={index} />;
+                })}
                 <span className="ml-1 text-[18px] font-medium leading-[18px] tracking-tight text-dimgray-100">
-                  (204 reviews)
+                  ({ratingCount} reviews)
                 </span>
               </div>
               <div className="mb-9 mt-2 flex items-center justify-start max-md:mb-2.5 max-md:ml-5">
@@ -419,7 +560,9 @@ const ProductDetail = () => {
                       setPrice(variant.price);
                     }}
                   >
-                    <span>{variant.option}</span>
+                    <span className="block max-w-[300px] text-wrap">
+                      {variant.option}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -444,7 +587,7 @@ const ProductDetail = () => {
                 {parse(singleProductData?.[0]?.body_html)}
               </div>
               <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
-              <div className="mb-12 max-sm:my-6">
+              {/* <div className="mb-12 max-sm:my-6">
                 <div className="mb-6 flex items-center justify-start gap-[10px] max-md:ml-5">
                   <img
                     src="/recipe.png"
@@ -461,9 +604,9 @@ const ProductDetail = () => {
                   <Highlight name={"Makes the hair smooth and shiny"} />
                   <Highlight name={"Reduces hairfall, repairs damaged hair"} />
                 </div>
-              </div>
-              <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
-              <div className="max-sm:mt-6">
+              </div> */}
+              {/* <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" /> */}
+              {/* <div className="max-sm:mt-6">
                 <div className="mb-6 flex items-center justify-start gap-[10px] max-md:ml-5">
                   <img
                     src="/recipe.png"
@@ -492,35 +635,43 @@ const ProductDetail = () => {
                     desc={"Naturally Repairs and strengthens hair"}
                   />
                 </div>
-              </div>
-              <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
-              <div className="mb-12">
-                <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
-                  How to use
-                </h4>
-                <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight [&_p]:text-dimgray-100">
-                  <p className="py-5 pl-3 pr-[18px] text-[18px] leading-[30px]">
-                    Mix one or tow tablespoons of Herbal Child Care Malt with
-                    milk or 100-200ml warm water and then consume twice a day or
-                    consult our Ayurvedic Expert to find the right Ayurvedic
-                    recipe for you.
-                  </p>
-                </div>
-              </div>
-              <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
-              <div className="mb-12">
-                <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
-                  General Instructions
-                </h4>
-                <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight [&_p]:text-dimgray-100">
-                  <p className="py-5 pl-3 pr-0 text-base leading-[30px]">
-                    Store in a cool and dry palce away from direct sunlight. Not
-                    advisable for diabetic patients
-                  </p>
-                </div>
-              </div>
-              <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
-              <div className="mb-[38px] [&_h5]:m-0 [&_h5]:pb-[14px] [&_h5]:pl-3 [&_h5]:pr-[15px] [&_h5]:pt-5 [&_h5]:text-base [&_h5]:font-bold [&_h5]:tracking-tight [&_h5]:text-darkslategray-300">
+              </div> */}
+              {/* <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" /> */}
+              {howToUse ? (
+                <>
+                  <div className="mb-12">
+                    <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
+                      How to use
+                    </h4>
+                    <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight [&_p]:text-dimgray-100">
+                      <p className="py-5 pl-3 pr-[18px] text-[18px] leading-[30px]">
+                        {howToUse}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
+                </>
+              ) : (
+                ""
+              )}
+              {generalInstructions ? (
+                <>
+                  <div className="mb-12">
+                    <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
+                      General Instructions
+                    </h4>
+                    <div className="w-[633px] rounded-xl bg-offWhite-200 max-md:mx-5 max-md:w-[calc(100%_-_40px)] [&_p]:m-0 [&_p]:tracking-tight [&_p]:text-dimgray-100">
+                      <p className="py-5 pl-3 pr-0 text-base leading-[30px]">
+                        {generalInstructions}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
+                </>
+              ) : (
+                ""
+              )}
+              {/* <div className="mb-[38px] [&_h5]:m-0 [&_h5]:pb-[14px] [&_h5]:pl-3 [&_h5]:pr-[15px] [&_h5]:pt-5 [&_h5]:text-base [&_h5]:font-bold [&_h5]:tracking-tight [&_h5]:text-darkslategray-300">
                 <h4 className="m-0 mb-3 text-xl font-bold leading-6 tracking-tight max-md:ml-5 max-md:text-base max-sm:my-6">
                   Commonly Asked Questions
                 </h4>
@@ -573,10 +724,10 @@ const ProductDetail = () => {
                   alt="play"
                   className="absolute right-[45%] top-[45%] h-[64px] w-[64px] cursor-pointer rounded-xl bg-none"
                 />
-              </div>
+              </div>*/}
             </div>
           </div>
-          <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
+          {/* <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" /> */}
           <div className="mx-[72px] mb-[88px] mt-0 max-md:mb-0 max-sm:mx-0">
             <h3 className="mb-[44px] text-center text-2xl font-semibold leading-6 tracking-tight text-darkslategray-300 max-sm:mb-[28px] max-sm:ml-5 max-sm:mt-6 max-sm:text-left max-sm:text-base">
               Reviews and Ratings
@@ -584,92 +735,221 @@ const ProductDetail = () => {
             <div className="mb-[34px] flex items-start justify-between max-lg:flex-col max-lg:items-center">
               <div className="flex h-[124px] w-[308px] items-center justify-start gap-5 rounded-xl bg-offWhite-100 pl-5 max-lg:mb-5 max-lg:w-full max-sm:mx-5 max-sm:w-[calc(100%_-_64px)]">
                 <h2 className="font-nunito text-[32px] font-bold leading-[42px] tracking-tight text-customblack-100">
-                  5.0
+                  {rating}
                 </h2>
                 <div>
-                  <div className="flex items-center [&_svg]:mx-1 [&_svg]:my-0">
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                        fill="#F79624"
-                      />
-                    </svg>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                        fill="#F79624"
-                      />
-                    </svg>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                        fill="#F79624"
-                      />
-                    </svg>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                        fill="#F79624"
-                      />
-                    </svg>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8.10329 0.816631C8.47013 0.0734626 9.52987 0.0734625 9.89671 0.816631L11.8576 4.78909C12.0031 5.08394 12.2843 5.2884 12.6096 5.33595L16.9962 5.97712C17.8161 6.09696 18.1429 7.1048 17.5493 7.68296L14.3768 10.773C14.1409 11.0027 14.0333 11.3339 14.0889 11.6584L14.8374 16.0226C14.9775 16.8396 14.12 17.4626 13.3864 17.0767L9.46545 15.0148C9.17407 14.8615 8.82593 14.8615 8.53455 15.0148L4.61363 17.0767C3.88 17.4626 3.02245 16.8396 3.16257 16.0226L3.91109 11.6584C3.96675 11.3339 3.85908 11.0027 3.62321 10.773L0.450678 7.68296C-0.142915 7.1048 0.183869 6.09696 1.00378 5.97712L5.39037 5.33595C5.71572 5.2884 5.99691 5.08394 6.14245 4.78909L8.10329 0.816631Z"
-                        fill="#F79624"
-                      />
-                    </svg>
+                  <div className="flex items-center gap-1">
+                    <img src="/star.svg" alt="star" className="h-6 w-6" />
+                    <img src="/star.svg" alt="star" className="h-6 w-6" />
+                    <img src="/star.svg" alt="star" className="h-6 w-6" />
+                    <img src="/star.svg" alt="star" className="h-6 w-6" />
+                    <img src="/star.svg" alt="star" className="h-6 w-6" />
                   </div>
                   <span className="font-nunito text-sm tracking-tight text-darkslategray-300">
-                    Based on 20 reviews
+                    Based on {ratingCount} reviews
                   </span>
                 </div>
               </div>
               <div className="hidden flex-col items-center max-lg:flex">
-                <UserReview />
-                <UserReview />
+                {productReviews?.data?.data?.reviews
+                  .slice(0, 5)
+                  ?.map((review) => {
+                    return (
+                      <UserReview
+                        title={review.title}
+                        body={review.body}
+                        key={review.id}
+                        date={review.created_at}
+                        image={review.pictures}
+                        name={review.reviewer?.name}
+                        rating={review.rating}
+                      />
+                    );
+                  })}
+                {showMoreReviews
+                  ? productReviews?.data?.data?.reviews
+                      .slice(5)
+                      ?.map((review) => {
+                        return (
+                          <UserReview
+                            title={review.title}
+                            body={review.body}
+                            key={review.id}
+                            date={review.created_at}
+                            image={review.pictures}
+                            name={review.reviewer?.name}
+                            rating={review.rating}
+                          />
+                        );
+                      })
+                  : ""}
               </div>
-              <div className="flex items-center justify-center gap-4 max-lg:mb-5 [&_div]:flex [&_div]:h-[40px] [&_div]:w-[156px] [&_div]:items-center [&_div]:justify-center [&_div]:rounded-xl [&_div]:border [&_div]:border-[#e2e2e2] [&_span]:text-sm [&_span]:font-medium [&_span]:leading-6 [&_span]:tracking-tight [&_span]:text-customgreen-800">
-                <div>
+              <div className="flex items-center justify-center gap-4 max-lg:mb-5 [&_button]:flex [&_button]:h-[40px] [&_button]:w-[156px] [&_button]:items-center [&_button]:justify-center [&_button]:rounded-xl [&_button]:border [&_button]:border-[#e2e2e2] [&_span]:text-sm [&_span]:font-medium [&_span]:leading-6 [&_span]:tracking-tight [&_span]:text-customgreen-800">
+                <button onClick={() => setShowMoreReviews(true)}>
                   <span>See more reviews</span>
-                </div>
-                <div>
-                  <span>Write a review</span>
-                </div>
+                </button>
+                {showWriteReviewBtn && (
+                  <button onClick={writeReviewHandler}>
+                    <span>Write a review</span>
+                  </button>
+                )}
+                {showCancelBtn && (
+                  <button onClick={cancelReviewHandler}>
+                    <span>Cancel</span>
+                  </button>
+                )}
               </div>
             </div>
+            {showReviewForm && (
+              <form
+                className="flex flex-col items-center justify-center"
+                onSubmit={reviewSubmitHandler}
+              >
+                <h3 className="mb-9 text-2xl font-semibold leading-6 tracking-[-1%]">
+                  Write your review
+                </h3>
+                <div className="mb-9 flex items-center justify-center gap-1">
+                  {[...Array(totalStars)].map((_, index) => (
+                    <span
+                      key={index}
+                      onClick={() => handleStarClick(index)}
+                      className="cursor-pointer"
+                    >
+                      <svg
+                        width="28"
+                        height="25"
+                        viewBox="0 0 28 25"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M13.1039 0.650614C13.4708 -0.0925545 14.5305 -0.0925533 14.8974 0.650615L18.1457 7.23141C18.2912 7.52626 18.5724 7.73072 18.8978 7.77827L26.1635 8.84027C26.9835 8.96011 27.3102 9.96795 26.7166 10.5461L21.4608 15.6653C21.2249 15.8951 21.1172 16.2262 21.1729 16.5507L22.4131 23.7816C22.5532 24.5986 21.6957 25.2215 20.962 24.8357L14.4661 21.4196C14.1747 21.2664 13.8266 21.2664 13.5352 21.4196L7.03928 24.8357C6.30565 25.2215 5.44811 24.5986 5.58822 23.7816L6.8284 16.5507C6.88407 16.2262 6.7764 15.8951 6.54053 15.6653L1.28466 10.5461C0.691071 9.96795 1.01785 8.96011 1.83777 8.84027L9.10352 7.77827C9.42887 7.73072 9.71006 7.52626 9.8556 7.23141L13.1039 0.650614Z"
+                          fill={index < userRating ? "#F79624" : "none"}
+                          stroke="#F79624"
+                          strokeWidth="1"
+                        />
+                      </svg>
+                    </span>
+                  ))}
+                </div>
+                <div className="mb-4 w-[657px] max-sm:w-[calc(100%_-_40px)]">
+                  <label className="flex flex-col rounded-2xl border border-[#CED8E0] px-4 py-2 text-xs text-[#646665]">
+                    Review title
+                    <input
+                      type="text"
+                      className="mt-1 w-[100%] font-nunito text-base font-medium tracking-tight text-[#2E2F2E] focus:outline-none"
+                      onChange={(e) => setTitle(e.target.value)}
+                    />
+                  </label>
+                  <p className="my-0 mt-1 px-2 text-sm font-medium text-red-400">
+                    {titleError}
+                  </p>
+                </div>
+                <div className="mb-4 w-[657px] max-sm:w-[calc(100%_-_40px)]">
+                  <label className="flex flex-col rounded-2xl border border-[#CED8E0] px-4 py-2 text-xs text-[#646665]">
+                    Review Description
+                    <textarea
+                      type="text"
+                      rows={3}
+                      onChange={(e) => setDescription(e.target.value)}
+                      className="mt-1 w-[100%] resize-none font-nunito text-base font-medium tracking-tight text-[#2E2F2E] focus:outline-none"
+                    />
+                  </label>
+                  <p className="my-0 mt-1 px-2 text-sm font-medium text-red-400">
+                    {descriptionError}
+                  </p>
+                </div>
+                <div className="mb-9 flex w-[657px] flex-col rounded-2xl border border-[#CED8E0] px-4 py-2 text-xs text-[#646665] max-sm:w-[calc(100%_-_40px)]">
+                  <label>
+                    Add attachments
+                    <input
+                      type="file"
+                      onChange={handleFileChange}
+                      accept="image/*"
+                      hidden
+                      ref={inputFileRef}
+                      className="mt-1 w-[100%] font-nunito text-base font-medium tracking-tight text-[#2E2F2E] focus:outline-none"
+                    />
+                  </label>
+                  <div className="flex justify-between">
+                    <div className="flex w-full justify-between">
+                      {selectedFile ? (
+                        <>
+                          <p className="mt-1 font-nunito text-base font-medium tracking-tight text-[#2E2F2E]">
+                            {selectedFile.name}
+                          </p>
+                          <button
+                            onClick={removeFileHandler}
+                            className="cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                    {!selectedFile ? (
+                      <img
+                        src="/pin.svg"
+                        alt="select-file"
+                        className="h-7 w-6 cursor-pointer"
+                        onClick={() => inputFileRef?.current?.click()}
+                      />
+                    ) : (
+                      ""
+                    )}
+                  </div>
+                </div>
+                <div className="mb-16 flex items-center justify-center gap-4">
+                  <button
+                    onClick={cancelReviewHandler}
+                    className="rounded-xl border border-[#e2e2e2] px-12 py-2 text-sm font-medium leading-6 tracking-tight text-customgreen-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={reviewSubmitHandler}
+                    className="rounded-xl border-none bg-customgreen-800 px-7 py-2 text-sm font-medium leading-6 tracking-tight text-white"
+                  >
+                    Submit Review
+                  </button>
+                </div>
+              </form>
+            )}
             <div className="block max-lg:hidden">
-              <UserReview />
-              <UserReview />
+              {productReviews?.data?.data?.reviews
+                .slice(0, 5)
+                ?.map((review) => {
+                  return (
+                    <UserReview
+                      title={review.title}
+                      body={review.body}
+                      key={review.id}
+                      date={review.created_at}
+                      image={review.pictures}
+                      name={review.reviewer?.name}
+                      rating={review.rating}
+                    />
+                  );
+                })}
+              {showMoreReviews
+                ? productReviews?.data?.data?.reviews
+                    .slice(5)
+                    ?.map((review) => {
+                      return (
+                        <UserReview
+                          title={review.title}
+                          body={review.body}
+                          key={review.id}
+                          date={review.created_at}
+                          image={review.pictures}
+                          name={review.reviewer?.name}
+                          rating={review.rating}
+                        />
+                      );
+                    })
+                : ""}
             </div>
           </div>
         </>

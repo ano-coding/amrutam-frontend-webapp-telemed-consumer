@@ -107,7 +107,6 @@ const router = createBrowserRouter([
 				path: "/triviaResult",
 				element: <TriviaResult />,
 			},
-
 			{
 				path: "/commune",
 				element: <ForumPage></ForumPage>,
@@ -129,12 +128,9 @@ const router = createBrowserRouter([
 				path: "/cancel-page",
 				element: <CancelRedirect />,
 			},
-			{ path: "*", element: <PageNotFound /> }
-
+			{ path: "*", element: <PageNotFound /> },
 		],
 	},
-
-
 
 	{
 		element: <Auth />,
@@ -147,7 +143,7 @@ const router = createBrowserRouter([
 				path: "/signup",
 				element: <Signup />,
 			},
-			{ path: "*", element: <PageNotFound /> }
+			{ path: "*", element: <PageNotFound /> },
 		],
 	},
 
@@ -218,7 +214,7 @@ const router = createBrowserRouter([
 				path: "/profile/edit",
 				element: <PatientProfileEdit />,
 			},
-			{ path: "*", element: <PageNotFound /> }
+			{ path: "*", element: <PageNotFound /> },
 		],
 	},
 ]);
@@ -229,26 +225,27 @@ const queryClient = new QueryClient();
 function App() {
 	return (
 		<UserProvider>
-			<QueryClientProvider client={queryClient}>
-				<RouterProvider router={router} />
-				<ToastContainer
-					position="top-right"
-					autoClose={5000}
-					hideProgressBar={false}
-					newestOnTop={true}
-					closeOnClick
-					rtl={false}
-					pauseOnFocusLoss
-					draggable
-					pauseOnHover
-					theme="light"
-					transition={Bounce}
-				/>
-				<ReactQueryDevtools initialIsOpen={false} />
-			</QueryClientProvider>
+			<ShopifyProvider>
+				<QueryClientProvider client={queryClient}>
+					<RouterProvider router={router} />
+					<ToastContainer
+						position="top-right"
+						autoClose={5000}
+						hideProgressBar={false}
+						newestOnTop={true}
+						closeOnClick
+						rtl={false}
+						pauseOnFocusLoss
+						draggable
+						pauseOnHover
+						theme="light"
+						transition={Bounce}
+					/>
+					<ReactQueryDevtools initialIsOpen={false} />
+				</QueryClientProvider>
+			</ShopifyProvider>
 		</UserProvider>
 	);
- 
 }
 
 export default App;
