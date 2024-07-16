@@ -1,7 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { processNames } from "../../../services/Doctor";
+// import { useDoctor } from "../useDoctor.js";
 
 function ProfileCard({ doctor }) {
+	// const { doctor: doc, setDoctor } = useDoctor();
+	const location = useLocation();
+
 	const {
 		firstname,
 		lastname,
@@ -20,7 +24,7 @@ function ProfileCard({ doctor }) {
 
 
 	const [firstName, lastName] = processNames(firstname, lastname);
-	
+
 
 	return (
 		<div className="w-[80%] mx-auto border-b-2 border-[#E5E5E5] py-8">
@@ -71,7 +75,7 @@ function ProfileCard({ doctor }) {
 							src="/hat.svg"
 						/>
 						<div className="text-base font-semibold leading-[20px] text-dimgray-100">
-							{experience > 0? `${experience} years of Experience`: 'Recently Licensed'}
+							{experience > 0 ? `${experience} years of Experience` : 'Recently Licensed'}
 
 							{/* 
 								Newly Qualified
@@ -131,7 +135,8 @@ function ProfileCard({ doctor }) {
 					</Link>
 
 					<Link
-						to="/appointment-booking"
+						to={`/appointment/${doctor._id}`}
+						state={{ from: location }}
 						className="block w-[250px] py-4  cursor-pointer  rounded-lg  bg-darkolivegreen-200  text-center text-base  font-semibold leading-[20px] text-white  duration-100 hover:bg-seagreen  active:scale-95"
 					>
 						Book a consultation

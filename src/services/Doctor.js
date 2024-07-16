@@ -159,16 +159,18 @@ export async function fetchDateByAppointmentType(appointmentType, doctorId) {
 		method: 'get',
 		maxBodyLength: Infinity,
 		// url: `https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/booking/getDatesByAppointmentType?appointmentType=${appointmentType}&doctorId=${doctorId}`,
-		url: `https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/booking/getDatesByAppointmentType?appointmentType=chat&doctorId=667be8fc8afa6a4fdf19afd6`,
+		url: `https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/booking/getDatesByAppointmentType?appointmentType=${appointmentType}&doctorId=664c9cdb82f45439bf5e4ff5`,
 		headers: {
 			'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzIwNTkwODQxNDcxNywiaWF0IjoxNzE4MTkyOTEyLCJleHAiOjE3MjU5Njg5MTJ9.tRK8eAF2AOh_GHNNzvMHR_6vqoa_Pf8kc7ylbg6b3C8'
 		},
 		data: data
 	};
 
+
+
 	try {
 		const res = await axios.request(config);
-		const dates = res.data.data;
+		const dates = res.data.data.sort(sortDates);
 
 		const sessions = [];
 
@@ -185,7 +187,7 @@ export async function fetchDateByAppointmentType(appointmentType, doctorId) {
 
 		console.log('Dates ', dates);
 
-		return dates;
+		return sessions;
 	} catch (e) {
 		console.log(e)
 	}
@@ -241,23 +243,24 @@ export async function fetchAllSpecialities() {
 
 export async function fetchAppointmentsByDate(doctorId, date) {
 	// Return an empty array if impossible values are received
-	if (!doctorId || !date) {
-		console.log('Impossible date or doctorId');
-		console.log('Date', date);
-		console.log('Doctor Id ', doctorId);
+	// if (!doctorId || !date) {
+	// 	console.log('Impossible date or doctorId');
+	// 	console.log('Date', date);
+	// 	console.log('Doctor Id ', doctorId);
 
-		return [];
-	}
+	// 	return [];
+	// }
 
 
 	let data = JSON.stringify({
-		"requestedDate": "2024-04-04"
+		"requestedDate": date
+		// "requestedDate": "2024-07-08"
 	});
 
 	let config = {
 		method: 'post',
 		maxBodyLength: Infinity,
-		url: 'https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/65e962ffcd28590235acfcf7/get-appointment-by-date',
+		url: 'https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/664c9cdb82f45439bf5e4ff5/get-appointment-by-date',
 		headers: {
 			'Content-Type': 'application/json',
 			'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzIwNTkwODQxNDcxNywiaWF0IjoxNzE4MTkyOTEyLCJleHAiOjE3MjU5Njg5MTJ9.tRK8eAF2AOh_GHNNzvMHR_6vqoa_Pf8kc7ylbg6b3C8'
@@ -267,9 +270,11 @@ export async function fetchAppointmentsByDate(doctorId, date) {
 
 	try {
 		const res = await axios.request(config);
+
+		// console.log('res ', res.data);
 		const slots = res.data.data[0].slots;
 
-		console.log('slots ', slots);
+		// console.log('slots ', slots);
 
 		return slots;
 	} catch (e) {
@@ -336,7 +341,15 @@ export function extractSpeciality(s){
 
 
 export function extractSessions(charges) {
+
 	const sessions = []
+
+	if (!charges) {
+		console.log('Invalid charges passed to extractSessions');
+		console.log('charges ', charges);
+		
+		return sessions;
+	}
 
 	for (let key in charges) {
 		if (charges[key] && typeof charges[key] === 'object') {
@@ -374,3 +387,16 @@ export function getFilteredReviews(reviews) {
 	return filteredReviews;
 }
 
+
+export function sortDates(d1, d2) {
+	const [year1, month1, day1] = d1.split('-');
+	const [year2, month2, day2] = d2.split('-');
+
+	if (year1 !== year2) {
+		return year1 - year2
+	} else if (month1 !== month2) {
+		return month1 - month2
+	} else {
+		return day1 - day2
+	}
+}

@@ -169,7 +169,7 @@ const Navbar = () => {
                       </NavLink>
                     ))}
                     <div className="ml-7 flex gap-2 pt-3">
-                      <DisclosureButton className="bg-oldlace block w-28 rounded-lg border-2 border-[#3a643b] px-1.5 pb-2 pt-1 text-xl text-[#3a643b]">
+                      <DisclosureButton className="block w-28 rounded-lg border-2 border-[#3a643b] bg-oldlace px-1.5 pb-2 pt-1 text-xl text-[#3a643b]">
                         Login
                       </DisclosureButton>
                       <DisclosureButton className="block w-28 rounded-lg bg-[#3a643b] px-1.5 pb-2 pt-1 text-xl text-white">

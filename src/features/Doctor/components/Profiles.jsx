@@ -1,8 +1,9 @@
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from '@tanstack/react-query';
-// import { useDoctorListQuery } from "../services/api";
 import ProfileCard from "./ProfileCard";
 import { fetchFilteredDoctors } from "../../../services/Doctor";
+// import { DoctorContext } from '../../Appointments/DoctorContext';
+
 // import { Bars } from "react-loader-spinner";
 
 // const doctorList = {
@@ -75,7 +76,7 @@ function Profiles() {
 	}
 
 
-	const filters = {gender, language, location, minChatCharge, minVideoCharge, maxChatCharge, maxVideoCharge, specialities}
+	const filters = { gender, language, location, minChatCharge, minVideoCharge, maxChatCharge, maxVideoCharge, specialities }
 
 	const { data: doctors, isLoading } = useQuery({
 		queryFn: () => fetchFilteredDoctors(filters),
@@ -87,44 +88,37 @@ function Profiles() {
 		return <div>...Loading</div>
 	}
 
-	/*  if (isFetching) {
-	   return (
-		 <div className="mt-10 flex w-full items-center justify-center">
-		   <Bars
-			 height="80"
-			 width="80"
-			 color="#3a643b"
-			 ariaLabel="bars-loading"
-			 visible={true}
-		   />
-		 </div>
-	   );
-	 }
-   
-	 if (isError)
-	   return (
-		 <div className="flex w-full items-center justify-center">
-		   <h1 className=" font-dinpro-bold text-xl">
-			 ⚠️ Something Went Wrong! Please Try Again.
-		   </h1>
-		 </div>
-	   ); */
+// 	return (
+// 		<div className="mt-10 flex w-full items-center justify-center">
+// 			<Bars
+// 				height="80"
+// 				width="80"
+// 				color="#3a643b"
+// 				ariaLabel="bars-loading"
+// 				visible={true}
+// 			/>
+// 		</div>
+// 	);
+// }
 
-	return (
-		<div className="my-8 w-full">
-			{/* <div className="">
-				{!doctors.totalDocs ? (
-					<h1 className=" font-dinpro-bold text-xl">No Doctors Found!</h1>
-				) : (
-					doctors.doctors.map(doctor => <ProfileCard key={doctor._id} doctor={doctor} />)
-				)}
-			</div> */}
+// if (isError)
+// 	return (
+// 		<div className="flex w-full items-center justify-center">
+// 			<h1 className=" font-dinpro-bold text-xl">
+// 				⚠️ Something Went Wrong! Please Try Again.
+// 			</h1>
+// 		</div>
+// 	);
 
+return (
+	<div className="my-8 w-full">
+		{/* <DoctorContext> */}
 			{
 				doctors.map(doctor => <ProfileCard key={doctor._id} doctor={doctor} />)
 			}
-		</div>
-	);
+		{/* </DoctorContext> */}
+	</div>
+);
 }
 
 export default Profiles;

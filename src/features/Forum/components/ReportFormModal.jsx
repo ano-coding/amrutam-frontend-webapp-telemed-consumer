@@ -4,15 +4,13 @@ import {
 	Transition,
 	TransitionChild,
 } from "@headlessui/react";
-import { useReport } from "./ReportContext";
 
 
-export default function ReportFormModalWindow({ children }) {
-	const { showReportForm, setShowReportForm } = useReport();
+export default function Modal({ children, show, setShow }) {
 
 	return (
-		<Transition show={showReportForm}>
-			<Dialog className="relative z-10" onClose={setShowReportForm}>
+		<Transition show={show}>
+			<Dialog className="relative z-10" onClose={setShow}>
 				<TransitionChild
 					enter="ease-out duration-300"
 					enterFrom="opacity-0"
@@ -35,7 +33,7 @@ export default function ReportFormModalWindow({ children }) {
 							leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
 						>
 							<DialogPanel className="relative p-4 transform  overflow-hidden rounded-[8px] bg-white shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-								<img src='/close-circle.png' alt='close circle' className="absolute right-4 top-2 cursor-pointer" onClick={() => setShowReportForm(false)} />
+								<img src='/close-circle.png' alt='close circle' className="absolute right-4 top-2 cursor-pointer" onClick={() => setShow(false)} />
 								{children}
 							</DialogPanel>
 						</TransitionChild>

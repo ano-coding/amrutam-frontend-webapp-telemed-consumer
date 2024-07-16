@@ -1,12 +1,15 @@
 import { Link } from "react-router-dom";
 import { PhoneNumberInput } from "../features/Auth/components/PhoneNumberInput";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { parsePhoneNumber } from "react-phone-number-input";
-import useSendOTP from "../hooks/useSendOTP";
-import useVerifyOTP from "../hooks/useVerifyOTP";
 import { UserContext } from "../context/UserContext";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { ShopifyContext } from "../context/ShopifyContext";
+import { getShopifyToken } from "../services/Shopify";
+import { useQuery } from "@tanstack/react-query";
+import useSendOTP from "../hooks/useSendOTP";
+import useVerifyOTP from "../hooks/useVerifyOTP";
 
 const Login = () => {
   const {
@@ -16,15 +19,27 @@ const Login = () => {
     formState: { errors },
   } = useForm();
 
-  const { setToken, setUserId } = useContext(UserContext);
+  const { setToken, setUserId, setPhoneNumber, setName, setEmail } =
+    useContext(UserContext);
+  const { setShopifyId, setShopifyToken } = useContext(ShopifyContext);
+
+  //States
+  const [showOTPBox, setShowOTPBox] = useState(false);
+  // const [loggedIn, setIsLoggedIn] = useState(false);
+
+  //APIs
   const { sendOTPMutate, sendOTPStatus } = useSendOTP();
   const { verifyOTPMutate, verifyOTPStatus } = useVerifyOTP();
-
-  const [showOTPBox, setShowOTPBox] = useState(false);
+  const { data: shopifyTokenResponse, isLoading: shopifyTokenLoading } =
+    useQuery({
+      queryFn: () => getShopifyToken(),
+      queryKey: ["shopifyToken"],
+    });
 
   const isProcessing = sendOTPStatus === "pending";
   const isVerifying = verifyOTPStatus === "pending";
 
+  //Handlers
   const onSubmit = (data) => {
     const { countryCallingCode, nationalNumber } = parsePhoneNumber(
       data.phoneNumber,
@@ -43,10 +58,27 @@ const Login = () => {
       // Verify OTP
       verifyOTPMutate([countryCallingCode, nationalNumber, data.otp], {
         onSuccess: (res) => {
+          console.log(res);
           setToken(res.data.token);
           localStorage.setItem("token", res.data.token);
           setUserId(res.data.info._id);
           localStorage.setItem("userId", res.data.info._id);
+          setPhoneNumber(countryCallingCode + " " + nationalNumber);
+          localStorage.setItem(
+            "phoneNumber",
+            countryCallingCode + " " + nationalNumber,
+          );
+          setName(
+            res?.data?.info?.first_name + " " + res?.data?.info?.last_name,
+          );
+          localStorage.setItem(
+            "name",
+            res?.data?.info?.first_name + " " + res?.data?.info?.last_name,
+          );
+          setShopifyId(res?.data?.info?.id);
+          localStorage.setItem("shopifyId", res?.data?.info?.id);
+          setEmail(res?.data?.info?.email);
+          localStorage.setItem("email", res?.data?.info?.email);
           toast.success("Logged in successfully!");
         },
         onError: (error) => {
@@ -59,6 +91,15 @@ const Login = () => {
       });
     }
   };
+  //Effects
+  useEffect(() => {
+    console.log("djfbhjb");
+    if (!shopifyTokenLoading && shopifyTokenResponse) {
+      console.log(shopifyTokenResponse);
+      setShopifyToken(shopifyTokenResponse?.data?.token);
+      localStorage.setItem("shopifyToken", shopifyTokenResponse?.data?.token);
+    }
+  }, [shopifyTokenLoading, shopifyTokenResponse, setShopifyToken]);
 
   return (
     <div className="grid h-svh grid-cols-1 lg:grid-cols-2">

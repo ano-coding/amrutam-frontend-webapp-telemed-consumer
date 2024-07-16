@@ -46,10 +46,10 @@ const Banner = ({
 						</div>
 						<div className=" flex items-center gap-1  ">
 							<span className=" font-poppins  text-darkolivegreen-200 ">
-								{ratings}
+								{Math.round(ratings * 100) / 100}
 							</span>
 							<div className="flex items-center gap-0 ">
-								{Array(ratings < 1? 1: Math.round(ratings))
+								{Array(ratings < 1? 1: Math.floor(ratings))
 									.fill("star")
 									.map((_, index) => (
 										<img

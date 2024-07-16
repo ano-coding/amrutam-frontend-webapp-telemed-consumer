@@ -9,6 +9,7 @@ function FindDoctors() {
 			<SearchBar />
 			<SortAndFilter />
 			<Profiles />
+			
 		</>
     );
 }

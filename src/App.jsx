@@ -45,6 +45,12 @@ import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Success from "./pages/Success";
 import CreateRoutineAdditionals from "./features/Routine/components/CreateRoutineAdditionals";
+import AppointmentBookingFormPage from "./pages/AppointmentBookingFormPage";
+import CouponsPage from "./pages/CouponsPage";
+import AppointmentSuccessPage from "./pages/AppointmentSuccessPage";
+import PageNotFound from "./pages/404";
+import CancelRedirect from "./pages/CancelRedirect";
+import { ShopifyProvider } from "./context/ShopifyContext";
 
 const router = createBrowserRouter([
   {
@@ -67,7 +73,18 @@ const router = createBrowserRouter([
         path: "/appointment-booking",
         element: <AppointmentBookingPage />,
       },
-
+      {
+        path: "/appointment/:doctorId",
+        element: <AppointmentBookingFormPage></AppointmentBookingFormPage>,
+      },
+      {
+        path: "/coupons",
+        element: <CouponsPage></CouponsPage>,
+      },
+      {
+        path: "/appointment-success",
+        element: <AppointmentSuccessPage></AppointmentSuccessPage>,
+      },
       {
         path: "/questionnaire",
         element: <QuestionnairePage></QuestionnairePage>,
@@ -105,85 +122,19 @@ const router = createBrowserRouter([
         path: "/about",
         element: <div>About us</div>,
       },
-      { path: "store", element: <Store /> },
-      { path: "prodDetail", element: <ProductDetail /> },
+      { path: "/store", element: <Store /> },
+      { path: "prodDetail/:id", element: <ProductDetail /> },
       { path: "cart", element: <Cart /> },
-      { path: "success", element: <Success /> },
+
+      { path: "success-page", element: <Success /> },
       {
-        element: <DashboardLayout />,
-        children: [
-          {
-            path: "/dashboard",
-            element: <ConsumerDashboard />,
-          },
-          {
-            path: "/appointments",
-            element: <Appointments />,
-          },
-          {
-            path: "/appointments/:id",
-            element: <AppointmentDetails />,
-          },
-          {
-            path: "/routines",
-            element: <RoutineDashboard />,
-          },
-          {
-            path: "/routines/create",
-            element: <CreateRoutine />,
-          },
-          {
-            path: "/routines/create-additionals",
-            element: <CreateRoutineAdditionals />,
-          },
-          {
-            path: "/medical-records",
-            element: <MedicalRecords />,
-          },
-          {
-            path: "/payments",
-            element: <Payments />,
-          },
-          {
-            path: "/chats",
-            element: <Chats />,
-          },
-          {
-            path: "/call-recordings",
-            element: <CallRecordings />,
-          },
-          {
-            path: "/routines/create-additionals/weekly-benefits",
-            element: <WeeklyBenefits />,
-          },
-          {
-            path: "/routines/create-additionals/add-reminder",
-            element: <AddReminder />,
-          },
-          {
-            path: "/routines/create-additionals/add-reminder/product-details",
-            element: <ProductDetails />,
-          },
-          {
-            path: "/routines/create-additionals/add-reminder-channels",
-            element: <ReminderChannel />,
-          },
-          {
-            path: "/routines/create-additionals/assign-caregiver",
-            element: <AssignCaregiver />,
-          },
-          {
-            path: "/profile",
-            element: <PatientProfile />,
-          },
-          {
-            path: "/profile/edit",
-            element: <PatientProfileEdit />,
-          },
-        ],
+        path: "/cancel-page",
+        element: <CancelRedirect />,
       },
+      { path: "*", element: <PageNotFound /> },
     ],
   },
+
   {
     element: <Auth />,
     children: [
@@ -195,6 +146,82 @@ const router = createBrowserRouter([
         path: "/signup",
         element: <Signup />,
       },
+      { path: "*", element: <PageNotFound /> },
+    ],
+  },
+
+  {
+    element: <DashboardLayout />,
+    children: [
+      {
+        path: "/dashboard",
+        element: <ConsumerDashboard />,
+      },
+      {
+        path: "/appointments",
+        element: <Appointments />,
+      },
+      {
+        path: "/appointments/:id",
+        element: <AppointmentDetails />,
+      },
+      {
+        path: "/routines",
+        element: <RoutineDashboard />,
+      },
+      {
+        path: "/routines/create",
+        element: <CreateRoutine />,
+      },
+      {
+        path: "/routines/create-additionals",
+        element: <CreateRoutineAdditionals />,
+      },
+      {
+        path: "/medical-records",
+        element: <MedicalRecords />,
+      },
+      {
+        path: "/payments",
+        element: <Payments />,
+      },
+      {
+        path: "/chats",
+        element: <Chats />,
+      },
+      {
+        path: "/call-recordings",
+        element: <CallRecordings />,
+      },
+      {
+        path: "/routines/create/weekly-benefits",
+        element: <WeeklyBenefits />,
+      },
+      {
+        path: "/routines/create/add-reminder",
+        element: <AddReminder />,
+      },
+      {
+        path: "/routines/create/add-reminder/product-details",
+        element: <ProductDetails />,
+      },
+      {
+        path: "/routines/create/add-reminder-channels",
+        element: <ReminderChannel />,
+      },
+      {
+        path: "/routines/create/assign-caregiver",
+        element: <AssignCaregiver />,
+      },
+      {
+        path: "/profile",
+        element: <PatientProfile />,
+      },
+      {
+        path: "/profile/edit",
+        element: <PatientProfileEdit />,
+      },
+      { path: "*", element: <PageNotFound /> },
     ],
   },
 ]);
@@ -213,23 +240,25 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <UserProvider>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-          transition={Bounce}
-        />
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
+      <ShopifyProvider>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={true}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            transition={Bounce}
+          />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </ShopifyProvider>
     </UserProvider>
   );
 }
