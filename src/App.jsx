@@ -107,145 +107,148 @@ const router = createBrowserRouter([
 				path: "/triviaResult",
 				element: <TriviaResult />,
 			},
-			{
-				path: "/commune",
-				element: <ForumPage></ForumPage>,
-			},
-			{
-				path: "/commune/post/:id",
-				element: <SinglePost />,
-			},
-			{
-				path: "/about",
-				element: <div>About us</div>,
-			},
-			{ path: "/store", element: <Store /> },
-			{ path: "prodDetail/:id", element: <ProductDetail /> },
-			{ path: "cart", element: <Cart /> },
 
-			{ path: "success-page", element: <Success /> },
-			{
-				path: "/cancel-page",
-				element: <CancelRedirect />,
-			},
-			{ path: "*", element: <PageNotFound /> },
-		],
-	},
 
-	{
-		element: <Auth />,
-		children: [
-			{
-				path: "/login",
-				element: <Login />,
-			},
-			{
-				path: "/signup",
-				element: <Signup />,
-			},
-			{ path: "*", element: <PageNotFound /> },
-		],
-	},
 
-	{
-		element: <DashboardLayout />,
-		children: [
-			{
-				path: "/dashboard",
-				element: <ConsumerDashboard />,
-			},
-			{
-				path: "/appointments",
-				element: <Appointments />,
-			},
-			{
-				path: "/appointments/:id",
-				element: <AppointmentDetails />,
-			},
-			{
-				path: "/routines",
-				element: <RoutineDashboard />,
-			},
-			{
-				path: "/routines/create",
-				element: <CreateRoutine />,
-			},
-			{
-				path: "/medical-records",
-				element: <MedicalRecords />,
-			},
-			{
-				path: "/payments",
-				element: <Payments />,
-			},
-			{
-				path: "/chats",
-				element: <Chats />,
-			},
-			{
-				path: "/call-recordings",
-				element: <CallRecordings />,
-			},
-			{
-				path: "/routines/create/weekly-benefits",
-				element: <WeeklyBenefits />,
-			},
-			{
-				path: "/routines/create/add-reminder",
-				element: <AddReminder />,
-			},
-			{
-				path: "/routines/create/add-reminder/product-details",
-				element: <ProductDetails />,
-			},
-			{
-				path: "/routines/create/add-reminder-channels",
-				element: <ReminderChannel />,
-			},
-			{
-				path: "/routines/create/assign-caregiver",
-				element: <AssignCaregiver />,
-			},
-			{
-				path: "/profile",
-				element: <PatientProfile />,
-			},
-			{
-				path: "/profile/edit",
-				element: <PatientProfileEdit />,
-			},
-			{ path: "*", element: <PageNotFound /> },
-		],
-	},
+      {
+        path: "/commune",
+        element: <ForumPage></ForumPage>,
+      },
+      {
+        path: "/commune/post/:id",
+        element: <SinglePost />,
+      },
+      {
+        path: "/about",
+        element: <div>About us</div>,
+      },
+      { path: "/store", element: <Store /> },
+      { path: "prodDetail/:id", element: <ProductDetail /> },
+      { path: "cart", element: <Cart /> },
+
+      { path: "success-page", element: <Success /> },
+      {
+        path: "/cancel-page",
+        element: <CancelRedirect />,
+      },
+      { path: "*", element: <PageNotFound /> },
+    ],
+  },
+
+  {
+    element: <Auth />,
+    children: [
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/signup",
+        element: <Signup />,
+      },
+      { path: "*", element: <PageNotFound /> },
+    ],
+  },
+
+  {
+    element: <DashboardLayout />,
+    children: [
+      {
+        path: "/dashboard",
+        element: <ConsumerDashboard />,
+      },
+      {
+        path: "/appointments",
+        element: <Appointments />,
+      },
+      {
+        path: "/appointments/:id",
+        element: <AppointmentDetails />,
+      },
+      {
+        path: "/routines",
+        element: <RoutineDashboard />,
+      },
+      {
+        path: "/routines/create",
+        element: <CreateRoutine />,
+      },
+      {
+        path: "/medical-records",
+        element: <MedicalRecords />,
+      },
+      {
+        path: "/payments",
+        element: <Payments />,
+      },
+      {
+        path: "/chats",
+        element: <Chats />,
+      },
+      {
+        path: "/call-recordings",
+        element: <CallRecordings />,
+      },
+      {
+        path: "/routines/create/weekly-benefits",
+        element: <WeeklyBenefits />,
+      },
+      {
+        path: "/routines/create/add-reminder",
+        element: <AddReminder />,
+      },
+      {
+        path: "/routines/create/add-reminder/product-details",
+        element: <ProductDetails />,
+      },
+      {
+        path: "/routines/create/add-reminder-channels",
+        element: <ReminderChannel />,
+      },
+      {
+        path: "/routines/create/assign-caregiver",
+        element: <AssignCaregiver />,
+      },
+      {
+        path: "/profile",
+        element: <PatientProfile />,
+      },
+      {
+        path: "/profile/edit",
+        element: <PatientProfileEdit />,
+      },
+      { path: "*", element: <PageNotFound /> },
+    ],
+  },
 ]);
 
 // Create a client
 const queryClient = new QueryClient();
 
 function App() {
-	return (
-		<UserProvider>
-			<ShopifyProvider>
-				<QueryClientProvider client={queryClient}>
-					<RouterProvider router={router} />
-					<ToastContainer
-						position="top-right"
-						autoClose={5000}
-						hideProgressBar={false}
-						newestOnTop={true}
-						closeOnClick
-						rtl={false}
-						pauseOnFocusLoss
-						draggable
-						pauseOnHover
-						theme="light"
-						transition={Bounce}
-					/>
-					<ReactQueryDevtools initialIsOpen={false} />
-				</QueryClientProvider>
-			</ShopifyProvider>
-		</UserProvider>
-	);
+  return (
+    <UserProvider>
+      <ShopifyProvider>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={true}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            transition={Bounce}
+          />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </ShopifyProvider>
+    </UserProvider>
+  );
 }
 
 export default App;

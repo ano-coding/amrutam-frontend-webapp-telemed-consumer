@@ -527,14 +527,16 @@ const ProductDetail = () => {
               <h3 className="mx-0 mb-[7px] mt-[12px] w-[606px] text-[22px] font-medium leading-[30px] tracking-tight max-xl:mb-0 max-xl:mt-[53px] max-md:mx-[20px] max-md:w-[calc(100%_-_40px)] max-md:text-lg max-md:leading-[18px]">
                 {singleProductData?.[0]?.title}
               </h3>
-              <div className="mb-[7px] mt-2.5 flex items-center justify-start gap-1 max-md:ml-5 [&_img]:h-[18px] [&_img]:w-[18px]">
-                {[...Array(Math.trunc(rating))].map((_, index) => {
-                  return <img src="/star.svg" alt="star" key={index} />;
-                })}
-                <span className="ml-1 text-[18px] font-medium leading-[18px] tracking-tight text-dimgray-100">
-                  ({ratingCount} reviews)
-                </span>
-              </div>
+              {rating > 0 && ratingCount > 0 && (
+                <div className="mb-[7px] mt-2.5 flex items-center justify-start gap-1 max-md:ml-5 [&_img]:h-[18px] [&_img]:w-[18px]">
+                  {[...Array(Math.trunc(rating))].map((_, index) => {
+                    return <img src="/star.svg" alt="star" key={index} />;
+                  })}
+                  <span className="ml-1 text-[18px] font-medium leading-[18px] tracking-tight text-dimgray-100">
+                    ({ratingCount} reviews)
+                  </span>
+                </div>
+              )}
               <div className="mb-9 mt-2 flex items-center justify-start max-md:mb-2.5 max-md:ml-5">
                 <img src="/ruppee.png" alt="ruppee" className="h-5 w-5" />
                 <span className="text-xl font-medium leading-[26px] tracking-tight text-customblack-100">
@@ -958,7 +960,7 @@ const ProductDetail = () => {
       )}
 
       <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
-      <SimilarProducts />
+      <SimilarProducts from={"prodDetail"} />
       <div className="hidden h-[8px] w-full bg-offWhite-100 max-sm:block" />
       <div className="mt-[137px] max-md:mt-6">
         <h4 className="m-0 mb-[114px] text-center text-2xl font-medium leading-6 tracking-tight max-md:mb-5 max-sm:ml-5 max-sm:text-left max-sm:text-base">
