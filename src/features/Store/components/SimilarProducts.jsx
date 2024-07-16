@@ -6,7 +6,7 @@ import { ShopifyContext } from "../../../context/ShopifyContext";
 import Product from "./Product";
 import Spinner from "./Spinner";
 
-const SimilarProducts = () => {
+const SimilarProducts = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { shopifyId } = useContext(ShopifyContext);
@@ -114,6 +114,7 @@ const SimilarProducts = () => {
                       : "plus"
                   }
                   onClick={() => prodDetailHandler(product?.shopify_product_id)}
+                  from={props.from}
                 />
               );
             });

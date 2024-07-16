@@ -355,7 +355,7 @@ const Cart = () => {
           <span className="pt-2 text-lg">Your cart is empty</span>
         </div>
       )}
-      <SimilarProducts />
+      <SimilarProducts from={"cart"} />
       <HomeAppContainer />
       <Footer />
     </div>

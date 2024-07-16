@@ -50,6 +50,7 @@ import AppointmentSuccessPage from "./pages/AppointmentSuccessPage";
 import PageNotFound from "./pages/404";
 import CancelRedirect from "./pages/CancelRedirect";
 import { ShopifyProvider } from "./context/ShopifyContext";
+import Ingredient from "./pages/Ingredient";
 
 const router = createBrowserRouter([
   {
@@ -122,14 +123,15 @@ const router = createBrowserRouter([
         element: <div>About us</div>,
       },
       { path: "/store", element: <Store /> },
-      { path: "prodDetail/:id", element: <ProductDetail /> },
-      { path: "cart", element: <Cart /> },
+      { path: "/prodDetail/:id", element: <ProductDetail /> },
+      { path: "/cart", element: <Cart /> },
 
-      { path: "success-page", element: <Success /> },
+      { path: "/success-page", element: <Success /> },
       {
         path: "/cancel-page",
         element: <CancelRedirect />,
       },
+      { path: "/ingredient", element: <Ingredient /> },
       { path: "*", element: <PageNotFound /> },
     ],
   },

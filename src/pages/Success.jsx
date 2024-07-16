@@ -57,7 +57,7 @@ const Success = () => {
           View my Order
         </button>
       </div>
-      <SimilarProducts />
+      <SimilarProducts from={"success"} />
       <HomeAppContainer />
       <Footer />
     </div>
