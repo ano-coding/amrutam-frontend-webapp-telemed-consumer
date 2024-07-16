@@ -44,6 +44,7 @@ import Store from "./pages/Store";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Success from "./pages/Success";
+import CreateRoutineAdditionals from "./features/Routine/components/CreateRoutineAdditionals";
 
 const router = createBrowserRouter([
   {
@@ -132,6 +133,10 @@ const router = createBrowserRouter([
             element: <CreateRoutine />,
           },
           {
+            path: "/routines/create-additionals",
+            element: <CreateRoutineAdditionals />,
+          },
+          {
             path: "/medical-records",
             element: <MedicalRecords />,
           },
@@ -148,23 +153,23 @@ const router = createBrowserRouter([
             element: <CallRecordings />,
           },
           {
-            path: "/routines/create/weekly-benefits",
+            path: "/routines/create-additionals/weekly-benefits",
             element: <WeeklyBenefits />,
           },
           {
-            path: "/routines/create/add-reminder",
+            path: "/routines/create-additionals/add-reminder",
             element: <AddReminder />,
           },
           {
-            path: "/routines/create/add-reminder/product-details",
+            path: "/routines/create-additionals/add-reminder/product-details",
             element: <ProductDetails />,
           },
           {
-            path: "/routines/create/add-reminder-channels",
+            path: "/routines/create-additionals/add-reminder-channels",
             element: <ReminderChannel />,
           },
           {
-            path: "/routines/create/assign-caregiver",
+            path: "/routines/create-additionals/assign-caregiver",
             element: <AssignCaregiver />,
           },
           {
