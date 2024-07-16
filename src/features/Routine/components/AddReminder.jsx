@@ -628,7 +628,7 @@ const CustomRadioButton = ({ id, label, name }) => {
         id={id}
         value={id}
         type="radio"
-        className="h-[20px] w-[20px] border-2 border-neutral-500 text-[#3A643B] ring-0 checked:border-[#3A643B] checked:ring-0 hover:ring-0 hover:ring-[#3A643B] focus:outline-none focus:ring-[#3a643b] focus-visible:bg-red-500 active:ring-0"
+        className="h-[20px] w-[20px] border-2 border-neutral-500 text-[#3A643B] ring-0 checked:border-[#3A643B] checked:ring-0 hover:ring-0 hover:ring-[#3A643B] focus:outline-none focus:ring-[#3a643b] focus-visible:bg-[#3a643b] active:ring-0"
       />
       <label htmlFor={id} className="ml-3 text-[14px] leading-[16px]">
         {label}

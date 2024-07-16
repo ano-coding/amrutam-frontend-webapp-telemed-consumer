@@ -88,7 +88,7 @@ const Header = (props) => {
             <input
               type="text"
               placeholder="Search for Kuntal Care"
-              className="w-[300px] bg-transparent placeholder:font-nunito placeholder:text-base placeholder:font-normal placeholder:tracking-tight placeholder:text-darkslategray-300 focus:outline-none active:outline-none max-sm:placeholder:text-sm"
+              className="w-[300px] border-none bg-transparent placeholder:font-nunito placeholder:text-base placeholder:font-normal placeholder:tracking-tight placeholder:text-darkslategray-300 focus:border-none focus:outline-none focus:ring-0 active:outline-none max-sm:placeholder:text-sm"
               onClick={inputHandler}
               onChange={searchHandler}
             />

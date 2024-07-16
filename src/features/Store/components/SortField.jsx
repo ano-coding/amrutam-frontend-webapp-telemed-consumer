@@ -15,7 +15,7 @@ const SortField = ({ setSelectedOption, ...props }) => {
         value={props.name}
         checked={props.selectedOption === props.id}
         onChange={() => setSelectedOption(props.id)}
-        className="cursor-pointer accent-customgreen-400"
+        className="checked:border-customgreen4text-customgreen-400 hover:ring-customgreen400 h-[20px] w-[20px] border-2 border-neutral-500 text-customgreen-400 ring-0 checked:ring-0 hover:ring-0 focus:ring-customgreen-400 focus-visible:bg-customgreen-400 active:ring-transparent"
       />
     </div>
   );
