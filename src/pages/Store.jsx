@@ -14,7 +14,7 @@ import FilterContainer from "../features/Store/components/FilterContainer";
 import MobileFilters from "../features/Store/components/MobileFilters";
 import Scroll from "../features/Store/components/Scroll";
 import Spinner from "../features/Store/components/Spinner";
-import { UserContext } from "../context/UserContext";
+import { UserContext } from "../context/UserContext.jsx";
 
 const Store = () => {
   const navigate = useNavigate();

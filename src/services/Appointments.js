@@ -1,12 +1,15 @@
 import axios from 'axios';
 import FormData from 'form-data';
- 
+
 
 
 export async function fetchDoctorCoupons(appointmentType, amount, doctorId) {
 	let data = JSON.stringify({
-		"appointmentType": "chat",
-		"amount": 50,
+		// "appointmentType": "chat",
+		"appointmentType": appointmentType,
+		// "amount": 50,
+		"amount": amount,
+		// "doctor": doctorId
 		"doctor": "65eac0a7cd28590235ad12d0"
 	});
 
@@ -31,7 +34,7 @@ export async function fetchDoctorCoupons(appointmentType, amount, doctorId) {
 	}
 }
 
-export async function fetchSingleCouponStatus(couponCode, amount, appointmentType, doctorId ) {
+export async function fetchSingleCouponStatus(couponCode, amount, appointmentType, doctorId) {
 	// If no coupon is selected
 
 	// console.log('coupon code ', couponCode);
@@ -46,9 +49,9 @@ export async function fetchSingleCouponStatus(couponCode, amount, appointmentTyp
 
 	let data = JSON.stringify({
 		"couponCode": couponCode,
-		"amount": 50,
-		"appointmentType": "chat",
-		"doctor": "65eac0a7cd28590235ad12d0"
+		"amount": amount,
+		"appointmentType": appointmentType,
+		"doctor": '664c9cdb82f45439bf5e4ff5'
 	});
 
 	let config = {
@@ -66,7 +69,7 @@ export async function fetchSingleCouponStatus(couponCode, amount, appointmentTyp
 		const res = await axios.request(config);
 		const couponStatus = res.data;
 
-		console.log('coupon data ', couponStatus);
+		// console.log('coupon data ', couponStatus);
 
 		return couponStatus;
 	} catch (e) {
@@ -150,33 +153,37 @@ export async function uploadFile(file) {
 }
 
 
-export async function bookAppointment(doctorId, appointmentDetails) {	
+export async function bookAppointment(doctorId, appointmentDetails) {
+	const { symptoms } = appointmentDetails;
+
+	console.log('appointment details ', appointmentDetails);
+
+
 	let data = JSON.stringify({
-		"sleepPattern": "Once a day",
+		"sleepPattern": appointmentDetails.sleepPattern,
 		"attachments": [
 			"https://www.google.com"
 		],
 		"symptoms": {
-			"concern": "Headache",
-			"description": "Pains at night",
-			"severity": "Very bad",
-			"duration": "2 weeks"
+			"concern": symptoms.concern,
+			"description": symptoms.description,
+			"severity": symptoms.severity,
+			"duration": symptoms.duration
 		},
-		"patientId": "666a8ad38b46507633759035",
-		"source": "app-android",
-		"fromTiming": "03:20 PM",
-		"requestedDate": "2024-07-29",
-		"appointmentType": "chat",
-		"bookedBy": "admin"
+		"patientId": appointmentDetails.patientId,
+		"source": "web",
+		"fromTiming": appointmentDetails.appointmentTime,
+		"requestedDate": appointmentDetails.appointmentDate,
+		"appointmentType": appointmentDetails.appointmentType,
+		"bookedBy": "consumer",
+		"coupon": appointmentDetails.coupon
 	});
 
-	// let data = JSON.stringify(appointmentDetails);
-
-	// console.log('appointmentDetails ', appointmentDetails);
 
 	let config = {
 		method: 'post',
 		maxBodyLength: Infinity,
+		'Content-Type': 'application/json',
 		url: `https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/664c9cdb82f45439bf5e4ff5/book-appointment`,
 		headers: {
 			'Content-Type': 'application/json',
@@ -252,6 +259,62 @@ export async function markAppointmentAsPaid(appointmentId) {
 		const res = await axios.request(config);
 
 		console.log('result in mark apppointment paid ', res);
+		return res;
+	} catch (e) {
+		console.log(e);
+		return e;
+	}
+}
+
+
+export async function updateAppointmentDetails(appointmentDetails) {
+	console.log('appointmentDetails in updateAD ', appointmentDetails)
+
+	let data = {
+		bookingId: appointmentDetails.appointmentId,
+	}
+
+	if (appointmentDetails.patientDetails) {
+		data = {
+			...data,
+			age: appointmentDetails.patientDetails?.age,
+			height: appointmentDetails.patientDetails?.height,
+			weight: appointmentDetails.patientDetails?.weight
+		}
+
+	}
+	
+
+	if (appointmentDetails.attachments?.[0]) {
+		data = {
+			...data,
+			attachments: [
+				...appointmentDetails.attachments
+			]
+		}
+	}
+
+	
+
+	const body = JSON.stringify(data);
+
+	let config = {
+		method: 'put',
+		maxBodyLength: Infinity,
+		url: 'https://amrutam-dev-backend.azurewebsites.net/api/v1/patient/appointments/book-appointment/update/info',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzQ2NTE5NDUyMDgyOSwiaWF0IjoxNzIwOTM2NzE1LCJleHAiOjE3Mjg3MTI3MTV9.k8UfRFrW7MiWnPoiIK_aXy5arxO0h-SzwtfbYHjieI8'
+		},
+		data: body
+	};
+
+
+	
+	try {
+		const res = await axios.request(config);
+
+		console.log('res in update appointment', res);
 		return res;
 	} catch (e) {
 		console.log(e);

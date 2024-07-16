@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext, useRef } from "react";
-import { UserContext } from '../../../context/UserContext';
+import { UserContext } from '../../../context/UserContext.jsx';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import Modal from './AuthModal';
@@ -16,10 +16,6 @@ export default function AppointmentSection({ setStep, appointmentDetails, setApp
 	const { doctorId } = useParams();
 	const [show, setShow] = useState(false);
 
-	console.log('sessionDetails ', sessionDetails);
-
-
-
 	const { data: doctor, isLoading: isDoctorLoading } = useQuery({
 		queryFn: () => fetchSingleDoctor(doctorId),
 		queryKey: ['doctor']
@@ -31,13 +27,6 @@ export default function AppointmentSection({ setStep, appointmentDetails, setApp
 	const [slotTime, setSlotTime] = useState(sessionDetails?.slotTime ?? "");
 	const [appointmentFee, setAppointmentFee] = useState(0);
 	
-
-	console.log('sessionModeIndex ', sessionModeIndex);
-	console.log('slotIndex', slotIndex);
-	console.log('slotDateIndex ', slotDateIndex);
-	console.log('slotTime ', slotTime);
-
-
 	const charges = doctor?.charges;
 	const sessions = extractSessions(charges);
 	const appointmentType = sessions[sessionModeIndex]?.type;

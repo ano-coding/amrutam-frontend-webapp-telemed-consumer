@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import ContentBoxLayout from "../components/ContentBoxLayout";
-import { UserContext } from "../context/UserContext";
+import { UserContext } from "../context/UserContext.jsx";
 import useGetPatientProfile from "../hooks/useGetPatientProfile";
 import { formatDate, isNotPhotoUrl } from "../helper/helper";
 import { formatPhoneNumberIntl } from "react-phone-number-input";

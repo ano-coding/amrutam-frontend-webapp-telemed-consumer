@@ -21,7 +21,7 @@ import RoutineDashboard from "./features/Routine/components/RoutineDashboard";
 import CreateRoutine from "./features/Routine/components/CreateRoutine";
 import ConsumerDashboard from "./pages/ConsumerDashboard";
 import PatientProfile from "./pages/PatientProfile";
-import { UserProvider } from "./context/UserContext";
+import { UserProvider } from "./context/UserContext.jsx";
 import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PatientProfileEdit from "./pages/PatientProfileEdit";
@@ -59,7 +59,6 @@ const router = createBrowserRouter([
 				path: "/",
 				element: <HomePage></HomePage>,
 			},
-
 			{
 				path: "/find-doctors",
 				element: <FindDoctorsPage></FindDoctorsPage>,
